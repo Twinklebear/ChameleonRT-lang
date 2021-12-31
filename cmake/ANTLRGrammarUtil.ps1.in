@@ -1,0 +1,6 @@
+$prev_classpath = $env:CLASSPATH
+$env:CLASSPATH = "@OUTPUT_DIR@;@ANTLR_EXECUTABLE@$env:CLASSPATH"
+
+& "@Java_JAVA_EXECUTABLE@" org.antlr.v4.gui.TestRig @ANTLR_GRAMMAR_NAME@ $Args
+
+$env:CLASSPATH = $prev_classpath

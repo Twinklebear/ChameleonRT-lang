@@ -1,0 +1,84 @@
+struct HitInfo {
+    float3 color;
+};
+
+struct CameraParams {
+    // Constants for global params would be packed into a UBO or SBO
+    float3 cam_pos;
+    float3 cam_du;
+    float3 cam_dv;
+    float3 cam_dir_top_left;
+};
+
+struct SceneParams {
+    // AS's, textures, buffers, would be passed through as global params
+    AccelerationStructure scene;
+    // It looks like HLSL doesn't distinguish writeonly/readonly vs. readwrite,
+    // so it's simplest to adopt the HLSL naming here and do either RWTexture2D
+    // or RWBuffer, meaning readwrite, or Texture2D, Buffer, meaning read only.
+    RWTexture2D<float4> image;
+};
+
+// TODO: User defined structs passed through globals or
+// SBT params will need some thought to support
+struct RayGenParams {
+    uint num_lights;
+};
+
+// Raygen and global params can be put into a uniform or storage buffer for GLSL,
+// and similar in HLSL to make these into globally accessible parameters.
+// Also generate a struct that corresponds to the global params to make it
+// easier to set them.
+// There can be multiple global params, and they can be a mix of constants and
+// AS's, textures, buffers.
+in SceneParams scene;
+in CameraParams camera;
+
+const int x = 5;
+
+ray_gen RayGen(RayGenParams params)
+{
+    // TODO: Do need to know the type the built in functions return in case
+    // a conversion is needed here for example.
+    uint2 pixel = ray_index();
+    Ray ray;
+    // ray set up
+    HitInfo hit_info;
+    // Params are: accel struct, ray, payload, flags, mask, hit group ray offset,
+    // hit group ray stride, miss group offset
+    trace_ray(scene.scene, ray, hit_info, RAY_FLAG_FORCE_OPAQUE, 0xff, 0, 1, 0);
+    scene.image[pixel] = hit_info.color;
+}
+
+// A test standalone shader function that takes a buffer
+float3 get_value(in Buffer<float3> b, const int i)
+{
+    return b[i];
+}
+
+// Params to closest_hit/any_hit/miss shaders would be put into SBT
+// Need C struct generated to match these up for convenience in setting
+// params on the host, need to know size this struct will be.
+struct ClosestHitParams {
+    Buffer<uint3> indices;
+    Buffer<float3> positions;
+};
+
+closest_hit ClosestHit(HitInfo hit_info, Attributes attribs, ClosestHitParams params)
+{
+    const uint3 idx = params.indices[primitive_index()];
+    const float3 va = get_value(params.positions, idx.x);
+    const float3 vb = get_value(params.positions, idx.y);
+    const float3 vc = get_value(params.positions, idx.z);
+    const float3 normal = normalize(cross(vb - va, vc - va));
+    hit_info.color = (normal + 1.f) * 0.5f;
+}
+
+struct MissParams {
+    float3 background_color;
+};
+
+miss Miss(HitInfo hit_info, MissParams params)
+{
+    hit_info.color = params.background_color;
+}
