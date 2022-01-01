@@ -28,7 +28,7 @@ class ResolverVisitor : public ast::Visitor, public crtl::ErrorReporter {
         bool defined = false;
         bool read = false;
 
-        ast::decl::Variable *var_decl;
+        ast::decl::Variable *var_decl = nullptr;
 
         VariableStatus() = default;
 
