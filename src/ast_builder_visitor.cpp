@@ -252,6 +252,8 @@ antlrcpp::Any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeName
             report_error(ctx->templateParameters()->getStart(),
                          "Error TODO: template structs");
         }
+        // TODO: Here it would be good to re-use type's we've already allocated so that it's
+        // easier to see two structs have the same type.
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Struct>(ctx->IDENTIFIER()->getText()));
     }

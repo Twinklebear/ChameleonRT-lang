@@ -5,100 +5,73 @@
 
 namespace crtl {
 
-ResolverVisitor::VariableStatus::VariableStatus(ast::decl::Variable *var_decl)
-    : var_decl(var_decl)
-{
-}
-
-std::any ResolverVisitor::visit_ast(ast::AST *ast)
-{
-    return std::any();
-}
+ResolverVisitor::SymbolStatus::SymbolStatus(ast::decl::Declaration *decl) : decl(decl) {}
 
 std::any ResolverVisitor::visit_decl_function(ast::decl::Function *d)
 {
-    functions[d->get_token()->getText()] = d;
-    // TODO: Also must begin a new scope here for the function parameters
+    declare(d);
+    define(d);
+
+    begin_scope();
+    // decl::Function's children are the parameters followed by the block,
+    // so we can just visit them in order
     visit_children(d);
-    // Then here end the scope
+    end_scope();
     return std::any();
 }
 std::any ResolverVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
 {
+    // Entry points are not callable from regular shader code, so we don't declare/define
+    // them for resolution. Just push on a scope and visit the children
+    begin_scope();
+    visit_children(d);
+    end_scope();
     return std::any();
 }
 
 std::any ResolverVisitor::visit_decl_global_param(ast::decl::GlobalParam *d)
 {
+    // GlobalParam's have no initializer expression, no children to visit
+    declare(d);
+    define(d);
     return std::any();
 }
 
 std::any ResolverVisitor::visit_decl_struct(ast::decl::Struct *d)
 {
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_decl_struct_member(ast::decl::StructMember *d)
-{
+    // No need to visit decl::Struct children, as members aren't resolved independently
+    // of the struct itself
+    declare(d);
+    define(d);
     return std::any();
 }
 
 std::any ResolverVisitor::visit_decl_variable(ast::decl::Variable *d)
 {
+    declare(d);
+    visit_children(d);
+    define(d);
     return std::any();
 }
 
 std::any ResolverVisitor::visit_stmt_block(ast::stmt::Block *s)
 {
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_stmt_if_else(ast::stmt::IfElse *s)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_stmt_while(ast::stmt::While *s)
-{
+    begin_scope();
+    visit_children(s);
+    end_scope();
     return std::any();
 }
 
 std::any ResolverVisitor::visit_stmt_for(ast::stmt::For *s)
 {
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_stmt_return(ast::stmt::Return *s)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_stmt_variable_declaration(ast::stmt::VariableDeclaration *s)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_stmt_expression(ast::stmt::Expression *s)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_expr_unary(ast::expr::Unary *e)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_expr_binary(ast::expr::Binary *e)
-{
+    // Push on a scope for the for loop's loop variable declaration
+    begin_scope();
+    visit_children(s);
+    end_scope();
     return std::any();
 }
 
 std::any ResolverVisitor::visit_expr_variable(ast::expr::Variable *e)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_expr_constant(ast::expr::Constant *e)
 {
     return std::any();
 }
@@ -127,49 +100,98 @@ void ResolverVisitor::end_scope()
 {
     for (auto &v : scopes.back()) {
         if (!v.second.read) {
-            auto *token = v.second.var_decl->get_token();
+            auto *token = v.second.decl->get_token();
             report_warning(token, "Unused variable '" + token->getText() + "'");
         }
     }
     scopes.pop_back();
 }
 
-void ResolverVisitor::declare(const ast::decl::Variable *var)
+void ResolverVisitor::declare(ast::decl::Declaration *decl)
 {
-    if (scopes.empty()) {
-        return;
-    }
-    auto &current_scope = scopes.back();
-    auto *token = var->get_token();
-    auto fnd = current_scope.find(token->getText());
-    if (fnd != current_scope.end()) {
+    auto *current_scope = scopes.empty() ? &global_scope : &scopes.back();
+    auto *token = decl->get_token();
+    auto fnd = current_scope->find(token->getText());
+    if (fnd != current_scope->end()) {
         report_error(token, "Variable '" + token->getText() + "' has already been declared");
         return;
     }
-    current_scope[token->getText()] = VariableStatus();
+    (*current_scope)[token->getText()] = SymbolStatus(decl);
 }
 
-void ResolverVisitor::define(const ast::decl::Variable *var)
+void ResolverVisitor::define(ast::decl::Declaration *decl)
 {
-    if (scopes.empty()) {
-        return;
+    auto *current_scope = scopes.empty() ? &global_scope : &scopes.back();
+    (*current_scope)[decl->get_token()->getText()].defined = true;
+}
+
+ast::decl::Variable *ResolverVisitor::resolve_variable(ast::expr::Variable *node)
+{
+    const std::string ident = node->name();
+    for (int i = scopes.size() - 1; i >= 0; --i) {
+        auto &scope = scopes[i];
+        auto fnd = scope.find(ident);
+        if (fnd != scope.end()) {
+            auto *var_decl = dynamic_cast<ast::decl::Variable *>(fnd->second.decl);
+            // Every decl in a local scope should be a variable, as struct/function/globalparam
+            // decls are not allowed at the parser level
+            if (!var_decl) {
+                return nullptr;
+            }
+            if (!fnd->second.defined) {
+                report_error(node->get_token(), "Cannot read variable in its own initializer");
+                return nullptr;
+            } else {
+                fnd->second.read = true;
+                resolved->var_expr[node] = var_decl;
+                return var_decl;
+            }
+        }
     }
-    auto &current_scope = scopes.back();
-    current_scope[var->get_token()->getText()].defined = true;
-}
 
-ast::decl::Struct *ResolverVisitor::resolve_struct(const ast::ty::Struct *node)
-{
+    // If we didn't find it in a local scope check the global scope for a global variable/param
+    // being accessed
+    auto fnd = global_scope.find(ident);
+    if (fnd != global_scope.end()) {
+        auto *var_decl = dynamic_cast<ast::decl::Variable *>(fnd->second.decl);
+        if (var_decl) {
+            fnd->second.read = true;
+            resolved->var_expr[node] = var_decl;
+            return var_decl;
+        }
+    }
     return nullptr;
 }
 
-ast::decl::Variable *ResolverVisitor::resolve_variable(const ast::expr::Variable *node)
+ast::decl::Struct *ResolverVisitor::resolve_struct(ast::ty::Struct *node)
 {
+    // Structs are only declared in global scope, so we only look there
+    auto fnd = global_scope.find(node->name);
+    if (fnd != global_scope.end()) {
+        // Check that what we found is a struct declaration
+        auto *decl = dynamic_cast<ast::decl::Struct *>(fnd->second.decl);
+        if (decl) {
+            fnd->second.read = true;
+            resolved->struct_type[node] = decl;
+            return decl;
+        }
+    }
     return nullptr;
 }
 
-ast::decl::Function *ResolverVisitor::resolve_function(const ast::expr::FunctionCall *node)
+ast::decl::Function *ResolverVisitor::resolve_function(ast::expr::FunctionCall *node)
 {
+    // Functions are only declared in global scope, so we only look there
+    auto fnd = global_scope.find(node->get_token()->getText());
+    if (fnd != global_scope.end()) {
+        // Check that what we found is a struct declaration
+        auto *decl = dynamic_cast<ast::decl::Function *>(fnd->second.decl);
+        if (decl) {
+            fnd->second.read = true;
+            resolved->call_expr[node] = decl;
+            return decl;
+        }
+    }
     return nullptr;
 }
 }
