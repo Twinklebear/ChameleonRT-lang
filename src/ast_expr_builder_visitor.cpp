@@ -128,13 +128,19 @@ antlrcpp::Any ASTExprBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::Prima
 
 antlrcpp::Any ASTExprBuilderVisitor::visitAssign(crtg::ChameleonRTParser::AssignContext *ctx)
 {
-    auto expr = visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
-    auto assignment = std::make_shared<expr::Assignment>(ctx->IDENTIFIER()->getSymbol(), expr);
+    auto value = visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
+    std::shared_ptr<expr::Expression> lhs;
     if (ctx->structArrayAccessChain()) {
         ASTStructArrayAccessBuilderVisitor struct_array_access_visitor;
         struct_array_access_visitor.visitChildren(ctx->structArrayAccessChain());
-        assignment->struct_array_access = struct_array_access_visitor.struct_array_chain;
+
+        auto var = std::make_shared<expr::Variable>(ctx->IDENTIFIER()->getSymbol());
+        lhs = std::make_shared<expr::StructArrayAccess>(
+            var, struct_array_access_visitor.struct_array_chain);
+    } else {
+        lhs = std::make_shared<expr::Variable>(ctx->IDENTIFIER()->getSymbol());
     }
+    auto assignment = std::make_shared<expr::Assignment>(lhs, value);
     return std::dynamic_pointer_cast<expr::Expression>(assignment);
 }
 

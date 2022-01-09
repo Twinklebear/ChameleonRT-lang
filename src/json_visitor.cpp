@@ -322,11 +322,7 @@ std::any JSONVisitor::visit_expr_assignment(expr::Assignment *e)
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["value"] = std::any_cast<nlohmann::json>(visit(e->value.get()));
-    e_json["variable_name"] = e->variable_name();
-    if (!e->struct_array_access.empty()) {
-        e_json["struct_array_access_chain"] =
-            visit_struct_array_fragments(e->struct_array_access);
-    }
+    e_json["lhs"] = std::any_cast<nlohmann::json>(visit(e->lhs.get()));
 
     return e_json;
 }

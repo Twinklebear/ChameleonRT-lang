@@ -158,14 +158,14 @@ public:
 
 class Assignment : public Expression {
 public:
+    // The left hand side will either be a plain expr::Variable or a expr::StructArrayAccess
+    std::shared_ptr<Expression> lhs;
     std::shared_ptr<Expression> value;
-    std::vector<std::shared_ptr<StructArrayAccessFragment>> struct_array_access;
 
-    Assignment(antlr4::Token *var, const std::shared_ptr<Expression> &value);
+    Assignment(const std::shared_ptr<Expression> &lhs,
+               const std::shared_ptr<Expression> &value);
 
     std::vector<Node *> get_children() override;
-
-    std::string variable_name() const;
 };
 
 }

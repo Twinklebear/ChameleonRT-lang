@@ -216,22 +216,20 @@ std::vector<Node *> FunctionCall::get_children()
     return children;
 }
 
-Assignment::Assignment(antlr4::Token *var, const std::shared_ptr<Expression> &value)
-    : Expression(var, NodeType::EXPR_ASSIGN), value(value)
+Assignment::Assignment(const std::shared_ptr<Expression> &leftside,
+                       const std::shared_ptr<Expression> &value)
+    : Expression(leftside->get_token(), NodeType::EXPR_ASSIGN), lhs(leftside), value(value)
 {
 }
 
 std::vector<Node *> Assignment::get_children()
 {
     std::vector<Node *> children;
+    children.push_back(lhs.get());
     children.push_back(value.get());
     return children;
 }
 
-std::string Assignment::variable_name() const
-{
-    return token->getText();
-}
 }
 }
 }
