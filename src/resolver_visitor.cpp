@@ -32,7 +32,13 @@ std::any ResolverVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
 
 std::any ResolverVisitor::visit_decl_global_param(ast::decl::GlobalParam *d)
 {
-    // GlobalParam's have no initializer expression, no children to visit
+    // GlobalParam's have no initializer expression, so no children to visit. We just need to
+    // resolve its type and declare/define it
+    if (!resolve_type(d->get_type())) {
+        report_error(d->get_token(),
+                     "Use of undeclared struct '" + d->get_type()->to_string() + "'");
+        return std::any();
+    }
     declare(d);
     define(d);
     return std::any();
@@ -49,6 +55,11 @@ std::any ResolverVisitor::visit_decl_struct(ast::decl::Struct *d)
 
 std::any ResolverVisitor::visit_decl_variable(ast::decl::Variable *d)
 {
+    if (!resolve_type(d->get_type())) {
+        report_error(d->get_token(),
+                     "Use of undeclared struct '" + d->get_type()->to_string() + "'");
+        return std::any();
+    }
     // We define the variable after visiting its initializer expression to catch
     // errors where a variable is used in its own initializer
     declare(d);
@@ -88,6 +99,13 @@ std::any ResolverVisitor::visit_expr_variable(ast::expr::Variable *e)
 
 std::any ResolverVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
 {
+    auto *fn_decl = resolve_function(e);
+    if (fn_decl) {
+        resolved->call_expr[e] = fn_decl;
+    } else {
+        report_error(e->get_token(),
+                     "Call of undeclared function '" + e->get_token()->getText() + "'");
+    }
     return std::any();
 }
 
@@ -123,6 +141,19 @@ void ResolverVisitor::define(ast::decl::Declaration *decl)
 {
     auto *current_scope = scopes.empty() ? &global_scope : &scopes.back();
     (*current_scope)[decl->get_token()->getText()].defined = true;
+}
+
+bool ResolverVisitor::resolve_type(const std::shared_ptr<ast::ty::Type> &type)
+{
+    if (type->base_type != ast::ty::BaseType::STRUCT) {
+        return true;
+    }
+    auto *struct_type = dynamic_cast<ast::ty::Struct *>(type.get());
+    auto *struct_decl = resolve_struct(struct_type);
+    if (struct_decl) {
+        resolved->struct_type[struct_type] = struct_decl;
+    }
+    return struct_decl != nullptr;
 }
 
 ast::decl::Variable *ResolverVisitor::resolve_variable(ast::expr::Variable *node)

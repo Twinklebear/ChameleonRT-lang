@@ -70,6 +70,12 @@ private:
 
     void define(ast::decl::Declaration *decl);
 
+    /* Resolve the struct type to the corresponding struct declaration, if the type passed is a
+     * struct. Returns true if the struct declaration was resolved or the type is not a struct
+     * (and thus requires no resolution). Returns false if the struct declaration was not found
+     */
+    bool resolve_type(const std::shared_ptr<ast::ty::Type> &type);
+
     /* Resolve the variable referenced by the token and associate it with the
      * node.
      * Returns null and reports an error if there's no such struct
