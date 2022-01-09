@@ -16,6 +16,7 @@ ray_gen RayGen(RayGenParams params)
     // TODO: Do need to know the type the built in functions return in case
     // a conversion is needed here for example.
     uint2 pixel = ray_index();
-    float4 c = params.color;
+    float4 c;
+    c = params.color;
     scene.image[pixel] = params.color;
 }
