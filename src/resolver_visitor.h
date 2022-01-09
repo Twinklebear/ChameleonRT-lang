@@ -60,8 +60,6 @@ public:
 
     std::any visit_expr_variable(ast::expr::Variable *e) override;
     std::any visit_expr_function_call(ast::expr::FunctionCall *e) override;
-    std::any visit_struct_array_access(ast::expr::StructArrayAccess *e) override;
-    std::any visit_expr_assignment(ast::expr::Assignment *e) override;
 
 private:
     void begin_scope();

@@ -22,7 +22,8 @@ std::any ResolverVisitor::visit_decl_function(ast::decl::Function *d)
 std::any ResolverVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
 {
     // Entry points are not callable from regular shader code, so we don't declare/define
-    // them for resolution. Just push on a scope and visit the children
+    // them for resolution. Just push on a scope for the parameters and visit the node's
+    // children (parameters and block)
     begin_scope();
     visit_children(d);
     end_scope();
@@ -48,6 +49,8 @@ std::any ResolverVisitor::visit_decl_struct(ast::decl::Struct *d)
 
 std::any ResolverVisitor::visit_decl_variable(ast::decl::Variable *d)
 {
+    // We define the variable after visiting its initializer expression to catch
+    // errors where a variable is used in its own initializer
     declare(d);
     visit_children(d);
     define(d);
@@ -73,20 +76,17 @@ std::any ResolverVisitor::visit_stmt_for(ast::stmt::For *s)
 
 std::any ResolverVisitor::visit_expr_variable(ast::expr::Variable *e)
 {
+    // Resolve the variable referenced by the expression
+    auto *var_decl = resolve_variable(e);
+    if (var_decl) {
+        resolved->var_expr[e] = var_decl;
+    } else {
+        report_error(e->get_token(), "Use of undeclared variable '" + e->name() + "'");
+    }
     return std::any();
 }
 
 std::any ResolverVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_struct_array_access(ast::expr::StructArrayAccess *e)
-{
-    return std::any();
-}
-
-std::any ResolverVisitor::visit_expr_assignment(ast::expr::Assignment *e)
 {
     return std::any();
 }
