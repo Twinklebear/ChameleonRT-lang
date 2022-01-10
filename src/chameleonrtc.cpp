@@ -8,6 +8,7 @@
 #include "ast_builder_visitor.h"
 #include "error_listener.h"
 #include "json_visitor.h"
+#include "resolver_visitor.h"
 
 using namespace crtg;
 
@@ -66,6 +67,32 @@ int main(int argc, char **argv)
     json_visitor.visit_ast(ast.get());
 
     std::cout << "AST JSON:\n" << json_visitor.ast_json.dump(4) << "\n";
+
+    crtl::ResolverVisitor resolver_visitor;
+    resolver_visitor.visit_ast(ast.get());
+
+    // For testing, print out some info about what was resolved by the resolver
+    for (const auto &x : resolver_visitor.resolved->struct_type) {
+        auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+        std::cout << "Resolved struct type: " << x.first->name << " to decl:\n"
+                  << decl.dump(4) << "\n";
+    }
+
+    for (const auto &x : resolver_visitor.resolved->var_expr) {
+        auto expr = std::any_cast<nlohmann::json>(json_visitor.visit(x.first));
+        auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+        std::cout << "Resolved var expr:\n"
+                  << expr.dump(4) << "\nreferencing var declared:\n"
+                  << decl.dump(4) << "\n";
+    }
+
+    for (const auto &x : resolver_visitor.resolved->call_expr) {
+        auto expr = std::any_cast<nlohmann::json>(json_visitor.visit(x.first));
+        auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+        std::cout << "Resolved function call:\n"
+                  << expr.dump(4) << "\nto function declared:\n"
+                  << decl.dump(4) << "\n";
+    }
 
     return 0;
 }
