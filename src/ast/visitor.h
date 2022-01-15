@@ -10,7 +10,12 @@ namespace crtl {
 namespace ast {
 
 class Visitor {
+private:
+    size_t trace_depth = 0;
+
 public:
+    bool trace_visitor = false;
+
     virtual ~Visitor() = default;
 
     virtual std::any visit_ast(AST *ast);
@@ -45,6 +50,10 @@ public:
     virtual std::any visit_expr_function_call(expr::FunctionCall *e);
     virtual std::any visit_struct_array_access(expr::StructArrayAccess *e);
     virtual std::any visit_expr_assignment(expr::Assignment *e);
+
+private:
+    void report_enter_node(const Node *n);
+    void report_exit_node(const Node *n);
 };
 
 }

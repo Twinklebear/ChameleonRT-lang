@@ -135,13 +135,23 @@ antlrcpp::Any ASTBuilderVisitor::visitBlock(crtg::ChameleonRTParser::BlockContex
         if (res.isNull()) {
             report_warning(s->getStart(), "TODO WILL: Unimplemented statement -> AST mapping");
         } else {
-            // varDeclStmt can be in top level and blocks, so it returns itself as its child
-            // type, not the parent Statement class
             if (res.is<std::shared_ptr<stmt::VariableDeclaration>>()) {
+                // varDeclStmt can be in top level and blocks, so it returns itself as its
+                // child type, not the parent Statement class
                 auto var_decl_stmt = res.as<std::shared_ptr<stmt::VariableDeclaration>>();
                 statements.push_back(
                     std::dynamic_pointer_cast<stmt::Statement>(var_decl_stmt));
+            } else if (res.is<std::shared_ptr<stmt::Block>>()) {
+                // Similar case for block, where it returns as a block instead of a statement
+                // to make some other code a bit easier
+                auto block_stmt = res.as<std::shared_ptr<stmt::Block>>();
+                statements.push_back(std::dynamic_pointer_cast<stmt::Statement>(block_stmt));
             } else {
+                if (!res.is<std::shared_ptr<stmt::Statement>>()) {
+                    report_error(
+                        s->getStart(),
+                        "Expecting statement for block statements but got non-statement!");
+                }
                 statements.push_back(res.as<std::shared_ptr<stmt::Statement>>());
             }
         }

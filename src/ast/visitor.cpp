@@ -19,45 +19,60 @@ std::any Visitor::visit(Node *n)
     if (!n) {
         throw std::runtime_error("Null node passed to visit!");
     }
+    report_enter_node(n);
     // switch on type and dispatch to visit
+    std::any result;
     switch (n->get_node_type()) {
     // Declarations
     case NodeType::DECL_FCN:
-        return visit_decl_function(dynamic_cast<decl::Function *>(n));
+        result = visit_decl_function(dynamic_cast<decl::Function *>(n));
+        break;
     case NodeType::DECL_ENTRY_POINT:
-        return visit_decl_entry_point(dynamic_cast<decl::EntryPoint *>(n));
+        result = visit_decl_entry_point(dynamic_cast<decl::EntryPoint *>(n));
+        break;
     case NodeType::DECL_GLOBAL_PARAM:
-        return visit_decl_global_param(dynamic_cast<decl::GlobalParam *>(n));
+        result = visit_decl_global_param(dynamic_cast<decl::GlobalParam *>(n));
+        break;
     case NodeType::DECL_STRUCT:
-        return visit_decl_struct(dynamic_cast<decl::Struct *>(n));
+        result = visit_decl_struct(dynamic_cast<decl::Struct *>(n));
+        break;
     case NodeType::DECL_STRUCT_MEMBER:
-        return visit_decl_struct_member(dynamic_cast<decl::StructMember *>(n));
+        result = visit_decl_struct_member(dynamic_cast<decl::StructMember *>(n));
+        break;
     case NodeType::DECL_VAR:
-        return visit_decl_variable(dynamic_cast<decl::Variable *>(n));
+        result = visit_decl_variable(dynamic_cast<decl::Variable *>(n));
+        break;
 
     // Statements
     case NodeType::STMT_BLOCK:
-        return visit_stmt_block(dynamic_cast<stmt::Block *>(n));
+        result = visit_stmt_block(dynamic_cast<stmt::Block *>(n));
+        break;
     case NodeType::STMT_IF_ELSE:
-        return visit_stmt_if_else(dynamic_cast<stmt::IfElse *>(n));
+        result = visit_stmt_if_else(dynamic_cast<stmt::IfElse *>(n));
+        break;
     case NodeType::STMT_WHILE:
-        return visit_stmt_while(dynamic_cast<stmt::While *>(n));
+        result = visit_stmt_while(dynamic_cast<stmt::While *>(n));
         // TODO: do-while isn't in the lexer/parser
         // STMT_DO_WHILE,
+        break;
     case NodeType::STMT_FOR:
-        return visit_stmt_for(dynamic_cast<stmt::For *>(n));
+        result = visit_stmt_for(dynamic_cast<stmt::For *>(n));
+        break;
     case NodeType::STMT_RETURN:
-        return visit_stmt_return(dynamic_cast<stmt::Return *>(n));
+        result = visit_stmt_return(dynamic_cast<stmt::Return *>(n));
+        break;
     case NodeType::STMT_EXPR:
-        return visit_stmt_expression(dynamic_cast<stmt::Expression *>(n));
+        result = visit_stmt_expression(dynamic_cast<stmt::Expression *>(n));
+        break;
     case NodeType::STMT_VAR_DECL:
-        return visit_stmt_variable_declaration(dynamic_cast<stmt::VariableDeclaration *>(n));
+        result = visit_stmt_variable_declaration(dynamic_cast<stmt::VariableDeclaration *>(n));
+        break;
 
     // Expressions
     case NodeType::EXPR_NEGATE:
     case NodeType::EXPR_LOGIC_NOT:
-        return visit_expr_unary(dynamic_cast<expr::Unary *>(n));
-        return visit_expr_unary(dynamic_cast<expr::Unary *>(n));
+        result = visit_expr_unary(dynamic_cast<expr::Unary *>(n));
+        break;
     case NodeType::EXPR_MULT:
     case NodeType::EXPR_DIV:
     case NodeType::EXPR_ADD:
@@ -70,22 +85,29 @@ std::any Visitor::visit(Node *n)
     case NodeType::EXPR_CMP_EQUAL:
     case NodeType::EXPR_LOGIC_AND:
     case NodeType::EXPR_LOGIC_OR:
-        return visit_expr_binary(dynamic_cast<expr::Binary *>(n));
+        result = visit_expr_binary(dynamic_cast<expr::Binary *>(n));
+        break;
     case NodeType::EXPR_LITERAL_VAR:
-        return visit_expr_variable(dynamic_cast<expr::Variable *>(n));
+        result = visit_expr_variable(dynamic_cast<expr::Variable *>(n));
+        break;
     case NodeType::EXPR_LITERAL_CONSTANT:
-        return visit_expr_constant(dynamic_cast<expr::Constant *>(n));
+        result = visit_expr_constant(dynamic_cast<expr::Constant *>(n));
+        break;
     case NodeType::EXPR_FCN_CALL:
-        return visit_expr_function_call(dynamic_cast<expr::FunctionCall *>(n));
+        result = visit_expr_function_call(dynamic_cast<expr::FunctionCall *>(n));
+        break;
     case NodeType::EXPR_STRUCT_ARRAY_ACCESS:
-        return visit_struct_array_access(dynamic_cast<expr::StructArrayAccess *>(n));
+        result = visit_struct_array_access(dynamic_cast<expr::StructArrayAccess *>(n));
+        break;
     case NodeType::EXPR_ASSIGN:
-        return visit_expr_assignment(dynamic_cast<expr::Assignment *>(n));
+        result = visit_expr_assignment(dynamic_cast<expr::Assignment *>(n));
+        break;
     default:
         throw std::runtime_error("Invalid node type encountered in visitor!");
         break;
     }
-    return std::any();
+    report_exit_node(n);
+    return result;
 }
 
 std::any Visitor::visit_children(Node *n)
@@ -198,5 +220,23 @@ std::any Visitor::visit_expr_assignment(expr::Assignment *e)
     return visit_children(e);
 }
 
+void Visitor::report_enter_node(const Node *n)
+{
+    if (trace_visitor) {
+        std::string indent(trace_depth, ' ');
+        std::cout << indent << "ENTER(" << to_string(n->get_node_type()) << ")\n"
+                  << std::flush;
+        ++trace_depth;
+    }
+}
+
+void Visitor::report_exit_node(const Node *n)
+{
+    if (trace_visitor) {
+        --trace_depth;
+        std::string indent(trace_depth, ' ');
+        std::cout << indent << "EXIT(" << to_string(n->get_node_type()) << ")\n" << std::flush;
+    }
+}
 }
 }
