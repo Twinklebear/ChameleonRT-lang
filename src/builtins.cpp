@@ -4,7 +4,7 @@ namespace crtl {
 std::vector<std::shared_ptr<ast::decl::Declaration>> get_builtin_decls()
 {
     using namespace ast;
-    std::vector<std::shared_ptr<ast::decl::Declaration>> builtins;
+    std::vector<std::shared_ptr<decl::Declaration>> builtins;
 
     // ray_index
     {

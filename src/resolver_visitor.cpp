@@ -26,6 +26,21 @@ std::any ResolverVisitor::visit_decl_function(ast::decl::Function *d)
     // so we can just visit them in order
     visit_children(d);
     end_scope();
+
+    // Resolve the function's parameter and return types in the functions ty::Function
+    // the parameter struct types (if any) will also be resolved when we visit the
+    // decl::Function's children and visit each parameter's decl::Variable
+    auto fn_ty = std::dynamic_pointer_cast<ast::ty::Function>(d->get_type());
+    for (const auto &p : fn_ty->parameters) {
+        // We don't need to report an error here because any errors with the parameter types
+        // will have already been reported when we visited the parameter node
+        resolve_type(p);
+    }
+    if (!resolve_type(fn_ty->return_type)) {
+        report_error(d->get_token(),
+                     "Use of undeclared struct '" + fn_ty->return_type->to_string() +
+                         "' as return type");
+    }
     return std::any();
 }
 std::any ResolverVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
