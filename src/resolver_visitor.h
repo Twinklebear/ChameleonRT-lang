@@ -49,6 +49,13 @@ class ResolverVisitor : public ast::Visitor, public crtl::ErrorReporter {
 public:
     std::shared_ptr<ResolverPassResult> resolved = std::make_shared<ResolverPassResult>();
 
+    /* Create the resolver and include set of builtins for variable/function resolution along
+     * with those declared by the input code.
+     */
+    ResolverVisitor(const std::vector<std::shared_ptr<ast::decl::Declaration>> &builtins);
+
+    ResolverVisitor() = default;
+
     std::any visit_decl_function(ast::decl::Function *d) override;
     std::any visit_decl_entry_point(ast::decl::EntryPoint *d) override;
     std::any visit_decl_global_param(ast::decl::GlobalParam *d) override;

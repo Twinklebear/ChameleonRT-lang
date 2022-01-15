@@ -35,6 +35,7 @@ add_executable(chameleonrtc
     src/error_listener.cpp
     src/json_visitor.cpp
     src/resolver_visitor.cpp
+    src/builtins.cpp
 
     src/ast/node.cpp
     src/ast/symbol.cpp

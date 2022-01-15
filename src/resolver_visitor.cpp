@@ -7,6 +7,15 @@ namespace crtl {
 
 ResolverVisitor::SymbolStatus::SymbolStatus(ast::decl::Declaration *decl) : decl(decl) {}
 
+ResolverVisitor::ResolverVisitor(
+    const std::vector<std::shared_ptr<ast::decl::Declaration>> &builtins)
+{
+    for (const auto &d : builtins) {
+        declare(d.get());
+        define(d.get());
+    }
+}
+
 std::any ResolverVisitor::visit_decl_function(ast::decl::Function *d)
 {
     declare(d);

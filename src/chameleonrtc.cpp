@@ -6,6 +6,7 @@
 #include "ChameleonRTParser.h"
 #include "antlr4-runtime.h"
 #include "ast_builder_visitor.h"
+#include "builtins.h"
 #include "error_listener.h"
 #include "json_visitor.h"
 #include "resolver_visitor.h"
@@ -68,7 +69,9 @@ int main(int argc, char **argv)
 
     std::cout << "AST JSON:\n" << json_visitor.ast_json.dump(4) << "\n";
 
-    crtl::ResolverVisitor resolver_visitor;
+    auto builtins = crtl::get_builtin_decls();
+
+    crtl::ResolverVisitor resolver_visitor(builtins);
     resolver_visitor.visit_ast(ast.get());
 
     // For testing, print out some info about what was resolved by the resolver
@@ -88,10 +91,14 @@ int main(int argc, char **argv)
 
     for (const auto &x : resolver_visitor.resolved->call_expr) {
         auto expr = std::any_cast<nlohmann::json>(json_visitor.visit(x.first));
-        auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
         std::cout << "Resolved function call:\n"
-                  << expr.dump(4) << "\nto function declared:\n"
-                  << decl.dump(4) << "\n";
+                  << expr.dump(4) << "\nto function declared:\n";
+        if (!x.second->is_builtin()) {
+            auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+            std::cout << decl.dump(4) << "\n";
+        } else {
+            std::cout << "Built-in function: " << x.second->get_text() << "\n";
+        }
     }
 
     return 0;
