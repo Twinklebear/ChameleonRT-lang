@@ -34,6 +34,11 @@ std::shared_ptr<Symbol> Declaration::get_symbol()
     return symbol;
 }
 
+std::string Declaration::get_text() const
+{
+    return symbol->name;
+}
+
 std::shared_ptr<ty::Type> make_function_type(
     const std::vector<std::shared_ptr<Variable>> &parameters,
     const std::shared_ptr<ty::Type> &return_type)
@@ -58,14 +63,33 @@ Function::Function(const std::string &name,
 {
 }
 
+Function::Function(const std::string &name,
+                   const std::vector<std::shared_ptr<Variable>> &parameters,
+                   const std::shared_ptr<ty::Type> &return_type)
+    : Declaration(
+          name, nullptr, make_function_type(parameters, return_type), NodeType::DECL_FCN),
+      parameters(parameters),
+      block(nullptr)
+{
+}
+
 std::vector<Node *> Function::get_children()
 {
     std::vector<Node *> children;
-    for (auto &p : parameters) {
-        children.push_back(p.get());
+    if (!is_builtin()) {
+        for (auto &p : parameters) {
+            children.push_back(p.get());
+        }
+        children.push_back(block.get());
     }
-    children.push_back(block.get());
     return children;
+}
+
+bool Function::is_builtin() const
+{
+    // Built-in functions won't have an ANTLR token associated with them, because they don't
+    // come from the user's code
+    return token == nullptr;
 }
 
 std::shared_ptr<ty::Type> make_entry_point_type(

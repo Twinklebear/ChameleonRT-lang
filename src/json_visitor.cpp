@@ -289,7 +289,7 @@ std::any JSONVisitor::visit_expr_function_call(expr::FunctionCall *e)
     e_json["ast_node"] = "ast::expr::FunctionCall";
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
-    e_json["callee"] = e->get_token()->getText();
+    e_json["callee"] = e->get_text();
 
     std::vector<Node *> args;
     std::transform(e->args.begin(),

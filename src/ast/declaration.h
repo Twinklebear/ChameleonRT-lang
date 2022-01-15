@@ -32,6 +32,8 @@ public:
     const std::shared_ptr<Symbol> get_symbol() const;
 
     std::shared_ptr<Symbol> get_symbol();
+
+    std::string get_text() const override;
 };
 
 class Variable : public Declaration {
@@ -51,13 +53,23 @@ public:
     std::vector<std::shared_ptr<Variable>> parameters;
     std::shared_ptr<stmt::Block> block;
 
+    // Create a declaration for a user/source code declared function
     Function(const std::string &name,
              antlr4::Token *token,
              const std::vector<std::shared_ptr<Variable>> &parameters,
              const std::shared_ptr<stmt::Block> &block,
              const std::shared_ptr<ty::Type> &return_type);
 
+    // Create a declaration for a built in function
+    Function(const std::string &name,
+             const std::vector<std::shared_ptr<Variable>> &parameters,
+             const std::shared_ptr<ty::Type> &return_type);
+
     std::vector<Node *> get_children() override;
+
+    // If the function declaration is for a built-in "intrinsic" function,
+    // or a user-declared function
+    bool is_builtin() const;
 };
 
 class EntryPoint : public Declaration {

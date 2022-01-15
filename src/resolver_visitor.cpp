@@ -103,8 +103,7 @@ std::any ResolverVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
     if (fn_decl) {
         resolved->call_expr[e] = fn_decl;
     } else {
-        report_error(e->get_token(),
-                     "Call of undeclared function '" + e->get_token()->getText() + "'");
+        report_error(e->get_token(), "Call of undeclared function '" + e->get_text() + "'");
     }
     return std::any();
 }
@@ -118,8 +117,8 @@ void ResolverVisitor::end_scope()
 {
     for (auto &v : scopes.back()) {
         if (!v.second.read) {
-            auto *token = v.second.decl->get_token();
-            report_warning(token, "Unused variable '" + token->getText() + "'");
+            auto *decl = v.second.decl;
+            report_warning(decl->get_token(), "Unused variable '" + decl->get_text() + "'");
         }
     }
     scopes.pop_back();
@@ -128,19 +127,20 @@ void ResolverVisitor::end_scope()
 void ResolverVisitor::declare(ast::decl::Declaration *decl)
 {
     auto *current_scope = scopes.empty() ? &global_scope : &scopes.back();
-    auto *token = decl->get_token();
-    auto fnd = current_scope->find(token->getText());
+    const std::string decl_name = decl->get_text();
+    auto fnd = current_scope->find(decl_name);
     if (fnd != current_scope->end()) {
-        report_error(token, "Variable '" + token->getText() + "' has already been declared");
+        report_error(decl->get_token(),
+                     "Variable '" + decl_name + "' has already been declared");
         return;
     }
-    (*current_scope)[token->getText()] = SymbolStatus(decl);
+    (*current_scope)[decl_name] = SymbolStatus(decl);
 }
 
 void ResolverVisitor::define(ast::decl::Declaration *decl)
 {
     auto *current_scope = scopes.empty() ? &global_scope : &scopes.back();
-    (*current_scope)[decl->get_token()->getText()].defined = true;
+    (*current_scope)[decl->get_text()].defined = true;
 }
 
 bool ResolverVisitor::resolve_type(const std::shared_ptr<ast::ty::Type> &type)
@@ -213,7 +213,7 @@ ast::decl::Struct *ResolverVisitor::resolve_struct(ast::ty::Struct *node)
 ast::decl::Function *ResolverVisitor::resolve_function(ast::expr::FunctionCall *node)
 {
     // Functions are only declared in global scope, so we only look there
-    auto fnd = global_scope.find(node->get_token()->getText());
+    auto fnd = global_scope.find(node->get_text());
     if (fnd != global_scope.end()) {
         // Check that what we found is a struct declaration
         auto *decl = dynamic_cast<ast::decl::Function *>(fnd->second.decl);

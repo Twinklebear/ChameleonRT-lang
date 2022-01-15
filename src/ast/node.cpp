@@ -94,5 +94,9 @@ const antlr4::Token *Node::get_token() const
     return token;
 }
 
+std::string Node::get_text() const
+{
+    return token->getText();
+}
 }
 }

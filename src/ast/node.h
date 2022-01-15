@@ -80,6 +80,8 @@ public:
 
     const antlr4::Token *get_token() const;
 
+    virtual std::string get_text() const;
+
     virtual std::vector<Node *> get_children() = 0;
 };
 
