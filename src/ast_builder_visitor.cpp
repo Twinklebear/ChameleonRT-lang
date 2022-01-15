@@ -45,8 +45,12 @@ antlrcpp::Any ASTBuilderVisitor::visitFunctionDecl(
 {
     antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
     std::string name = ctx->IDENTIFIER()->getText();
-    auto params = visitParameterList(ctx->parameterList())
+
+    std::vector<std::shared_ptr<decl::Variable>> params;
+    if (ctx->parameterList()) {
+        params = *visitParameterList(ctx->parameterList())
                       .as<std::shared_ptr<std::vector<std::shared_ptr<decl::Variable>>>>();
+    }
 
     auto block = visit(ctx->block()).as<std::shared_ptr<stmt::Block>>();
 
@@ -71,12 +75,12 @@ antlrcpp::Any ASTBuilderVisitor::visitFunctionDecl(
                          "Invalid entry point type " + entry_pt_type_ctx->getText());
             return antlrcpp::Any();
         }
-        return std::make_shared<decl::EntryPoint>(name, token, *params, entry_pt_type, block);
+        return std::make_shared<decl::EntryPoint>(name, token, params, entry_pt_type, block);
     }
 
     // Regular functions have a return type
     auto return_type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
-    return std::make_shared<decl::Function>(name, token, *params, block, return_type);
+    return std::make_shared<decl::Function>(name, token, params, block, return_type);
 }
 
 antlrcpp::Any ASTBuilderVisitor::visitStructDecl(
