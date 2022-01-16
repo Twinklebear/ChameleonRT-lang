@@ -14,16 +14,16 @@ struct RayGenParams {
     float4 color;
 };
 
-cbuffer RayGen_params : register(b0, space1)
-{
-    RayGenParams RayGen_params;
-}
+// Note: name is optional from reading HLSL spec, I'm not sure if having
+// it's name be the same as the member would give a name collision
+ConstantBuffer<RayGenParams> RayGen_params : register(b0, space1);
 
 [[shader("raygeneration")]]
 void RayGen()
 {
     uint2 pixel = DispatchRaysIndex().xy;
-    float4 c = RayGen_params.color;
+    float4 c;
+    c = RayGen_params.color;
     scene_image[pixel] = RayGen_params.color;
 }
 

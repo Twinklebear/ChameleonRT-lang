@@ -48,7 +48,7 @@ add_executable(chameleonrtc
 
 target_include_directories(chameleonrtc PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/src/
     external)
 
 target_link_libraries(chameleonrtc chameleonrt_grammar)
