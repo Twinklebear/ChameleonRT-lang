@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast/visitor.h"
+#include "resolver_visitor.h"
 
 namespace crtl {
 namespace hlsl {
@@ -8,11 +9,26 @@ namespace hlsl {
 // TODO: Later can have a parent for all langage output visitors that will hold the generated
 // source, metadata, etc.
 class OutputVisitor : public ast::Visitor {
+    std::shared_ptr<ResolverPassResult> resolver_result;
+
     int current_register_space = 0;
+    int next_srv_slot = 0;
+    int next_sampler_slot = 0;
+    int next_uav_slot = 0;
+    int next_cbv_slot = 0;
 
 public:
+    OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
+
+    OutputVisitor() = default;
+
     // NOTE: Most statements don't need any rewriting but we do still need to visit
     // everything to build the HLSL source code
+
+    /* Visit the AST and translate it to HLSL. The std::any returned contains a std::string
+     * with the translated source code
+     */
+    std::any visit_ast(ast::AST *ast) override;
 
     // Declarations
     std::any visit_decl_function(ast::decl::Function *d) override;

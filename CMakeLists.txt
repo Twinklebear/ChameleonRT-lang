@@ -44,6 +44,8 @@ add_executable(chameleonrtc
     src/ast/statement.cpp
     src/ast/expression.cpp
     src/ast/visitor.cpp
+
+    src/hlsl/output_visitor.cpp
 )
 
 target_include_directories(chameleonrtc PUBLIC

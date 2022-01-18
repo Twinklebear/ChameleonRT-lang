@@ -8,10 +8,9 @@
 #include "ast_builder_visitor.h"
 #include "builtins.h"
 #include "error_listener.h"
+#include "hlsl/output_visitor.h"
 #include "json_visitor.h"
 #include "resolver_visitor.h"
-
-using namespace crtg;
 
 const std::string DIVIDER = "----------\n";
 
@@ -27,7 +26,7 @@ int main(int argc, char **argv)
 
     crtl::ErrorListener error_listener;
 
-    ChameleonRTLexer lexer(&input);
+    crtg::ChameleonRTLexer lexer(&input);
     lexer.addErrorListener(&error_listener);
     antlr4::CommonTokenStream tokens(&lexer);
     tokens.fill();
@@ -42,7 +41,7 @@ int main(int argc, char **argv)
     }
     std::cout << DIVIDER;
 
-    ChameleonRTParser parser(&tokens);
+    crtg::ChameleonRTParser parser(&tokens);
     parser.addErrorListener(&error_listener);
     antlr4::tree::ParseTree *tree = parser.file();
 
@@ -100,6 +99,16 @@ int main(int argc, char **argv)
             std::cout << "Built-in function: " << x.second->get_text() << "\n";
         }
     }
+
+    if (resolver_visitor.had_error) {
+        std::cout << "Error during resolver pass, exiting\n";
+        return 1;
+    }
+
+    crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
+    const std::string hlsl_src =
+        std::any_cast<std::string>(hlsl_translator.visit_ast(ast.get()));
+    std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
 
     return 0;
 }
