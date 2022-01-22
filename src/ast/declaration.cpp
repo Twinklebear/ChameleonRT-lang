@@ -162,6 +162,16 @@ Struct::Struct(const std::string &name,
 {
 }
 
+const StructMember *Struct::get_member(const std::string &name) const
+{
+    for (const auto &m : members) {
+        if (m->get_text() == name) {
+            return m.get();
+        }
+    }
+    return nullptr;
+}
+
 std::vector<Node *> Struct::get_children()
 {
     std::vector<Node *> children;

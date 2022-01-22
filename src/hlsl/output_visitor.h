@@ -2,20 +2,21 @@
 
 #include "ast/visitor.h"
 #include "resolver_visitor.h"
+#include "shader_register_allocator.h"
 
 namespace crtl {
 namespace hlsl {
 
 // TODO: Later can have a parent for all langage output visitors that will hold the generated
 // source, metadata, etc.
-class OutputVisitor : public ast::Visitor {
+class OutputVisitor : public ast::Visitor, ErrorReporter {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
-    int current_register_space = 0;
-    int next_srv_slot = 0;
-    int next_sampler_slot = 0;
-    int next_uav_slot = 0;
-    int next_cbv_slot = 0;
+    ShaderRegisterAllocator register_allocator;
+
+    // Map of global and entry point parameter names to their register binding information
+    phmap::parallel_flat_hash_map<std::string, std::shared_ptr<ParameterRegisterBinding>>
+        parameter_binding;
 
 public:
     OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
@@ -55,8 +56,19 @@ public:
     std::any visit_expr_function_call(ast::expr::FunctionCall *e) override;
     std::any visit_struct_array_access(ast::expr::StructArrayAccess *e) override;
     std::any visit_expr_assignment(ast::expr::Assignment *e) override;
-};
 
+private:
+    /* Bind the passed global or entry point parameter to registers and return the HLSL source
+     * for the binding. The ParameterRegisterBinding metadata will be stored in the
+     * parameter_binding map
+     */
+    std::string bind_parameter(const ast::decl::Variable *param);
+
+    /* Bind the passed built in parameter type (i.e. not a struct) to a shader register.
+     */
+    ShaderRegisterBinding bind_builtin_type_parameter(
+        const std::shared_ptr<ast::ty::Type> &type);
+};
 }
 }
 

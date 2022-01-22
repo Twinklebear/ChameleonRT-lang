@@ -12,7 +12,10 @@ struct RayGenParams {
     float4 color;
 };
 
-ConstantBuffer<RayGenParams> RayGen_params : register(b0, space1);
+//ConstantBuffer<RayGenParams> RayGen_params : register(b0, space1);
+cbuffer : register(b0, space1) {
+    float4 RayGen_params_color;
+}
 
 [[shader("raygeneration")]]
 void RayGen()
