@@ -112,6 +112,12 @@ bool Type::is_pointer_like() const
            modifiers.contains(Modifier::IN_OUT);
 }
 
+bool Type::is_builtin() const
+{
+    return base_type != BaseType::STRUCT && base_type != BaseType::FUNCTION &&
+           base_type != BaseType::ENTRY_POINT;
+}
+
 Primitive::Primitive(const PrimitiveType type_id) : Type(BaseType::PRIMITIVE), type_id(type_id)
 {
 }
@@ -269,7 +275,7 @@ Texture::Texture(const std::shared_ptr<Type> &element_type,
     : access(access), dimensionality(dimensionality)
 
 {
-    base_type = BaseType::BUFFER;
+    base_type = BaseType::TEXTURE;
     template_parameters.push_back(element_type);
 }
 
@@ -280,7 +286,7 @@ Texture::Texture(const std::shared_ptr<Type> &element_type,
     : access(access), dimensionality(dimensionality)
 
 {
-    base_type = BaseType::BUFFER;
+    base_type = BaseType::TEXTURE;
     modifiers = mods;
     template_parameters.push_back(element_type);
 }

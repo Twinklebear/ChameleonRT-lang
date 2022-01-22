@@ -80,6 +80,8 @@ public:
 
     bool is_pointer_like() const;
 
+    bool is_builtin() const;
+
     virtual const std::string to_string() const = 0;
 };
 

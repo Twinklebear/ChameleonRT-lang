@@ -1,6 +1,7 @@
 #include "output_visitor.h"
 #include <memory>
 #include "shader_register_binding.h"
+#include "translate_builtin_type.h"
 
 namespace crtl {
 namespace hlsl {
@@ -146,8 +147,16 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
     std::string hlsl_src;
     const auto param_type = param->get_type();
     if (param_type->base_type == ty::BaseType::STRUCT) {
+        const auto *struct_decl =
+            resolver_result->struct_type[dynamic_cast<ty::Struct *>(param_type.get())];
+        if (!struct_decl) {
+            report_error(param->get_token(),
+                         "Error: Failed to find resolved struct decl for struct var decl");
+            return "";
+        }
+
         auto binding = std::make_shared<StructRegisterBinding>();
-        const auto *struct_decl = dynamic_cast<const decl::Struct *>(param);
+        const std::string struct_name = param->get_text();
         for (const auto &m : struct_decl->members) {
             // Primitive/Vector/Matrix types get packed into a constant buffer
             const auto member_ty = m->get_type();
@@ -156,6 +165,13 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
                 member_ty->base_type == ty::BaseType::VECTOR ||
                 member_ty->base_type == ty::BaseType::MATRIX) {
                 binding->constant_buffer_contents.push_back(name);
+            } else if (member_ty->base_type == ty::BaseType::STRUCT) {
+                // If we have another struct type member we need to expand it out to flatten
+                // the structs down
+                // TODO: Maybe this is best done as a pre-pass on the AST that does this
+                // flattening of the types, then we don't need to worry about it at this point
+                report_error(param->get_token(),
+                             "TODO Will: Nested structs in global/entry point param");
             } else {
                 binding->members[name] = bind_builtin_type_parameter(member_ty);
             }
@@ -165,14 +181,48 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
         }
         parameter_binding[param->get_text()] = binding;
 
-        // TODO: here need to map built in type -> HLSL string
-        // to build the constant buffer and the members HLSL source
+        std::string cbuffer_src;
+        if (!binding->constant_buffer_contents.empty()) {
+            cbuffer_src = "cbuffer " + struct_name + "_cbv : " +
+                          binding->constant_buffer_register.shader_register.to_string() +
+                          "{\n";
+        }
+        for (const auto &m : struct_decl->members) {
+            const auto member_ty = m->get_type();
+            const std::string &name = m->get_text();
+
+            const std::string type_str = translate_builtin_type(member_ty);
+            if (member_ty->base_type == ty::BaseType::PRIMITIVE ||
+                member_ty->base_type == ty::BaseType::VECTOR ||
+                member_ty->base_type == ty::BaseType::MATRIX) {
+                // Rename the cbuffer members to StructParamName_MemberName
+                // TODO: This should be based on a slightly different naming, maybe do a
+                // pre-pass renaming the structs for entry points to avoid name collisions
+                cbuffer_src += "\t" + type_str + " " + struct_name + "_" + name + ";\n";
+
+            } else if (member_ty->base_type != ty::BaseType::STRUCT) {
+                const auto reg = binding->members[name];
+                // Rename the members to StructParamName_MemberName
+                // TODO: This should be based on a slightly different naming, maybe do a
+                // pre-pass renaming the structs for entry points to avoid name collisions
+                hlsl_src += type_str + " " + struct_name + "_" + name + " : " +
+                            reg.shader_register.to_string() + ";\n";
+            }
+        }
+
+        // Generate the constant buffer, if we have one
+        if (!cbuffer_src.empty()) {
+            cbuffer_src += "}\n";
+            hlsl_src += cbuffer_src;
+        }
     } else {
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
         parameter_binding[param->get_text()] = binding;
 
-        // TODO: here need to map built in type -> HLSL string
+        const std::string type_str = translate_builtin_type(param->get_type());
+        hlsl_src = type_str + " " + param->get_text() + " : " +
+                   binding->shader_register.to_string() + ";";
     }
     return hlsl_src;
 }
@@ -208,7 +258,7 @@ ShaderRegisterBinding OutputVisitor::bind_builtin_type_parameter(
         // AccelerationStructure is SRV
         return register_allocator.bind_srv(1);
     } else {
-        throw std::runtime_error("Unsupported parameter type");
+        throw std::runtime_error("Unsupported parameter type: '" + type->to_string() + "'");
     }
     return ShaderRegisterBinding();
 }
