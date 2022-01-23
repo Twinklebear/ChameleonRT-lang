@@ -1,7 +1,4 @@
 struct SceneParams {
-    // It looks like HLSL doesn't distinguish writeonly/readonly vs. readwrite,
-    // so it's simplest to adopt the HLSL naming here and do either RWTexture2D
-    // or RWBuffer, meaning readwrite, or Texture2D, Buffer, meaning read only.
     RWTexture2D<float4> image;
     float test_constant;
 };
