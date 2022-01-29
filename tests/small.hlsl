@@ -19,7 +19,7 @@ cbuffer RayGen_params_cbv : register(b1, space0) {
     float4 RayGen_params_color;
 }
 
-[[shader("raygeneration")]]
+[shader("raygeneration")]
 void RayGen()
 {
     uint2 pixel = DispatchRaysIndex().xy;

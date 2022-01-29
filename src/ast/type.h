@@ -32,6 +32,7 @@ enum class EntryPointType {
     INTERSECTION,
     MISS,
     COMPUTE,
+    // TODO: Callable shaders?
     INVALID
 };
 

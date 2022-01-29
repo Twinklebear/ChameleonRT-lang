@@ -30,7 +30,52 @@ std::any OutputVisitor::visit_decl_function(ast::decl::Function *d)
 
 std::any OutputVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
 {
+    // TODO: Entry point parameters need to be renamed to avoid name collision in
+    // a pass that works on the AST. Not at this point when we're just doing the lowering
+    // to HLSL
+    // Translate the entry point's parameters into shader input parameters for HLSL
     std::string hlsl_src;
+    for (auto &p : d->parameters) {
+        hlsl_src += bind_parameter(p.get()) + "\n";
+    }
+
+    // Emit the entry point declaration, then translate the entry point function body
+    auto ty = std::dynamic_pointer_cast<ty::EntryPoint>(d->get_type());
+    if (ty->entry_point_type != ty::EntryPointType::COMPUTE) {
+        hlsl_src += "[shader(\"";
+        switch (ty->entry_point_type) {
+        case ty::EntryPointType::RAY_GEN:
+            hlsl_src += "raygeneration";
+            break;
+        case ty::EntryPointType::CLOSEST_HIT:
+            hlsl_src += "closesthit";
+            break;
+        case ty::EntryPointType::ANY_HIT:
+            hlsl_src += "anyhit";
+            break;
+        case ty::EntryPointType::INTERSECTION:
+            hlsl_src += "intersection";
+            break;
+        case ty::EntryPointType::MISS:
+            hlsl_src += "miss";
+            break;
+        default:
+            report_error(d->get_token(), "Unhandled RT shader entry point type!");
+            break;
+        }
+        hlsl_src += "\")]\n";
+    } else {
+        report_error(
+            d->get_token(),
+            "TODO WILL: Compute shaders need to take & translate num threads annotation");
+    }
+
+    // Emit the declaration
+    hlsl_src += "void " + d->get_text() + "()\n";
+
+    // Emit the function body
+    hlsl_src += std::any_cast<std::string>(visit(d->block.get()));
+
     return hlsl_src;
 }
 
@@ -60,7 +105,15 @@ std::any OutputVisitor::visit_decl_variable(ast::decl::Variable *d)
 
 std::any OutputVisitor::visit_stmt_block(ast::stmt::Block *s)
 {
-    std::string hlsl_src;
+    std::string hlsl_src = "{\n";
+
+    // Visit the block's statements and append them to the HLSL output
+    auto stmts = std::any_cast<std::vector<std::any>>(visit_children(s));
+    for (auto &stmt : stmts) {
+        hlsl_src += std::any_cast<std::string>(stmt) + "\n";
+    }
+
+    hlsl_src += "}\n";
     return hlsl_src;
 }
 
