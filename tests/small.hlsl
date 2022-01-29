@@ -24,7 +24,7 @@ void RayGen()
 {
     uint2 pixel = DispatchRaysIndex().xy;
     float4 c;
-    c = RayGen_params.color;
-    scene_image[pixel] = RayGen_params.color;
+    c = RayGen_params_color;
+    scene_image[pixel] = RayGen_params_color;
 }
 
