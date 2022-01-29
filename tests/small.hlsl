@@ -1,19 +1,21 @@
+/*
 struct SceneParams {
-    // It looks like HLSL doesn't distinguish writeonly/readonly vs. readwrite,
-    // so it's simplest to adopt the HLSL naming here and do either RWTexture2D
-    // or RWBuffer, meaning readwrite, or Texture2D, Buffer, meaning read only.
     RWTexture2D<float4> image;
+    float test_constant;
 };
+*/
 
 //in SceneParams scene;
 RWTexture2D<float4> scene_image : register(u0, space0);
+cbuffer scene_cbv : register(b0, space0) {
+    float scene_test_constant;
+}
 
 struct RayGenParams {
     float4 color;
 };
 
-//ConstantBuffer<RayGenParams> RayGen_params : register(b0, space1);
-cbuffer : register(b0, space1) {
+cbuffer RayGen_params_cbv : register(b1, space0) {
     float4 RayGen_params_color;
 }
 
