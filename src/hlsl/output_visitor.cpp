@@ -1,6 +1,7 @@
 #include "output_visitor.h"
 #include <memory>
 #include "shader_register_binding.h"
+#include "translate_builtin_function_call.h"
 #include "translate_builtin_type.h"
 
 namespace crtl {
@@ -144,6 +145,18 @@ std::any OutputVisitor::visit_stmt_return(ast::stmt::Return *s)
 std::any OutputVisitor::visit_stmt_variable_declaration(ast::stmt::VariableDeclaration *s)
 {
     std::string hlsl_src;
+    auto var_decl = s->var_decl;
+    if (var_decl->get_type()->base_type != ty::BaseType::STRUCT) {
+        hlsl_src = translate_builtin_type(var_decl->get_type());
+    } else {
+        hlsl_src = var_decl->get_type()->to_string();
+    }
+    hlsl_src += " " + var_decl->get_text();
+    if (var_decl->expression) {
+        auto expr = std::any_cast<std::string>(visit(var_decl->expression.get()));
+        hlsl_src += " = " + expr;
+    }
+    hlsl_src += ";";
     return hlsl_src;
 }
 
@@ -180,6 +193,25 @@ std::any OutputVisitor::visit_expr_constant(ast::expr::Constant *e)
 std::any OutputVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
 {
     std::string hlsl_src;
+    auto *callee = resolver_result->call_expr[e];
+
+    // Translate calls to built-ins to the appropriate built in HLSL function
+    if (callee->is_builtin()) {
+        hlsl_src = translate_builtin_function_call(e, callee);
+        if (hlsl_src.empty()) {
+            report_error(e->get_token(), "Unhandled built-in call!");
+        }
+    } else {
+        hlsl_src += e->get_text() + "(";
+        auto args = std::any_cast<std::vector<std::any>>(visit_children(e));
+        for (size_t i = 0; i < args.size(); ++i) {
+            hlsl_src += std::any_cast<std::string>(args[i]);
+            if (i + 1 < args.size()) {
+                hlsl_src += ", ";
+            }
+        }
+        hlsl_src += ")";
+    }
     return hlsl_src;
 }
 

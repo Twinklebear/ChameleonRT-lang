@@ -48,6 +48,7 @@ add_executable(chameleonrtc
     src/hlsl/shader_register_binding.cpp
     src/hlsl/shader_register_allocator.cpp
     src/hlsl/translate_builtin_type.cpp
+    src/hlsl/translate_builtin_function_call.cpp
     src/hlsl/output_visitor.cpp
 )
 
