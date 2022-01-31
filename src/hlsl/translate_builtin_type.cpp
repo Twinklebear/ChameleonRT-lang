@@ -110,5 +110,14 @@ std::string translate_builtin_type(const std::shared_ptr<ast::ty::Type> &type)
     }
     return type_str;
 }
+
+std::string translate_type(const std::shared_ptr<ast::ty::Type> &type)
+{
+    if (type->base_type == ty::BaseType::STRUCT) {
+        auto struct_ty = std::dynamic_pointer_cast<ty::Struct>(type);
+        return struct_ty->name;
+    }
+    return translate_builtin_type(type);
+}
 }
 }

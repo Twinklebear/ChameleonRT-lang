@@ -20,5 +20,8 @@ std::string translate_modifiers(const std::set<ast::ty::Modifier> &modifiers);
  * - Ray
  */
 std::string translate_builtin_type(const std::shared_ptr<ast::ty::Type> &type);
+
+// Translate the passed built-in or user struct type to the corresponding HLSL type string.
+std::string translate_type(const std::shared_ptr<ast::ty::Type> &type);
 }
 }

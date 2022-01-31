@@ -5,6 +5,46 @@ namespace crtl {
 namespace ast {
 namespace expr {
 
+std::string operator_to_string(const NodeType nt)
+{
+    switch (nt) {
+    case NodeType::EXPR_NEGATE:
+        return "-";
+    case NodeType::EXPR_LOGIC_NOT:
+        return "!";
+    case NodeType::EXPR_MULT:
+        return "*";
+    case NodeType::EXPR_DIV:
+        return "/";
+    case NodeType::EXPR_ADD:
+        return "+";
+    case NodeType::EXPR_SUB:
+        return "-";
+    case NodeType::EXPR_CMP_LESS:
+        return "<";
+    case NodeType::EXPR_CMP_LESS_EQUAL:
+        return "<=";
+    case NodeType::EXPR_CMP_GREATER:
+        return ">";
+    case NodeType::EXPR_CMP_GREATER_EQUAL:
+        return ">=";
+    case NodeType::EXPR_CMP_NOT_EQUAL:
+        return "!=";
+    case NodeType::EXPR_CMP_EQUAL:
+        return "==";
+    case NodeType::EXPR_LOGIC_AND:
+        return "&&";
+    case NodeType::EXPR_LOGIC_OR:
+        return "||";
+    default:
+        break;
+    }
+
+    throw std::runtime_error(
+        "Invalid NodeType passed to operator_to_string: not an expression!");
+    return "INVALID";
+}
+
 Expression::Expression(antlr4::Token *token, NodeType expr_type) : Node(token, expr_type) {}
 
 Unary::Unary(antlr4::Token *op, NodeType expr_type, const std::shared_ptr<Expression> &expr)
@@ -29,6 +69,11 @@ std::vector<Node *> Unary::get_children()
     std::vector<Node *> children;
     children.push_back(expr.get());
     return children;
+}
+
+std::string Unary::operator_string() const
+{
+    return operator_to_string(node_type);
 }
 
 Binary::Binary(antlr4::Token *op,
@@ -131,6 +176,11 @@ std::vector<Node *> Binary::get_children()
     return children;
 }
 
+std::string Binary::operator_string() const
+{
+    return operator_to_string(node_type);
+}
+
 Variable::Variable(antlr4::Token *var) : Expression(var, NodeType::EXPR_LITERAL_VAR) {}
 
 std::string Variable::name() const
@@ -178,6 +228,11 @@ std::vector<Node *> Constant::get_children()
 
 StructMemberAccessFragment::StructMemberAccessFragment(antlr4::Token *member) : member(member)
 {
+}
+
+std::string StructMemberAccessFragment::name() const
+{
+    return member->getText();
 }
 
 ArrayAccessFragment::ArrayAccessFragment(const std::shared_ptr<Expression> &index)

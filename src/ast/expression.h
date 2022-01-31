@@ -8,6 +8,13 @@ namespace crtl {
 namespace ast {
 namespace expr {
 
+/* Return the string representation of the operator for output to code
+ * Supports app expr node types and returns the corresponding string representation
+ * for the source code. Shared here as these are all the same across the target output
+ * languages
+ */
+std::string operator_to_string(const NodeType nt);
+
 class Expression : public Node {
 public:
     Expression(antlr4::Token *token, NodeType expr_type);
@@ -26,6 +33,8 @@ public:
                                             const std::shared_ptr<Expression> &expr);
 
     std::vector<Node *> get_children() override;
+
+    std::string operator_string() const;
 };
 
 class Binary : public Expression {
@@ -87,6 +96,8 @@ public:
                                             const std::shared_ptr<Expression> &right);
 
     std::vector<Node *> get_children() override;
+
+    std::string operator_string() const;
 };
 
 class Variable : public Expression {
@@ -124,6 +135,8 @@ public:
     antlr4::Token *member;
 
     StructMemberAccessFragment(antlr4::Token *member);
+
+    std::string name() const;
 };
 
 class ArrayAccessFragment : public StructArrayAccessFragment {
