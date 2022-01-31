@@ -74,8 +74,28 @@ std::any OutputVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
     // Emit the declaration
     hlsl_src += "void " + d->get_text() + "()\n";
 
+    // Map the parameter bindings for any structs back to make the struct the user's code is
+    // working with
+    // TODO: I think these should get optimized out to the same code by DXC?
+    hlsl_src += "{\n";
+    for (auto &p : d->parameters) {
+        if (p->get_type()->base_type == ty::BaseType::STRUCT) {
+            auto struct_ty = std::dynamic_pointer_cast<ty::Struct>(p->get_type());
+            // Output variable declaration
+            hlsl_src += p->get_type()->to_string() + " " + p->get_text() + ";\n";
+
+            auto struct_decl = resolver_result->struct_type[struct_ty.get()];
+            for (auto &m : struct_decl->members) {
+                hlsl_src += p->get_text() + "." + m->get_text() + " = " + p->get_text() + "_" +
+                            m->get_text() + ";\n";
+            }
+        }
+    }
+
     // Emit the function body
     hlsl_src += std::any_cast<std::string>(visit(d->block.get()));
+
+    hlsl_src += "}\n";
 
     return hlsl_src;
 }
@@ -88,14 +108,17 @@ std::any OutputVisitor::visit_decl_global_param(ast::decl::GlobalParam *d)
 
 std::any OutputVisitor::visit_decl_struct(ast::decl::Struct *d)
 {
-    std::string hlsl_src;
+    std::string hlsl_src = "struct " + d->get_text() + " {\n";
+    for (auto &m : d->members) {
+        hlsl_src += std::any_cast<std::string>(visit(m.get())) + "\n";
+    }
+    hlsl_src += "};\n";
     return hlsl_src;
 }
 
 std::any OutputVisitor::visit_decl_struct_member(ast::decl::StructMember *d)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    return translate_type(d->get_type()) + " " + d->get_text() + ";";
 }
 
 std::any OutputVisitor::visit_decl_variable(ast::decl::Variable *d)
@@ -162,26 +185,25 @@ std::any OutputVisitor::visit_stmt_variable_declaration(ast::stmt::VariableDecla
 
 std::any OutputVisitor::visit_stmt_expression(ast::stmt::Expression *s)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    return std::any_cast<std::string>(visit(s->expr.get())) + ";";
 }
 
 std::any OutputVisitor::visit_expr_unary(ast::expr::Unary *e)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    const std::string operand = std::any_cast<std::string>(visit(e->expr.get()));
+    return e->operator_string() + operand;
 }
 
 std::any OutputVisitor::visit_expr_binary(ast::expr::Binary *e)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    const std::string lhs = std::any_cast<std::string>(visit(e->left.get()));
+    const std::string rhs = std::any_cast<std::string>(visit(e->right.get()));
+    return lhs + " " + e->operator_string() + " " + rhs;
 }
 
 std::any OutputVisitor::visit_expr_variable(ast::expr::Variable *e)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    return e->name();
 }
 
 std::any OutputVisitor::visit_expr_constant(ast::expr::Constant *e)
@@ -217,21 +239,35 @@ std::any OutputVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
 
 std::any OutputVisitor::visit_struct_array_access(ast::expr::StructArrayAccess *e)
 {
-    std::string hlsl_src;
+    std::string hlsl_src = e->variable->name();
+    for (auto &f : e->struct_array_access) {
+        auto member_access = std::dynamic_pointer_cast<expr::StructMemberAccessFragment>(f);
+        if (member_access) {
+            // TODO: When accessing a member of a global parameter we need to use _ because
+            // the struct has been flattened out
+            hlsl_src += "." + member_access->name();
+        } else {
+            auto array_access = std::dynamic_pointer_cast<expr::ArrayAccessFragment>(f);
+            const std::string idx =
+                std::any_cast<std::string>(visit(array_access->index.get()));
+            hlsl_src += "[" + idx + "]";
+        }
+    }
     return hlsl_src;
 }
 
 std::any OutputVisitor::visit_expr_assignment(ast::expr::Assignment *e)
 {
-    std::string hlsl_src;
-    return hlsl_src;
+    const std::string lhs = std::any_cast<std::string>(visit(e->lhs.get()));
+    const std::string value = std::any_cast<std::string>(visit(e->value.get()));
+    return lhs + " = " + value;
 }
 
 std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
 {
     std::string hlsl_src;
     const auto param_type = param->get_type();
-    if (param_type->base_type == ty::BaseType::STRUCT) {
+    if (!param_type->is_builtin()) {
         const auto *struct_decl =
             resolver_result->struct_type[dynamic_cast<ty::Struct *>(param_type.get())];
         if (!struct_decl) {
@@ -300,7 +336,9 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
             cbuffer_src += "}\n";
             hlsl_src += cbuffer_src;
         }
-    } else {
+    } else if (param_type->base_type == ty::BaseType::BUFFER ||
+               param_type->base_type == ty::BaseType::TEXTURE ||
+               param_type->base_type == ty::BaseType::ACCELERATION_STRUCTURE) {
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
         parameter_binding[param->get_text()] = binding;
@@ -308,6 +346,19 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
         const std::string type_str = translate_builtin_type(param->get_type());
         hlsl_src = type_str + " " + param->get_text() + " : " +
                    binding->shader_register.to_string() + ";";
+    } else {
+        // TODO: This can be better: if we have a lot of individual constant args to an entry
+        // point or as a global, we generate a CBV for each one. We could pack them into a
+        // single CBV instead. They could be made to view the same buffer at different
+        // offsets, but it'd be best to pack them all together into a single CBV
+        auto binding =
+            std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
+        parameter_binding[param->get_text()] = binding;
+
+        const std::string type_str = translate_builtin_type(param->get_type());
+        hlsl_src = "cbuffer " + param->get_text() +
+                   "_cbv : " + binding->shader_register.to_string() + " {\n\t" + type_str +
+                   " " + param->get_text() + ";\n}\n";
     }
     return hlsl_src;
 }
