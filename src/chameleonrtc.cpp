@@ -10,6 +10,7 @@
 #include "error_listener.h"
 #include "hlsl/output_visitor.h"
 #include "json_visitor.h"
+#include "rename_entry_point_param_visitor.h"
 #include "resolver_visitor.h"
 
 const std::string DIVIDER = "----------\n";
@@ -104,6 +105,9 @@ int main(int argc, char **argv)
         std::cout << "Error during resolver pass, exiting\n";
         return 1;
     }
+
+    crtl::RenameEntryPointParamVisitor rename_entry_point_params(resolver_visitor.resolved);
+    rename_entry_point_params.visit_ast(ast.get());
 
     crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
     const std::string hlsl_src =
