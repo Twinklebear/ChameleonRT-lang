@@ -14,22 +14,22 @@ Declaration::Declaration(const std::string &name,
     symbol->type = type;
 }
 
-const std::shared_ptr<ty::Type> Declaration::get_type() const
+const std::shared_ptr<ty::Type> &Declaration::get_type() const
 {
     return symbol->type;
 }
 
-std::shared_ptr<ty::Type> Declaration::get_type()
+std::shared_ptr<ty::Type> &Declaration::get_type()
 {
     return symbol->type;
 }
 
-const std::shared_ptr<Symbol> Declaration::get_symbol() const
+const std::shared_ptr<Symbol> &Declaration::get_symbol() const
 {
     return symbol;
 }
 
-std::shared_ptr<Symbol> Declaration::get_symbol()
+std::shared_ptr<Symbol> &Declaration::get_symbol()
 {
     return symbol;
 }

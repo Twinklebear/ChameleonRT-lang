@@ -181,11 +181,14 @@ std::string Binary::operator_string() const
     return operator_to_string(node_type);
 }
 
-Variable::Variable(antlr4::Token *var) : Expression(var, NodeType::EXPR_LITERAL_VAR) {}
+Variable::Variable(antlr4::Token *var)
+    : Expression(var, NodeType::EXPR_LITERAL_VAR), var_name(var->getText())
+{
+}
 
 std::string Variable::name() const
 {
-    return token->getText();
+    return var_name;
 }
 
 std::vector<Node *> Variable::get_children()

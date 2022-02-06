@@ -25,13 +25,13 @@ public:
                 const std::shared_ptr<ty::Type> &type,
                 NodeType decl_type);
 
-    const std::shared_ptr<ty::Type> get_type() const;
+    const std::shared_ptr<ty::Type> &get_type() const;
 
-    std::shared_ptr<ty::Type> get_type();
+    std::shared_ptr<ty::Type> &get_type();
 
-    const std::shared_ptr<Symbol> get_symbol() const;
+    const std::shared_ptr<Symbol> &get_symbol() const;
 
-    std::shared_ptr<Symbol> get_symbol();
+    std::shared_ptr<Symbol> &get_symbol();
 
     std::string get_text() const override;
 };

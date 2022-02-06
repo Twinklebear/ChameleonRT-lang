@@ -102,6 +102,8 @@ public:
 
 class Variable : public Expression {
 public:
+    std::string var_name;
+
     Variable(antlr4::Token *var);
 
     std::string name() const;
