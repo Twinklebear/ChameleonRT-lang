@@ -24,7 +24,7 @@ struct ResolverPassResult {
     phmap::parallel_flat_hash_map<ast::expr::FunctionCall *, ast::decl::Function *> call_expr;
 };
 
-class ResolverVisitor : public ast::Visitor, public crtl::ErrorReporter {
+class ResolverVisitor : public ast::Visitor {
     // The status of a variable, struct, or function defined in the program.
     struct SymbolStatus {
         bool defined = false;

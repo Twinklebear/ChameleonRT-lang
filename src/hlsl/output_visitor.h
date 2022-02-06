@@ -9,7 +9,7 @@ namespace hlsl {
 
 // TODO: Later can have a parent for all langage output visitors that will hold the generated
 // source, metadata, etc.
-class OutputVisitor : public ast::Visitor, ErrorReporter {
+class OutputVisitor : public ast::Visitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
     ShaderRegisterAllocator register_allocator;

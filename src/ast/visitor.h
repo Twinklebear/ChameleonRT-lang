@@ -2,6 +2,7 @@
 
 #include <any>
 #include "declaration.h"
+#include "error_listener.h"
 #include "expression.h"
 #include "node.h"
 #include "statement.h"
@@ -9,7 +10,7 @@
 namespace crtl {
 namespace ast {
 
-class Visitor {
+class Visitor : public ErrorReporter {
 private:
     size_t trace_depth = 0;
 
@@ -55,6 +56,5 @@ private:
     void report_enter_node(const Node *n);
     void report_exit_node(const Node *n);
 };
-
 }
 }
