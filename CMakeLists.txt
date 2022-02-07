@@ -37,6 +37,7 @@ add_executable(chameleonrtc
     src/resolver_visitor.cpp
     src/builtins.cpp
     src/rename_entry_point_param_visitor.cpp
+    src/global_struct_param_expansion_visitor.cpp
 
     src/ast/node.cpp
     src/ast/symbol.cpp
