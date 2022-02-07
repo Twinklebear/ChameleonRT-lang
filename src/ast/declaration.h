@@ -45,7 +45,7 @@ public:
              const std::shared_ptr<ty::Type> &type,
              const std::shared_ptr<expr::Expression> &expression = nullptr);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class Function : public Declaration {
@@ -65,7 +65,7 @@ public:
              const std::vector<std::shared_ptr<Variable>> &parameters,
              const std::shared_ptr<ty::Type> &return_type);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 
     // If the function declaration is for a built-in "intrinsic" function,
     // or a user-declared function
@@ -83,7 +83,7 @@ public:
                const ty::EntryPointType type,
                const std::shared_ptr<stmt::Block> &block);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class GlobalParam : public Variable {
@@ -92,7 +92,7 @@ public:
                 antlr4::Token *token,
                 const std::shared_ptr<ty::Type> &type);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class StructMember : public Declaration {
@@ -101,7 +101,7 @@ public:
                  antlr4::Token *token,
                  const std::shared_ptr<ty::Type> &type);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class Struct : public Declaration {
@@ -114,7 +114,7 @@ public:
 
     const StructMember *get_member(const std::string &name) const;
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 }

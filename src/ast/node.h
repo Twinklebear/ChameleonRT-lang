@@ -82,7 +82,7 @@ public:
 
     virtual std::string get_text() const;
 
-    virtual std::vector<Node *> get_children() = 0;
+    virtual std::vector<std::shared_ptr<Node>> get_children() = 0;
 };
 
 class AST {

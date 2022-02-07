@@ -29,33 +29,38 @@ public:
     /* Visit the AST and translate it to HLSL. The std::any returned contains a std::string
      * with the translated source code
      */
-    std::any visit_ast(ast::AST *ast) override;
+    std::any visit_ast(const std::shared_ptr<ast::AST> &ast) override;
 
     // Declarations
-    std::any visit_decl_function(ast::decl::Function *d) override;
-    std::any visit_decl_entry_point(ast::decl::EntryPoint *d) override;
-    std::any visit_decl_global_param(ast::decl::GlobalParam *d) override;
-    std::any visit_decl_struct(ast::decl::Struct *d) override;
-    std::any visit_decl_struct_member(ast::decl::StructMember *d) override;
-    std::any visit_decl_variable(ast::decl::Variable *d) override;
+    std::any visit_decl_function(const std::shared_ptr<ast::decl::Function> &d) override;
+    std::any visit_decl_entry_point(const std::shared_ptr<ast::decl::EntryPoint> &d) override;
+    std::any visit_decl_global_param(
+        const std::shared_ptr<ast::decl::GlobalParam> &d) override;
+    std::any visit_decl_struct(const std::shared_ptr<ast::decl::Struct> &d) override;
+    std::any visit_decl_struct_member(
+        const std::shared_ptr<ast::decl::StructMember> &d) override;
+    std::any visit_decl_variable(const std::shared_ptr<ast::decl::Variable> &d) override;
 
     // Statements
-    std::any visit_stmt_block(ast::stmt::Block *s) override;
-    std::any visit_stmt_if_else(ast::stmt::IfElse *s) override;
-    std::any visit_stmt_while(ast::stmt::While *s) override;
-    std::any visit_stmt_for(ast::stmt::For *s) override;
-    std::any visit_stmt_return(ast::stmt::Return *s) override;
-    std::any visit_stmt_variable_declaration(ast::stmt::VariableDeclaration *s) override;
-    std::any visit_stmt_expression(ast::stmt::Expression *s) override;
+    std::any visit_stmt_block(const std::shared_ptr<ast::stmt::Block> &s) override;
+    std::any visit_stmt_if_else(const std::shared_ptr<ast::stmt::IfElse> &s) override;
+    std::any visit_stmt_while(const std::shared_ptr<ast::stmt::While> &s) override;
+    std::any visit_stmt_for(const std::shared_ptr<ast::stmt::For> &s) override;
+    std::any visit_stmt_return(const std::shared_ptr<ast::stmt::Return> &s) override;
+    std::any visit_stmt_variable_declaration(
+        const std::shared_ptr<ast::stmt::VariableDeclaration> &s) override;
+    std::any visit_stmt_expression(const std::shared_ptr<ast::stmt::Expression> &s) override;
 
     // Expressions
-    std::any visit_expr_unary(ast::expr::Unary *e) override;
-    std::any visit_expr_binary(ast::expr::Binary *e) override;
-    std::any visit_expr_variable(ast::expr::Variable *e) override;
-    std::any visit_expr_constant(ast::expr::Constant *e) override;
-    std::any visit_expr_function_call(ast::expr::FunctionCall *e) override;
-    std::any visit_struct_array_access(ast::expr::StructArrayAccess *e) override;
-    std::any visit_expr_assignment(ast::expr::Assignment *e) override;
+    std::any visit_expr_unary(const std::shared_ptr<ast::expr::Unary> &e) override;
+    std::any visit_expr_binary(const std::shared_ptr<ast::expr::Binary> &e) override;
+    std::any visit_expr_variable(const std::shared_ptr<ast::expr::Variable> &e) override;
+    std::any visit_expr_constant(const std::shared_ptr<ast::expr::Constant> &e) override;
+    std::any visit_expr_function_call(
+        const std::shared_ptr<ast::expr::FunctionCall> &e) override;
+    std::any visit_struct_array_access(
+        const std::shared_ptr<ast::expr::StructArrayAccess> &e) override;
+    std::any visit_expr_assignment(const std::shared_ptr<ast::expr::Assignment> &e) override;
 
 private:
     /* Bind the passed global or entry point parameter to registers and return the HLSL source

@@ -73,14 +73,14 @@ Function::Function(const std::string &name,
 {
 }
 
-std::vector<Node *> Function::get_children()
+std::vector<std::shared_ptr<Node>> Function::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     if (!is_builtin()) {
         for (auto &p : parameters) {
-            children.push_back(p.get());
+            children.push_back(p);
         }
-        children.push_back(block.get());
+        children.push_back(block);
     }
     return children;
 }
@@ -118,13 +118,13 @@ EntryPoint::EntryPoint(const std::string &name,
 {
 }
 
-std::vector<Node *> EntryPoint::get_children()
+std::vector<std::shared_ptr<Node>> EntryPoint::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     for (auto &p : parameters) {
-        children.push_back(p.get());
+        children.push_back(p);
     }
-    children.push_back(block.get());
+    children.push_back(block);
     return children;
 }
 
@@ -137,9 +137,9 @@ GlobalParam::GlobalParam(const std::string &name,
     node_type = NodeType::DECL_GLOBAL_PARAM;
 }
 
-std::vector<Node *> GlobalParam::get_children()
+std::vector<std::shared_ptr<Node>> GlobalParam::get_children()
 {
-    return std::vector<Node *>();
+    return std::vector<std::shared_ptr<Node>>();
 }
 
 StructMember::StructMember(const std::string &name,
@@ -149,9 +149,9 @@ StructMember::StructMember(const std::string &name,
 {
 }
 
-std::vector<Node *> StructMember::get_children()
+std::vector<std::shared_ptr<Node>> StructMember::get_children()
 {
-    return std::vector<Node *>();
+    return std::vector<std::shared_ptr<Node>>();
 }
 
 Struct::Struct(const std::string &name,
@@ -172,11 +172,11 @@ const StructMember *Struct::get_member(const std::string &name) const
     return nullptr;
 }
 
-std::vector<Node *> Struct::get_children()
+std::vector<std::shared_ptr<Node>> Struct::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     for (auto &m : members) {
-        children.push_back(m.get());
+        children.push_back(m);
     }
     return children;
 }
@@ -189,11 +189,11 @@ Variable::Variable(const std::string &name,
 {
 }
 
-std::vector<Node *> Variable::get_children()
+std::vector<std::shared_ptr<Node>> Variable::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     if (expression) {
-        children.push_back(expression.get());
+        children.push_back(expression);
     }
     return children;
 }

@@ -11,11 +11,11 @@ Block::Block(antlr4::Token *token, const std::vector<std::shared_ptr<Statement>>
 {
 }
 
-std::vector<Node *> Block::get_children()
+std::vector<std::shared_ptr<Node>> Block::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     for (auto &s : statements) {
-        children.push_back(s.get());
+        children.push_back(s);
     }
     return children;
 }
@@ -31,13 +31,13 @@ IfElse::IfElse(antlr4::Token *token,
 {
 }
 
-std::vector<Node *> IfElse::get_children()
+std::vector<std::shared_ptr<Node>> IfElse::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(condition.get());
-    children.push_back(if_branch.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(condition);
+    children.push_back(if_branch);
     if (else_branch) {
-        children.push_back(else_branch.get());
+        children.push_back(else_branch);
     }
     return children;
 }
@@ -49,12 +49,12 @@ While::While(antlr4::Token *token,
 {
 }
 
-std::vector<Node *> While::get_children()
+std::vector<std::shared_ptr<Node>> While::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(condition.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(condition);
     if (body) {
-        children.push_back(body.get());
+        children.push_back(body);
     }
     return children;
 }
@@ -72,20 +72,20 @@ For::For(antlr4::Token *token,
 {
 }
 
-std::vector<Node *> For::get_children()
+std::vector<std::shared_ptr<Node>> For::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     if (init) {
-        children.push_back(init.get());
+        children.push_back(init);
     }
     if (condition) {
-        children.push_back(condition.get());
+        children.push_back(condition);
     }
     if (advance) {
-        children.push_back(advance.get());
+        children.push_back(advance);
     }
     if (body) {
-        children.push_back(body.get());
+        children.push_back(body);
     }
     return children;
 }
@@ -95,11 +95,11 @@ Return::Return(antlr4::Token *token, const std::shared_ptr<expr::Expression> &ex
 {
 }
 
-std::vector<Node *> Return::get_children()
+std::vector<std::shared_ptr<Node>> Return::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     if (expression) {
-        children.push_back(expression.get());
+        children.push_back(expression);
     }
     return children;
 }
@@ -110,10 +110,10 @@ VariableDeclaration::VariableDeclaration(antlr4::Token *token,
 {
 }
 
-std::vector<Node *> VariableDeclaration::get_children()
+std::vector<std::shared_ptr<Node>> VariableDeclaration::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(var_decl.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(var_decl);
     return children;
 }
 
@@ -122,10 +122,10 @@ Expression::Expression(antlr4::Token *token, const std::shared_ptr<expr::Express
 {
 }
 
-std::vector<Node *> Expression::get_children()
+std::vector<std::shared_ptr<Node>> Expression::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(expr.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(expr);
     return children;
 }
 }

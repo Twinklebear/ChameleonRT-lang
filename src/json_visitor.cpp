@@ -4,17 +4,17 @@ namespace crtl {
 
 using namespace ast;
 
-std::any JSONVisitor::visit_ast(AST *ast)
+std::any JSONVisitor::visit_ast(const std::shared_ptr<AST> &ast)
 {
     std::vector<nlohmann::json> results;
     for (auto &n : ast->top_level_decls) {
-        results.push_back(std::any_cast<nlohmann::json>(visit(n.get())));
+        results.push_back(std::any_cast<nlohmann::json>(visit(n)));
     }
     ast_json = results;
     return ast_json;
 }
 
-std::any JSONVisitor::visit_decl_function(decl::Function *d)
+std::any JSONVisitor::visit_decl_function(const std::shared_ptr<decl::Function> &d)
 {
     nlohmann::json d_json;
     const auto sym = d->get_symbol();
@@ -24,14 +24,14 @@ std::any JSONVisitor::visit_decl_function(decl::Function *d)
     d_json["col"] = sym->token->getCharPositionInLine();
     d_json["type"] = d->get_type()->to_string();
 
-    std::vector<Node *> children = d->get_children();
+    auto children = d->get_children();
     // Get a list of just the parameters to visit
-    std::vector<Node *> parameters;
-    Node *block = nullptr;
-    for (auto *c : children) {
-        if (dynamic_cast<decl::Variable *>(c)) {
+    std::vector<std::shared_ptr<Node>> parameters;
+    std::shared_ptr<Node> block = nullptr;
+    for (auto &c : children) {
+        if (std::dynamic_pointer_cast<decl::Variable>(c)) {
             parameters.push_back(c);
-        } else if (dynamic_cast<stmt::Block *>(c)) {
+        } else if (std::dynamic_pointer_cast<stmt::Block>(c)) {
             block = c;
         }
     }
@@ -40,7 +40,7 @@ std::any JSONVisitor::visit_decl_function(decl::Function *d)
     return d_json;
 }
 
-std::any JSONVisitor::visit_decl_entry_point(decl::EntryPoint *d)
+std::any JSONVisitor::visit_decl_entry_point(const std::shared_ptr<decl::EntryPoint> &d)
 {
     const auto sym = d->get_symbol();
 
@@ -50,14 +50,14 @@ std::any JSONVisitor::visit_decl_entry_point(decl::EntryPoint *d)
     d_json["name"] = sym->name;
     d_json["line"] = sym->token->getLine();
 
-    std::vector<Node *> children = d->get_children();
+    auto children = d->get_children();
     // Get a list of just the parameters to visit
-    std::vector<Node *> parameters;
-    Node *block = nullptr;
-    for (auto *c : children) {
-        if (dynamic_cast<decl::Variable *>(c)) {
+    std::vector<std::shared_ptr<Node>> parameters;
+    std::shared_ptr<Node> block = nullptr;
+    for (auto &c : children) {
+        if (std::dynamic_pointer_cast<decl::Variable>(c)) {
             parameters.push_back(c);
-        } else if (dynamic_cast<stmt::Block *>(c)) {
+        } else if (std::dynamic_pointer_cast<stmt::Block>(c)) {
             block = c;
         }
     }
@@ -66,7 +66,7 @@ std::any JSONVisitor::visit_decl_entry_point(decl::EntryPoint *d)
     return d_json;
 }
 
-std::any JSONVisitor::visit_decl_global_param(decl::GlobalParam *d)
+std::any JSONVisitor::visit_decl_global_param(const std::shared_ptr<decl::GlobalParam> &d)
 {
     const auto sym = d->get_symbol();
 
@@ -79,7 +79,7 @@ std::any JSONVisitor::visit_decl_global_param(decl::GlobalParam *d)
     return d_json;
 }
 
-std::any JSONVisitor::visit_decl_struct(decl::Struct *d)
+std::any JSONVisitor::visit_decl_struct(const std::shared_ptr<decl::Struct> &d)
 {
     const auto sym = d->get_symbol();
 
@@ -92,7 +92,7 @@ std::any JSONVisitor::visit_decl_struct(decl::Struct *d)
     return d_json;
 }
 
-std::any JSONVisitor::visit_decl_struct_member(decl::StructMember *d)
+std::any JSONVisitor::visit_decl_struct_member(const std::shared_ptr<decl::StructMember> &d)
 {
     const auto sym = d->get_symbol();
 
@@ -105,7 +105,7 @@ std::any JSONVisitor::visit_decl_struct_member(decl::StructMember *d)
     return d_json;
 }
 
-std::any JSONVisitor::visit_decl_variable(decl::Variable *d)
+std::any JSONVisitor::visit_decl_variable(const std::shared_ptr<decl::Variable> &d)
 {
     const auto sym = d->get_symbol();
 
@@ -115,13 +115,13 @@ std::any JSONVisitor::visit_decl_variable(decl::Variable *d)
     d_json["name"] = sym->name;
     d_json["line"] = sym->token->getLine();
     if (d->expression) {
-        d_json["initializer"] = std::any_cast<nlohmann::json>(visit(d->expression.get()));
+        d_json["initializer"] = std::any_cast<nlohmann::json>(visit(d->expression));
     }
 
     return d_json;
 }
 
-std::any JSONVisitor::visit_stmt_block(stmt::Block *s)
+std::any JSONVisitor::visit_stmt_block(const std::shared_ptr<stmt::Block> &s)
 {
     nlohmann::json s_json;
 
@@ -132,36 +132,36 @@ std::any JSONVisitor::visit_stmt_block(stmt::Block *s)
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_if_else(stmt::IfElse *s)
+std::any JSONVisitor::visit_stmt_if_else(const std::shared_ptr<stmt::IfElse> &s)
 {
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::IfElse";
     s_json["line"] = s->get_token()->getLine();
-    s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition.get()));
-    s_json["if_branch"] = std::any_cast<nlohmann::json>(visit(s->if_branch.get()));
+    s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition));
+    s_json["if_branch"] = std::any_cast<nlohmann::json>(visit(s->if_branch));
     if (s->else_branch) {
-        s_json["else_branch"] = std::any_cast<nlohmann::json>(visit(s->if_branch.get()));
+        s_json["else_branch"] = std::any_cast<nlohmann::json>(visit(s->if_branch));
     }
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_while(stmt::While *s)
+std::any JSONVisitor::visit_stmt_while(const std::shared_ptr<stmt::While> &s)
 {
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::While";
     s_json["line"] = s->get_token()->getLine();
-    s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition.get()));
+    s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition));
     if (s->body) {
-        s_json["body"] = std::any_cast<nlohmann::json>(visit(s->body.get()));
+        s_json["body"] = std::any_cast<nlohmann::json>(visit(s->body));
     }
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_for(stmt::For *s)
+std::any JSONVisitor::visit_stmt_for(const std::shared_ptr<stmt::For> &s)
 {
     nlohmann::json s_json;
 
@@ -169,79 +169,80 @@ std::any JSONVisitor::visit_stmt_for(stmt::For *s)
     s_json["line"] = s->get_token()->getLine();
 
     if (s->init) {
-        s_json["init"] = std::any_cast<nlohmann::json>(visit(s->init.get()));
+        s_json["init"] = std::any_cast<nlohmann::json>(visit(s->init));
     }
     if (s->condition) {
-        s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition.get()));
+        s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition));
     }
     if (s->advance) {
-        s_json["advance"] = std::any_cast<nlohmann::json>(visit(s->advance.get()));
+        s_json["advance"] = std::any_cast<nlohmann::json>(visit(s->advance));
     }
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_return(stmt::Return *s)
+std::any JSONVisitor::visit_stmt_return(const std::shared_ptr<stmt::Return> &s)
 {
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::Return";
     s_json["line"] = s->get_token()->getLine();
     if (s->expression) {
-        s_json["expression"] = std::any_cast<nlohmann::json>(visit(s->expression.get()));
+        s_json["expression"] = std::any_cast<nlohmann::json>(visit(s->expression));
     }
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_variable_declaration(stmt::VariableDeclaration *s)
+std::any JSONVisitor::visit_stmt_variable_declaration(
+    const std::shared_ptr<stmt::VariableDeclaration> &s)
 {
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::VariableDeclaration";
     s_json["line"] = s->get_token()->getLine();
-    s_json["var"] = std::any_cast<nlohmann::json>(visit(s->var_decl.get()));
+    s_json["var"] = std::any_cast<nlohmann::json>(visit(s->var_decl));
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_stmt_expression(stmt::Expression *s)
+std::any JSONVisitor::visit_stmt_expression(const std::shared_ptr<stmt::Expression> &s)
 {
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::Expression";
     s_json["line"] = s->get_token()->getLine();
-    s_json["expr"] = std::any_cast<nlohmann::json>(visit(s->expr.get()));
+    s_json["expr"] = std::any_cast<nlohmann::json>(visit(s->expr));
 
     return s_json;
 }
 
-std::any JSONVisitor::visit_expr_unary(expr::Unary *e)
+std::any JSONVisitor::visit_expr_unary(const std::shared_ptr<expr::Unary> &e)
 {
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Unary";
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
-    e_json["expr"] = std::any_cast<nlohmann::json>(visit(e->expr.get()));
+    e_json["expr"] = std::any_cast<nlohmann::json>(visit(e->expr));
 
     return e_json;
 }
 
-std::any JSONVisitor::visit_expr_binary(expr::Binary *e)
+std::any JSONVisitor::visit_expr_binary(const std::shared_ptr<expr::Binary> &e)
 {
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Binary";
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
-    e_json["left"] = std::any_cast<nlohmann::json>(visit(e->left.get()));
-    e_json["right"] = std::any_cast<nlohmann::json>(visit(e->right.get()));
+    e_json["left"] = std::any_cast<nlohmann::json>(visit(e->left));
+    e_json["right"] = std::any_cast<nlohmann::json>(visit(e->right));
 
     return e_json;
 }
 
-std::any JSONVisitor::visit_expr_variable(expr::Variable *e)
+std::any JSONVisitor::visit_expr_variable(const std::shared_ptr<expr::Variable> &e)
 {
     nlohmann::json e_json;
 
@@ -252,7 +253,7 @@ std::any JSONVisitor::visit_expr_variable(expr::Variable *e)
     return e_json;
 }
 
-std::any JSONVisitor::visit_expr_constant(expr::Constant *e)
+std::any JSONVisitor::visit_expr_constant(const std::shared_ptr<expr::Constant> &e)
 {
     nlohmann::json e_json;
 
@@ -282,7 +283,7 @@ std::any JSONVisitor::visit_expr_constant(expr::Constant *e)
     return e_json;
 }
 
-std::any JSONVisitor::visit_expr_function_call(expr::FunctionCall *e)
+std::any JSONVisitor::visit_expr_function_call(const std::shared_ptr<expr::FunctionCall> &e)
 {
     nlohmann::json e_json;
 
@@ -291,46 +292,50 @@ std::any JSONVisitor::visit_expr_function_call(expr::FunctionCall *e)
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["callee"] = e->get_text();
 
-    std::vector<Node *> args;
+    std::vector<std::shared_ptr<Node>> args;
     std::transform(e->args.begin(),
                    e->args.end(),
                    std::back_inserter(args),
-                   [](std::shared_ptr<expr::Expression> &a) { return a.get(); });
+                   [](std::shared_ptr<expr::Expression> &a) {
+                       return std::dynamic_pointer_cast<Node>(a);
+                   });
     e_json["args"] = visit_all(args);
 
     return e_json;
 }
 
-std::any JSONVisitor::visit_struct_array_access(expr::StructArrayAccess *e)
+std::any JSONVisitor::visit_struct_array_access(
+    const std::shared_ptr<expr::StructArrayAccess> &e)
 {
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::StructArrayAccess";
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
-    e_json["variable"] = std::any_cast<nlohmann::json>(visit(e->variable.get()));
+    e_json["variable"] = std::any_cast<nlohmann::json>(visit(e->variable));
     e_json["struct_array_access_chain"] = visit_struct_array_fragments(e->struct_array_access);
 
     return e_json;
 }
 
-std::any JSONVisitor::visit_expr_assignment(expr::Assignment *e)
+std::any JSONVisitor::visit_expr_assignment(const std::shared_ptr<expr::Assignment> &e)
 {
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Assignment";
     e_json["line"] = e->get_token()->getLine();
     e_json["op"] = ast::to_string(e->get_node_type());
-    e_json["value"] = std::any_cast<nlohmann::json>(visit(e->value.get()));
-    e_json["lhs"] = std::any_cast<nlohmann::json>(visit(e->lhs.get()));
+    e_json["value"] = std::any_cast<nlohmann::json>(visit(e->value));
+    e_json["lhs"] = std::any_cast<nlohmann::json>(visit(e->lhs));
 
     return e_json;
 }
 
-std::vector<nlohmann::json> JSONVisitor::visit_all(const std::vector<Node *> &nodes)
+std::vector<nlohmann::json> JSONVisitor::visit_all(
+    const std::vector<std::shared_ptr<Node>> &nodes)
 {
     std::vector<nlohmann::json> results;
-    for (auto *n : nodes) {
+    for (auto &n : nodes) {
         results.push_back(std::any_cast<nlohmann::json>(visit(n)));
     }
     return results;
@@ -351,7 +356,7 @@ std::vector<nlohmann::json> JSONVisitor::visit_struct_array_fragments(
             auto array_fragment = std::dynamic_pointer_cast<expr::ArrayAccessFragment>(f);
             nlohmann::json j;
             j["ast_node"] = "ast::expr::ArrayAccessFragment";
-            j["expr"] = std::any_cast<nlohmann::json>(visit(array_fragment->index.get()));
+            j["expr"] = std::any_cast<nlohmann::json>(visit(array_fragment->index));
             results.push_back(j);
         }
     }

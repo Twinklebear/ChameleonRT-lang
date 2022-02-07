@@ -15,16 +15,16 @@ namespace crtl {
 class RenameEntryPointParamVisitor : public ast::Visitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
-    phmap::parallel_flat_hash_set<ast::decl::Variable *> renamed_vars;
+    phmap::parallel_flat_hash_set<std::shared_ptr<ast::decl::Variable>> renamed_vars;
 
 public:
     RenameEntryPointParamVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
     RenameEntryPointParamVisitor() = default;
 
-    std::any visit_decl_entry_point(ast::decl::EntryPoint *d) override;
+    std::any visit_decl_entry_point(const std::shared_ptr<ast::decl::EntryPoint> &d) override;
 
-    std::any visit_expr_variable(ast::expr::Variable *e) override;
+    std::any visit_expr_variable(const std::shared_ptr<ast::expr::Variable> &e) override;
 };
 
 }

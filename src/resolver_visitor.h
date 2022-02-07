@@ -13,15 +13,21 @@ namespace crtl {
  */
 struct ResolverPassResult {
     // A map of all struct type usages found in the code to the declaration for the struct
-    phmap::parallel_flat_hash_map<ast::ty::Struct *, ast::decl::Struct *> struct_type;
+    phmap::parallel_flat_hash_map<std::shared_ptr<ast::ty::Struct>,
+                                  std::shared_ptr<ast::decl::Struct>>
+        struct_type;
 
     // A map of each variable expression found in the program to the declaration of that
     // variable. Each variable expr may be accessing a local/global variable decl or a global
     // parameter
-    phmap::parallel_flat_hash_map<ast::expr::Variable *, ast::decl::Variable *> var_expr;
+    phmap::parallel_flat_hash_map<std::shared_ptr<ast::expr::Variable>,
+                                  std::shared_ptr<ast::decl::Variable>>
+        var_expr;
 
     // A map of each function call expression in the program to the function being called
-    phmap::parallel_flat_hash_map<ast::expr::FunctionCall *, ast::decl::Function *> call_expr;
+    phmap::parallel_flat_hash_map<std::shared_ptr<ast::expr::FunctionCall>,
+                                  std::shared_ptr<ast::decl::Function>>
+        call_expr;
 };
 
 class ResolverVisitor : public ast::Visitor {
@@ -30,11 +36,11 @@ class ResolverVisitor : public ast::Visitor {
         bool defined = false;
         bool read = false;
 
-        ast::decl::Declaration *decl = nullptr;
+        std::shared_ptr<ast::decl::Declaration> decl;
 
         SymbolStatus() = default;
 
-        SymbolStatus(ast::decl::Declaration *decl);
+        SymbolStatus(const std::shared_ptr<ast::decl::Declaration> &decl);
     };
 
     // Map of user defined global variables, parameters, structs, functions, entry points
@@ -56,26 +62,28 @@ public:
 
     ResolverVisitor() = default;
 
-    std::any visit_decl_function(ast::decl::Function *d) override;
-    std::any visit_decl_entry_point(ast::decl::EntryPoint *d) override;
-    std::any visit_decl_global_param(ast::decl::GlobalParam *d) override;
-    std::any visit_decl_struct(ast::decl::Struct *d) override;
-    std::any visit_decl_variable(ast::decl::Variable *d) override;
+    std::any visit_decl_function(const std::shared_ptr<ast::decl::Function> &d) override;
+    std::any visit_decl_entry_point(const std::shared_ptr<ast::decl::EntryPoint> &d) override;
+    std::any visit_decl_global_param(
+        const std::shared_ptr<ast::decl::GlobalParam> &d) override;
+    std::any visit_decl_struct(const std::shared_ptr<ast::decl::Struct> &d) override;
+    std::any visit_decl_variable(const std::shared_ptr<ast::decl::Variable> &d) override;
 
-    std::any visit_stmt_block(ast::stmt::Block *s) override;
-    std::any visit_stmt_for(ast::stmt::For *s) override;
+    std::any visit_stmt_block(const std::shared_ptr<ast::stmt::Block> &s) override;
+    std::any visit_stmt_for(const std::shared_ptr<ast::stmt::For> &s) override;
 
-    std::any visit_expr_variable(ast::expr::Variable *e) override;
-    std::any visit_expr_function_call(ast::expr::FunctionCall *e) override;
+    std::any visit_expr_variable(const std::shared_ptr<ast::expr::Variable> &e) override;
+    std::any visit_expr_function_call(
+        const std::shared_ptr<ast::expr::FunctionCall> &e) override;
 
 private:
     void begin_scope();
 
     void end_scope();
 
-    void declare(ast::decl::Declaration *decl);
+    void declare(const std::shared_ptr<ast::decl::Declaration> &decl);
 
-    void define(ast::decl::Declaration *decl);
+    void define(const std::shared_ptr<ast::decl::Declaration> &decl);
 
     /* Resolve the struct type to the corresponding struct declaration, if the type passed is a
      * struct. Returns true if the struct declaration was resolved or the type is not a struct
@@ -87,17 +95,20 @@ private:
      * node.
      * Returns null and reports an error if there's no such struct
      */
-    ast::decl::Variable *resolve_variable(ast::expr::Variable *node);
+    std::shared_ptr<ast::decl::Variable> resolve_variable(
+        const std::shared_ptr<ast::expr::Variable> &node);
 
     /* Find the descriptor for the struct with the given name.
      * Returns null and reports an error if there's no such struct
      */
-    ast::decl::Struct *resolve_struct(ast::ty::Struct *node);
+    std::shared_ptr<ast::decl::Struct> resolve_struct(
+        const std::shared_ptr<ast::ty::Struct> &node);
 
     /* Resolve the function referenced by the call and associate it with the
      * node.
      * Returns null and reports an error if there's no such struct
      */
-    ast::decl::Function *resolve_function(ast::expr::FunctionCall *node);
+    std::shared_ptr<ast::decl::Function> resolve_function(
+        const std::shared_ptr<ast::expr::FunctionCall> &node);
 };
 }

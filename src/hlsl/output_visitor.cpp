@@ -14,22 +14,22 @@ OutputVisitor::OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver
 {
 }
 
-std::any OutputVisitor::visit_ast(ast::AST *ast)
+std::any OutputVisitor::visit_ast(const std::shared_ptr<ast::AST> &ast)
 {
     std::string hlsl_src = "// CRTL HLSL Output\n";
     for (auto &n : ast->top_level_decls) {
-        hlsl_src += std::any_cast<std::string>(visit(n.get())) + "\n";
+        hlsl_src += std::any_cast<std::string>(visit(n)) + "\n";
     }
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_decl_function(ast::decl::Function *d)
+std::any OutputVisitor::visit_decl_function(const std::shared_ptr<ast::decl::Function> &d)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
+std::any OutputVisitor::visit_decl_entry_point(const std::shared_ptr<ast::decl::EntryPoint> &d)
 {
     // TODO: Entry point parameters need to be renamed to avoid name collision in
     // a pass that works on the AST. Not at this point when we're just doing the lowering
@@ -93,41 +93,43 @@ std::any OutputVisitor::visit_decl_entry_point(ast::decl::EntryPoint *d)
     }
 
     // Emit the function body
-    hlsl_src += std::any_cast<std::string>(visit(d->block.get()));
+    hlsl_src += std::any_cast<std::string>(visit(d->block));
 
     hlsl_src += "}\n";
 
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_decl_global_param(ast::decl::GlobalParam *d)
+std::any OutputVisitor::visit_decl_global_param(
+    const std::shared_ptr<ast::decl::GlobalParam> &d)
 {
-    std::string hlsl_src = bind_parameter(d);
+    std::string hlsl_src = bind_parameter(d.get());
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_decl_struct(ast::decl::Struct *d)
+std::any OutputVisitor::visit_decl_struct(const std::shared_ptr<ast::decl::Struct> &d)
 {
     std::string hlsl_src = "struct " + d->get_text() + " {\n";
     for (auto &m : d->members) {
-        hlsl_src += std::any_cast<std::string>(visit(m.get())) + "\n";
+        hlsl_src += std::any_cast<std::string>(visit(m)) + "\n";
     }
     hlsl_src += "};\n";
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_decl_struct_member(ast::decl::StructMember *d)
+std::any OutputVisitor::visit_decl_struct_member(
+    const std::shared_ptr<ast::decl::StructMember> &d)
 {
     return translate_type(d->get_type()) + " " + d->get_text() + ";";
 }
 
-std::any OutputVisitor::visit_decl_variable(ast::decl::Variable *d)
+std::any OutputVisitor::visit_decl_variable(const std::shared_ptr<ast::decl::Variable> &d)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_block(ast::stmt::Block *s)
+std::any OutputVisitor::visit_stmt_block(const std::shared_ptr<ast::stmt::Block> &s)
 {
     std::string hlsl_src = "{\n";
 
@@ -141,31 +143,32 @@ std::any OutputVisitor::visit_stmt_block(ast::stmt::Block *s)
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_if_else(ast::stmt::IfElse *s)
+std::any OutputVisitor::visit_stmt_if_else(const std::shared_ptr<ast::stmt::IfElse> &s)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_while(ast::stmt::While *s)
+std::any OutputVisitor::visit_stmt_while(const std::shared_ptr<ast::stmt::While> &s)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_for(ast::stmt::For *s)
+std::any OutputVisitor::visit_stmt_for(const std::shared_ptr<ast::stmt::For> &s)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_return(ast::stmt::Return *s)
+std::any OutputVisitor::visit_stmt_return(const std::shared_ptr<ast::stmt::Return> &s)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_variable_declaration(ast::stmt::VariableDeclaration *s)
+std::any OutputVisitor::visit_stmt_variable_declaration(
+    const std::shared_ptr<ast::stmt::VariableDeclaration> &s)
 {
     std::string hlsl_src;
     auto var_decl = s->var_decl;
@@ -176,50 +179,51 @@ std::any OutputVisitor::visit_stmt_variable_declaration(ast::stmt::VariableDecla
     }
     hlsl_src += " " + var_decl->get_text();
     if (var_decl->expression) {
-        auto expr = std::any_cast<std::string>(visit(var_decl->expression.get()));
+        auto expr = std::any_cast<std::string>(visit(var_decl->expression));
         hlsl_src += " = " + expr;
     }
     hlsl_src += ";";
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_stmt_expression(ast::stmt::Expression *s)
+std::any OutputVisitor::visit_stmt_expression(const std::shared_ptr<ast::stmt::Expression> &s)
 {
-    return std::any_cast<std::string>(visit(s->expr.get())) + ";";
+    return std::any_cast<std::string>(visit(s->expr)) + ";";
 }
 
-std::any OutputVisitor::visit_expr_unary(ast::expr::Unary *e)
+std::any OutputVisitor::visit_expr_unary(const std::shared_ptr<ast::expr::Unary> &e)
 {
-    const std::string operand = std::any_cast<std::string>(visit(e->expr.get()));
+    const std::string operand = std::any_cast<std::string>(visit(e->expr));
     return e->operator_string() + operand;
 }
 
-std::any OutputVisitor::visit_expr_binary(ast::expr::Binary *e)
+std::any OutputVisitor::visit_expr_binary(const std::shared_ptr<ast::expr::Binary> &e)
 {
-    const std::string lhs = std::any_cast<std::string>(visit(e->left.get()));
-    const std::string rhs = std::any_cast<std::string>(visit(e->right.get()));
+    const std::string lhs = std::any_cast<std::string>(visit(e->left));
+    const std::string rhs = std::any_cast<std::string>(visit(e->right));
     return lhs + " " + e->operator_string() + " " + rhs;
 }
 
-std::any OutputVisitor::visit_expr_variable(ast::expr::Variable *e)
+std::any OutputVisitor::visit_expr_variable(const std::shared_ptr<ast::expr::Variable> &e)
 {
     return e->name();
 }
 
-std::any OutputVisitor::visit_expr_constant(ast::expr::Constant *e)
+std::any OutputVisitor::visit_expr_constant(const std::shared_ptr<ast::expr::Constant> &e)
 {
     std::string hlsl_src;
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
+std::any OutputVisitor::visit_expr_function_call(
+    const std::shared_ptr<ast::expr::FunctionCall> &e)
 {
     std::string hlsl_src;
-    auto *callee = resolver_result->call_expr[e];
+    auto callee = resolver_result->call_expr[e];
 
     // Translate calls to built-ins to the appropriate built in HLSL function
     if (callee->is_builtin()) {
-        hlsl_src = translate_builtin_function_call(e, callee);
+        hlsl_src = translate_builtin_function_call(e.get(), callee.get());
         if (hlsl_src.empty()) {
             report_error(e->get_token(), "Unhandled built-in call!");
         }
@@ -237,7 +241,8 @@ std::any OutputVisitor::visit_expr_function_call(ast::expr::FunctionCall *e)
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_struct_array_access(ast::expr::StructArrayAccess *e)
+std::any OutputVisitor::visit_struct_array_access(
+    const std::shared_ptr<ast::expr::StructArrayAccess> &e)
 {
     std::string hlsl_src = e->variable->name();
     for (auto &f : e->struct_array_access) {
@@ -248,18 +253,17 @@ std::any OutputVisitor::visit_struct_array_access(ast::expr::StructArrayAccess *
             hlsl_src += "." + member_access->name();
         } else {
             auto array_access = std::dynamic_pointer_cast<expr::ArrayAccessFragment>(f);
-            const std::string idx =
-                std::any_cast<std::string>(visit(array_access->index.get()));
+            const std::string idx = std::any_cast<std::string>(visit(array_access->index));
             hlsl_src += "[" + idx + "]";
         }
     }
     return hlsl_src;
 }
 
-std::any OutputVisitor::visit_expr_assignment(ast::expr::Assignment *e)
+std::any OutputVisitor::visit_expr_assignment(const std::shared_ptr<ast::expr::Assignment> &e)
 {
-    const std::string lhs = std::any_cast<std::string>(visit(e->lhs.get()));
-    const std::string value = std::any_cast<std::string>(visit(e->value.get()));
+    const std::string lhs = std::any_cast<std::string>(visit(e->lhs));
+    const std::string value = std::any_cast<std::string>(visit(e->value));
     return lhs + " = " + value;
 }
 
@@ -268,7 +272,7 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
     std::string hlsl_src;
     const auto param_type = param->get_type();
     if (!param_type->is_builtin()) {
-        const auto *struct_decl =
+        const auto struct_decl =
             resolver_result->struct_type[dynamic_cast<ty::Struct *>(param_type.get())];
         if (!struct_decl) {
             report_error(param->get_token(),

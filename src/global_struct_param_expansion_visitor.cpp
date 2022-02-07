@@ -9,25 +9,27 @@ GlobalStructParamExpansionVisitor::GlobalStructParamExpansionVisitor(
 {
 }
 
-std::any GlobalStructParamExpansionVisitor::visit_ast(ast::AST *ast)
+std::any GlobalStructParamExpansionVisitor::visit_ast(const std::shared_ptr<ast::AST> &ast)
 {
     // Make a copy of the AST to ensure any global param decl references remain valid as we
     // create the new tree with them expanded
     return std::any();
 }
 
-std::any GlobalStructParamExpansionVisitor::visit_decl_global_param(ast::decl::GlobalParam *d)
+std::any GlobalStructParamExpansionVisitor::visit_decl_global_param(
+    const std::shared_ptr<ast::decl::GlobalParam> &d)
 {
     return std::any();
 }
 
-std::any GlobalStructParamExpansionVisitor::visit_expr_variable(ast::expr::Variable *e)
+std::any GlobalStructParamExpansionVisitor::visit_expr_variable(
+    const std::shared_ptr<ast::expr::Variable> &e)
 {
     return std::any();
 }
 
 std::any GlobalStructParamExpansionVisitor::visit_struct_array_access(
-    ast::expr::StructArrayAccess *e)
+    const std::shared_ptr<ast::expr::StructArrayAccess> &e)
 {
     // TODO: Here we actually need to replace this node w/ a plain expr::Variable node
     // also need to make sure it's resolved to the new expanded decl in the resolver result for

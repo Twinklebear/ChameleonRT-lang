@@ -32,7 +32,7 @@ public:
     static std::shared_ptr<Unary> logic_not(antlr4::Token *op,
                                             const std::shared_ptr<Expression> &expr);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 
     std::string operator_string() const;
 };
@@ -95,7 +95,7 @@ public:
                                             const std::shared_ptr<Expression> &left,
                                             const std::shared_ptr<Expression> &right);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 
     std::string operator_string() const;
 };
@@ -108,7 +108,7 @@ public:
 
     std::string name() const;
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 /* A compile time constant value
@@ -124,7 +124,7 @@ public:
     Constant(antlr4::Token *constant, float value);
     Constant(antlr4::Token *constant, double value);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class StructArrayAccessFragment {
@@ -156,7 +156,7 @@ public:
 
     FunctionCall(antlr4::Token *callee, const std::vector<std::shared_ptr<Expression>> &args);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class StructArrayAccess : public Expression {
@@ -168,7 +168,7 @@ public:
         const std::shared_ptr<Variable> &variable,
         const std::vector<std::shared_ptr<StructArrayAccessFragment>> &struct_array_access);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 class Assignment : public Expression {
@@ -180,7 +180,7 @@ public:
     Assignment(const std::shared_ptr<Expression> &lhs,
                const std::shared_ptr<Expression> &value);
 
-    std::vector<Node *> get_children() override;
+    std::vector<std::shared_ptr<Node>> get_children() override;
 };
 
 }

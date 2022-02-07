@@ -65,14 +65,14 @@ int main(int argc, char **argv)
     auto ast = ast_builder.ast;
 
     crtl::JSONVisitor json_visitor;
-    json_visitor.visit_ast(ast.get());
+    json_visitor.visit_ast(ast);
 
     std::cout << "AST JSON:\n" << json_visitor.ast_json.dump(4) << "\n";
 
     auto builtins = crtl::get_builtin_decls();
 
     crtl::ResolverVisitor resolver_visitor(builtins);
-    resolver_visitor.visit_ast(ast.get());
+    resolver_visitor.visit_ast(ast);
 
     // For testing, print out some info about what was resolved by the resolver
     for (const auto &x : resolver_visitor.resolved->struct_type) {
@@ -107,11 +107,10 @@ int main(int argc, char **argv)
     }
 
     crtl::RenameEntryPointParamVisitor rename_entry_point_params(resolver_visitor.resolved);
-    rename_entry_point_params.visit_ast(ast.get());
+    rename_entry_point_params.visit_ast(ast);
 
     crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
-    const std::string hlsl_src =
-        std::any_cast<std::string>(hlsl_translator.visit_ast(ast.get()));
+    const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
     std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
 
     return 0;

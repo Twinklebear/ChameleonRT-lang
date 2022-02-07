@@ -64,10 +64,10 @@ std::shared_ptr<Unary> Unary::logic_not(antlr4::Token *op,
     return std::make_shared<Unary>(op, NodeType::EXPR_LOGIC_NOT, expr);
 }
 
-std::vector<Node *> Unary::get_children()
+std::vector<std::shared_ptr<Node>> Unary::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(expr.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(expr);
     return children;
 }
 
@@ -168,11 +168,11 @@ std::shared_ptr<Binary> Binary::logic_or(antlr4::Token *op,
     return std::make_shared<Binary>(op, NodeType::EXPR_LOGIC_OR, left, right);
 }
 
-std::vector<Node *> Binary::get_children()
+std::vector<std::shared_ptr<Node>> Binary::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(left.get());
-    children.push_back(right.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(left);
+    children.push_back(right);
     return children;
 }
 
@@ -191,9 +191,9 @@ std::string Variable::name() const
     return var_name;
 }
 
-std::vector<Node *> Variable::get_children()
+std::vector<std::shared_ptr<Node>> Variable::get_children()
 {
-    return std::vector<Node *>{};
+    return std::vector<std::shared_ptr<Node>>();
 }
 
 Constant::Constant(antlr4::Token *constant, bool value)
@@ -224,9 +224,9 @@ Constant::Constant(antlr4::Token *constant, double value)
 {
 }
 
-std::vector<Node *> Constant::get_children()
+std::vector<std::shared_ptr<Node>> Constant::get_children()
 {
-    return std::vector<Node *>{};
+    return std::vector<std::shared_ptr<Node>>();
 }
 
 StructMemberAccessFragment::StructMemberAccessFragment(antlr4::Token *member) : member(member)
@@ -258,18 +258,18 @@ StructArrayAccess::StructArrayAccess(
 {
 }
 
-std::vector<Node *> StructArrayAccess::get_children()
+std::vector<std::shared_ptr<Node>> StructArrayAccess::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(variable.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(variable);
     return children;
 }
 
-std::vector<Node *> FunctionCall::get_children()
+std::vector<std::shared_ptr<Node>> FunctionCall::get_children()
 {
-    std::vector<Node *> children;
+    std::vector<std::shared_ptr<Node>> children;
     for (auto &a : args) {
-        children.push_back(a.get());
+        children.push_back(a);
     }
     return children;
 }
@@ -280,11 +280,11 @@ Assignment::Assignment(const std::shared_ptr<Expression> &leftside,
 {
 }
 
-std::vector<Node *> Assignment::get_children()
+std::vector<std::shared_ptr<Node>> Assignment::get_children()
 {
-    std::vector<Node *> children;
-    children.push_back(lhs.get());
-    children.push_back(value.get());
+    std::vector<std::shared_ptr<Node>> children;
+    children.push_back(lhs);
+    children.push_back(value);
     return children;
 }
 
