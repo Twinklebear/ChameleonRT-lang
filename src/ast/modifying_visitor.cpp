@@ -5,7 +5,33 @@ namespace ast {
 
 // TODO
 
-std::any ModifyingVisitor::visit_ast(const std::shared_ptr<AST> &ast) {}
+std::any ModifyingVisitor::visit_ast(const std::shared_ptr<AST> &ast)
+{
+    auto ast_out = std::make_shared<AST>();
+    for (auto &n : ast->top_level_decls) {
+        auto result = visit(n);
+        if (!result.has_value()) {
+            continue;
+        }
+        if (result.type() == typeid(std::shared_ptr<decl::Declaration>)) {
+            auto decl = std::any_cast<std::shared_ptr<decl::Declaration>>(result);
+            ast_out->top_level_decls.push_back(decl);
+        } else if (result.type() == typeid(std::vector<std::shared_ptr<decl::Declaration>>)) {
+            auto decls =
+                std::any_cast<std::vector<std::shared_ptr<decl::Declaration>>>(result);
+            for (auto &d : decls) {
+                ast_out->top_level_decls.push_back(d);
+            }
+        } else {
+            const std::string type_name = result.type().name();
+            std::cout << "ModifyingVisitor: Top-level decl returned invalid type '"
+                      << type_name << "'\n";
+            throw std::runtime_error(
+                "ModifyingVisitor: Top-level decl returned invalid type '" + type_name + "'");
+        }
+    }
+    return ast_out;
+}
 
 std::any ModifyingVisitor::visit_decl_function(const std::shared_ptr<decl::Function> &d) {}
 
@@ -26,7 +52,11 @@ std::any ModifyingVisitor::visit_decl_struct_member(
 
 std::any ModifyingVisitor::visit_decl_variable(const std::shared_ptr<decl::Variable> &d) {}
 
-std::any ModifyingVisitor::visit_stmt_block(const std::shared_ptr<stmt::Block> &s) {}
+std::any ModifyingVisitor::visit_stmt_block(const std::shared_ptr<stmt::Block> &s)
+{
+    // TODO: Need similar handling here as the AST for getting back zero, one, or multiple
+    // statements
+}
 
 std::any ModifyingVisitor::visit_stmt_if_else(const std::shared_ptr<stmt::IfElse> &s) {}
 
