@@ -5,6 +5,7 @@
 #include "ChameleonRTLexer.h"
 #include "ChameleonRTParser.h"
 #include "antlr4-runtime.h"
+#include "ast/modifying_visitor.h"
 #include "ast_builder_visitor.h"
 #include "builtins.h"
 #include "error_listener.h"
@@ -105,6 +106,10 @@ int main(int argc, char **argv)
         std::cout << "Error during resolver pass, exiting\n";
         return 1;
     }
+
+    crtl::ast::ModifyingVisitor modifying_visitor_test;
+    ast =
+        std::any_cast<std::shared_ptr<crtl::ast::AST>>(modifying_visitor_test.visit_ast(ast));
 
     crtl::RenameEntryPointParamVisitor rename_entry_point_params(resolver_visitor.resolved);
     rename_entry_point_params.visit_ast(ast);
