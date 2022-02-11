@@ -80,6 +80,12 @@ public:
 
     const antlr4::Token *get_token() const;
 
+    // Generated nodes's tokens are null, as there's no source input they correspond too
+    // TODO: Maybe this could refer to the original source token that caused their generation?
+    // might get hard to track with more complex generation of nodes or not make much sense.
+    // making it null will help catch bugs
+    bool is_generated() const;
+
     virtual std::string get_text() const;
 
     virtual std::vector<std::shared_ptr<Node>> get_children() = 0;

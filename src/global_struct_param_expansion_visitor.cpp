@@ -9,23 +9,18 @@ GlobalStructParamExpansionVisitor::GlobalStructParamExpansionVisitor(
 {
 }
 
-std::any GlobalStructParamExpansionVisitor::visit_ast(const std::shared_ptr<ast::AST> &ast)
-{
-    // Make a copy of the AST to ensure any global param decl references remain valid as we
-    // create the new tree with them expanded
-    return std::any();
-}
-
 std::any GlobalStructParamExpansionVisitor::visit_decl_global_param(
     const std::shared_ptr<ast::decl::GlobalParam> &d)
 {
-    return std::any();
+    // TODO
+    return std::dynamic_pointer_cast<decl::Declaration>(d);
 }
 
 std::any GlobalStructParamExpansionVisitor::visit_expr_variable(
     const std::shared_ptr<ast::expr::Variable> &e)
 {
-    return std::any();
+    // TODO
+    return std::dynamic_pointer_cast<expr::Expression>(e);
 }
 
 std::any GlobalStructParamExpansionVisitor::visit_struct_array_access(
@@ -38,6 +33,6 @@ std::any GlobalStructParamExpansionVisitor::visit_struct_array_access(
     // of raw pointers? then I could write visitors for statements and expressions that didn't
     // need to care if their child node was changed or not, it would just re-assign the thing
     // it got returned when visiting its sub-expression
-    return std::any();
+    return std::dynamic_pointer_cast<expr::Expression>(e);
 }
 }

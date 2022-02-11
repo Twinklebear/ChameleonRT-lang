@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast/visitor.h"
+#include "ast/modifying_visitor.h"
 #include "resolver_visitor.h"
 
 namespace crtl {
@@ -14,7 +14,7 @@ struct ExpandedGlobalParam {
     phmap::parallel_flat_hash_map<std::string, ast::decl::GlobalParam *> expanded_members;
 };
 
-class GlobalStructParamExpansionVisitor : public ast::Visitor {
+class GlobalStructParamExpansionVisitor : public ast::ModifyingVisitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
     phmap::parallel_flat_hash_map<ast::decl::GlobalParam *,
@@ -26,8 +26,6 @@ public:
         const std::shared_ptr<ResolverPassResult> &resolver_result);
 
     GlobalStructParamExpansionVisitor() = default;
-
-    std::any visit_ast(const std::shared_ptr<ast::AST> &ast) override;
 
     std::any visit_decl_global_param(
         const std::shared_ptr<ast::decl::GlobalParam> &d) override;
@@ -41,5 +39,4 @@ public:
     std::any visit_struct_array_access(
         const std::shared_ptr<ast::expr::StructArrayAccess> &e) override;
 };
-
 }

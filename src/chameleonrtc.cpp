@@ -9,6 +9,7 @@
 #include "ast_builder_visitor.h"
 #include "builtins.h"
 #include "error_listener.h"
+#include "global_struct_param_expansion_visitor.h"
 #include "hlsl/output_visitor.h"
 #include "json_visitor.h"
 #include "rename_entry_point_param_visitor.h"
@@ -107,12 +108,22 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    crtl::ast::ModifyingVisitor modifying_visitor_test;
-    ast =
-        std::any_cast<std::shared_ptr<crtl::ast::AST>>(modifying_visitor_test.visit_ast(ast));
+    crtl::GlobalStructParamExpansionVisitor global_struct_param_expansion_visitor;
+    ast = std::any_cast<std::shared_ptr<crtl::ast::AST>>(
+        global_struct_param_expansion_visitor.visit_ast(ast));
 
     crtl::RenameEntryPointParamVisitor rename_entry_point_params(resolver_visitor.resolved);
     rename_entry_point_params.visit_ast(ast);
+
+#if 0
+    {
+        // TODO: this will need to handle generated nodes (null token)
+        crtl::JSONVisitor post_modification_json;
+        post_modification_json.visit_ast(ast);
+
+        std::cout << "AST JSON post-modifications:\n" << json_visitor.ast_json.dump(4) << "\n";
+    }
+#endif
 
     crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
     const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
