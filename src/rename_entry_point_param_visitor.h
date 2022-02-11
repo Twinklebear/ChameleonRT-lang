@@ -20,8 +20,6 @@ class RenameEntryPointParamVisitor : public ast::Visitor {
 public:
     RenameEntryPointParamVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
-    RenameEntryPointParamVisitor() = default;
-
     std::any visit_decl_entry_point(const std::shared_ptr<ast::decl::EntryPoint> &d) override;
 
     std::any visit_expr_variable(const std::shared_ptr<ast::expr::Variable> &e) override;

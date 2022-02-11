@@ -21,8 +21,6 @@ class OutputVisitor : public ast::Visitor {
 public:
     OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
-    OutputVisitor() = default;
-
     // NOTE: Most statements don't need any rewriting but we do still need to visit
     // everything to build the HLSL source code
 

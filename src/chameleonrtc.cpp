@@ -108,7 +108,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    crtl::GlobalStructParamExpansionVisitor global_struct_param_expansion_visitor;
+    crtl::GlobalStructParamExpansionVisitor global_struct_param_expansion_visitor(
+        resolver_visitor.resolved);
     ast = std::any_cast<std::shared_ptr<crtl::ast::AST>>(
         global_struct_param_expansion_visitor.visit_ast(ast));
 

@@ -103,6 +103,10 @@ std::any OutputVisitor::visit_decl_entry_point(const std::shared_ptr<ast::decl::
 std::any OutputVisitor::visit_decl_global_param(
     const std::shared_ptr<ast::decl::GlobalParam> &d)
 {
+    if (d->get_type()->base_type == ty::BaseType::STRUCT) {
+        report_error(d->get_token(), "Error: Global parameters should not be struct types!");
+        return std::string();
+    }
     std::string hlsl_src = bind_parameter(d.get());
     return hlsl_src;
 }

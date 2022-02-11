@@ -6,26 +6,22 @@
 namespace crtl {
 
 struct ExpandedGlobalParam {
-    // The original struct type declaration that was expanded
-    ast::decl::Struct *original_struct = nullptr;
-
     // The former members of the global struct parameter that have been expanded to global
     // parameters
-    phmap::parallel_flat_hash_map<std::string, ast::decl::GlobalParam *> expanded_members;
+    phmap::parallel_flat_hash_map<std::string, std::shared_ptr<ast::decl::GlobalParam>>
+        members;
 };
 
 class GlobalStructParamExpansionVisitor : public ast::ModifyingVisitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
-    phmap::parallel_flat_hash_map<ast::decl::GlobalParam *,
+    phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::GlobalParam>,
                                   std::shared_ptr<ExpandedGlobalParam>>
         expanded_global_params;
 
 public:
     GlobalStructParamExpansionVisitor(
         const std::shared_ptr<ResolverPassResult> &resolver_result);
-
-    GlobalStructParamExpansionVisitor() = default;
 
     std::any visit_decl_global_param(
         const std::shared_ptr<ast::decl::GlobalParam> &d) override;
