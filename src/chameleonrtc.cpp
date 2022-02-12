@@ -116,13 +116,40 @@ int main(int argc, char **argv)
     crtl::RenameEntryPointParamVisitor rename_entry_point_params(resolver_visitor.resolved);
     rename_entry_point_params.visit_ast(ast);
 
-#if 0
+#if 1
     {
         // TODO: this will need to handle generated nodes (null token)
-        crtl::JSONVisitor post_modification_json;
-        post_modification_json.visit_ast(ast);
+        json_visitor.visit_ast(ast);
 
         std::cout << "AST JSON post-modifications:\n" << json_visitor.ast_json.dump(4) << "\n";
+
+        // Print out the resolver data again to validate that it's been updated correctly
+        std::cout << "Resolver data post-modifications\n";
+        for (const auto &x : resolver_visitor.resolved->struct_type) {
+            auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+            std::cout << "Resolved struct type: " << x.first->name << " to decl:\n"
+                      << decl.dump(4) << "\n";
+        }
+
+        for (const auto &x : resolver_visitor.resolved->var_expr) {
+            auto expr = std::any_cast<nlohmann::json>(json_visitor.visit(x.first));
+            auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+            std::cout << "Resolved var expr:\n"
+                      << expr.dump(4) << "\nreferencing var declared:\n"
+                      << decl.dump(4) << "\n";
+        }
+
+        for (const auto &x : resolver_visitor.resolved->call_expr) {
+            auto expr = std::any_cast<nlohmann::json>(json_visitor.visit(x.first));
+            std::cout << "Resolved function call:\n"
+                      << expr.dump(4) << "\nto function declared:\n";
+            if (!x.second->is_builtin()) {
+                auto decl = std::any_cast<nlohmann::json>(json_visitor.visit(x.second));
+                std::cout << decl.dump(4) << "\n";
+            } else {
+                std::cout << "Built-in function: " << x.second->get_text() << "\n";
+            }
+        }
     }
 #endif
 

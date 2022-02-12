@@ -20,8 +20,10 @@ std::any JSONVisitor::visit_decl_function(const std::shared_ptr<decl::Function> 
     const auto sym = d->get_symbol();
     d_json["ast_node"] = "ast::decl::Function";
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
-    d_json["col"] = sym->token->getCharPositionInLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
     d_json["type"] = d->get_type()->to_string();
 
     auto children = d->get_children();
@@ -48,7 +50,10 @@ std::any JSONVisitor::visit_decl_entry_point(const std::shared_ptr<decl::EntryPo
     d_json["ast_node"] = "ast::decl::EntryPoint";
     d_json["type"] = d->get_type()->to_string();
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
 
     auto children = d->get_children();
     // Get a list of just the parameters to visit
@@ -74,7 +79,10 @@ std::any JSONVisitor::visit_decl_global_param(const std::shared_ptr<decl::Global
     d_json["ast_node"] = "ast::decl::GlobalParam";
     d_json["type"] = d->get_type()->to_string();
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
 
     return d_json;
 }
@@ -86,7 +94,10 @@ std::any JSONVisitor::visit_decl_struct(const std::shared_ptr<decl::Struct> &d)
     nlohmann::json d_json;
     d_json["ast_node"] = "ast::decl::Struct";
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
     d_json["members"] = visit_all(d->get_children());
 
     return d_json;
@@ -100,7 +111,10 @@ std::any JSONVisitor::visit_decl_struct_member(const std::shared_ptr<decl::Struc
     d_json["ast_node"] = "ast::decl::StructMember";
     d_json["type"] = d->get_type()->to_string();
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
 
     return d_json;
 }
@@ -113,7 +127,10 @@ std::any JSONVisitor::visit_decl_variable(const std::shared_ptr<decl::Variable> 
     d_json["ast_node"] = "ast::decl::Variable";
     d_json["type"] = d->get_type()->to_string();
     d_json["name"] = sym->name;
-    d_json["line"] = sym->token->getLine();
+    d_json["generated"] = sym->is_generated();
+    if (!sym->is_generated()) {
+        d_json["line"] = sym->token->getLine();
+    }
     if (d->expression) {
         d_json["initializer"] = std::any_cast<nlohmann::json>(visit(d->expression));
     }
@@ -126,7 +143,10 @@ std::any JSONVisitor::visit_stmt_block(const std::shared_ptr<stmt::Block> &s)
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::Block";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     s_json["statements"] = visit_all(s->get_children());
 
     return s_json;
@@ -137,7 +157,10 @@ std::any JSONVisitor::visit_stmt_if_else(const std::shared_ptr<stmt::IfElse> &s)
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::IfElse";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition));
     s_json["if_branch"] = std::any_cast<nlohmann::json>(visit(s->if_branch));
     if (s->else_branch) {
@@ -152,7 +175,10 @@ std::any JSONVisitor::visit_stmt_while(const std::shared_ptr<stmt::While> &s)
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::While";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     s_json["condition"] = std::any_cast<nlohmann::json>(visit(s->condition));
     if (s->body) {
         s_json["body"] = std::any_cast<nlohmann::json>(visit(s->body));
@@ -166,7 +192,10 @@ std::any JSONVisitor::visit_stmt_for(const std::shared_ptr<stmt::For> &s)
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::For";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
 
     if (s->init) {
         s_json["init"] = std::any_cast<nlohmann::json>(visit(s->init));
@@ -186,7 +215,10 @@ std::any JSONVisitor::visit_stmt_return(const std::shared_ptr<stmt::Return> &s)
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::Return";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     if (s->expression) {
         s_json["expression"] = std::any_cast<nlohmann::json>(visit(s->expression));
     }
@@ -200,7 +232,10 @@ std::any JSONVisitor::visit_stmt_variable_declaration(
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::VariableDeclaration";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     s_json["var"] = std::any_cast<nlohmann::json>(visit(s->var_decl));
 
     return s_json;
@@ -211,7 +246,10 @@ std::any JSONVisitor::visit_stmt_expression(const std::shared_ptr<stmt::Expressi
     nlohmann::json s_json;
 
     s_json["ast_node"] = "ast::stmt::Expression";
-    s_json["line"] = s->get_token()->getLine();
+    s_json["generated"] = s->is_generated();
+    if (!s->is_generated()) {
+        s_json["line"] = s->get_token()->getLine();
+    }
     s_json["expr"] = std::any_cast<nlohmann::json>(visit(s->expr));
 
     return s_json;
@@ -222,7 +260,10 @@ std::any JSONVisitor::visit_expr_unary(const std::shared_ptr<expr::Unary> &e)
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Unary";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["expr"] = std::any_cast<nlohmann::json>(visit(e->expr));
 
@@ -234,7 +275,10 @@ std::any JSONVisitor::visit_expr_binary(const std::shared_ptr<expr::Binary> &e)
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Binary";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["left"] = std::any_cast<nlohmann::json>(visit(e->left));
     e_json["right"] = std::any_cast<nlohmann::json>(visit(e->right));
@@ -247,7 +291,10 @@ std::any JSONVisitor::visit_expr_variable(const std::shared_ptr<expr::Variable> 
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Variable";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["name"] = e->name();
 
     return e_json;
@@ -258,7 +305,10 @@ std::any JSONVisitor::visit_expr_constant(const std::shared_ptr<expr::Constant> 
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Constant";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["type"] = ty::to_string(e->constant_type);
     switch (e->constant_type) {
     case ty::PrimitiveType::BOOL:
@@ -288,7 +338,10 @@ std::any JSONVisitor::visit_expr_function_call(const std::shared_ptr<expr::Funct
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::FunctionCall";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["callee"] = e->get_text();
 
@@ -310,7 +363,10 @@ std::any JSONVisitor::visit_struct_array_access(
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::StructArrayAccess";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["variable"] = std::any_cast<nlohmann::json>(visit(e->variable));
     e_json["struct_array_access_chain"] = visit_struct_array_fragments(e->struct_array_access);
@@ -323,7 +379,10 @@ std::any JSONVisitor::visit_expr_assignment(const std::shared_ptr<expr::Assignme
     nlohmann::json e_json;
 
     e_json["ast_node"] = "ast::expr::Assignment";
-    e_json["line"] = e->get_token()->getLine();
+    e_json["generated"] = e->is_generated();
+    if (!e->is_generated()) {
+        e_json["line"] = e->get_token()->getLine();
+    }
     e_json["op"] = ast::to_string(e->get_node_type());
     e_json["value"] = std::any_cast<nlohmann::json>(visit(e->value));
     e_json["lhs"] = std::any_cast<nlohmann::json>(visit(e->lhs));
