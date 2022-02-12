@@ -5,7 +5,7 @@ on: [push]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: RelWithDebInfo
-  ANTLR_VERSON: 4.9.3
+  ANTLR_VERSION: 4.9.3
 
 jobs:
   build:
@@ -15,7 +15,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     # Share ANTLR4 config for all runners
     env:
-      CLASSPATH: ${{github.workspace}}/antlr4/antlr-${{ANTLR_VERSION}}-complete.jar
+      # Can't seem to use ${{env.ANTLR_VERSION}} here?
+      CLASSPATH: ${{github.workspace}}/antlr-4.9.3-complete.jar
+      ANTLR_EXECUTABLE: ${{github.workspace}}/antlr-4.9.3-complete.jar
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-java@v2
@@ -23,8 +25,14 @@ jobs:
         distribution: 'zulu'
         java-version: '15'
 
+    - name: Install wget
+      if: ${{matrix.os == 'windows-latest'}}
+      run: choco install wget
+
     - name: Setup ANTLR4
-      run: wget https://www.antlr.org/download/antlr-${{ANTLR_VERSION}}-complete.jar
+      # Can't seem to use ${{env.ANTLR_VERSION}} here?
+      working-directory: ${{github.workspace}}/
+      run: wget https://www.antlr.org/download/antlr-4.9.3-complete.jar
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
@@ -34,7 +42,7 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: cmake ../ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake ../ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DANTLR_EXECUTABLE=$ANTLR_EXECUTABLE
 
     - name: Build
       working-directory: ${{github.workspace}}/build
