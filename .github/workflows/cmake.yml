@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     # Share ANTLR4 config for all runners
     env:
-      CLASSPATH: ${{github.workspace}}/antlr4/antlr-${{ANTLR_VERSON}}-complete.jar
+      CLASSPATH: ${{github.workspace}}/antlr4/antlr-${{ANTLR_VERSION}}-complete.jar
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-java@v2
@@ -24,7 +24,7 @@ jobs:
         java-version: '15'
 
     - name: Setup ANTLR4
-      run: wget https://www.antlr.org/download/antlr-${{ANTLR_VERSON}}-complete.jar
+      run: wget https://www.antlr.org/download/antlr-${{ANTLR_VERSION}}-complete.jar
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
