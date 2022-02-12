@@ -186,6 +186,11 @@ Variable::Variable(antlr4::Token *var)
 {
 }
 
+Variable::Variable(const std::string &name)
+    : Expression(nullptr, NodeType::EXPR_LITERAL_VAR), var_name(name)
+{
+}
+
 std::string Variable::name() const
 {
     return var_name;

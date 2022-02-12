@@ -106,6 +106,9 @@ public:
 
     Variable(antlr4::Token *var);
 
+    // Constructor for generated variable expressions
+    Variable(const std::string &name);
+
     std::string name() const;
 
     std::vector<std::shared_ptr<Node>> get_children() override;

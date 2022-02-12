@@ -38,21 +38,80 @@ std::any GlobalStructParamExpansionVisitor::visit_decl_global_param(
 std::any GlobalStructParamExpansionVisitor::visit_expr_variable(
     const std::shared_ptr<ast::expr::Variable> &e)
 {
-    // TODO we need to update this variable if it referenced an expanded global param
-    // TODO: Technically for a struct parameter that's been expanded, we should never encounter
-    // such a statement. if we do it means the struct is being passed as a parameter to a
-    // function in the code, which we don't support in this expansion thing. So I think this
-    // should just error out
+    // Check if this variable expression is referencing an expanded global struct parameter
+    auto resolved_decl = resolver_result->var_expr[e];
+    auto global_decl = std::dynamic_pointer_cast<decl::GlobalParam>(resolved_decl);
+    if (!global_decl || !expanded_global_params.contains(global_decl)) {
+        return std::dynamic_pointer_cast<expr::Expression>(e);
+    }
+
+    // TODO: If we encounter an expanded global parameter struct being used directly (not
+    // accessing its members), we have a problem as the struct no longer exists. This would
+    // mean that we would actually need to go rewrite the code using the struct. This would
+    // most likely be the case if the code was passing the global struct param to a function in
+    // some library header. Right now this kind of use case isn't supported.
+    report_error(e->get_token(),
+                 "TODO: Direct use of expanded global struct parameter is not supported");
     return std::dynamic_pointer_cast<expr::Expression>(e);
 }
 
 std::any GlobalStructParamExpansionVisitor::visit_struct_array_access(
     const std::shared_ptr<ast::expr::StructArrayAccess> &e)
 {
-    // TODO we need to update this variable if it referenced an expanded global param
-    // TODO: Here we actually need to replace this node w/ a plain expr::Variable node
-    // also need to make sure it's resolved to the new expanded decl in the resolver result for
-    // later passes that need this info
+    // Check if this variable expression is referencing an expanded global struct parameter
+    auto resolved_decl = resolver_result->var_expr[e->variable];
+    auto global_decl = std::dynamic_pointer_cast<decl::GlobalParam>(resolved_decl);
+    if (!global_decl || !expanded_global_params.contains(global_decl)) {
+        return std::dynamic_pointer_cast<expr::Expression>(e);
+    }
+
+    // If this is a struct/array access on an expanded global struct parameter we replace the
+    // struct array access expression with either a plain variable expression (if there's only
+    // one struct_array_access fragment), or replace the variable in the expression with the
+    // expanded one to replace the first struct_array_access fragment, which corresponds to the
+    // original struct. The new variable expression is then resolved to the expanded global
+    // parameter for subsequent passes.
+
+    // We expect this must be a struct fragment, as an array fragment would not be valid here
+    auto struct_fragment =
+        std::dynamic_pointer_cast<expr::StructMemberAccessFragment>(e->struct_array_access[0]);
+    if (!struct_fragment) {
+        report_error(e->get_token(),
+                     "Invalid direct array expression on expanded global struct parameter?");
+        return std::dynamic_pointer_cast<expr::Expression>(e);
+    }
+    // Pop the struct member that's been made into its own standalone variable
+    e->struct_array_access.erase(e->struct_array_access.begin());
+
+    std::cout << "Expanding struct access " << e->variable->name() << " of member "
+              << struct_fragment->name() << "\n";
+
+    auto expanded_member =
+        expanded_global_params[global_decl]->members[struct_fragment->name()];
+
+    std::cout << "New global param referenced: " << expanded_member->get_text() << "\n";
+
+    auto var_expr = std::make_shared<expr::Variable>(expanded_member->get_text());
+
+    // Update the resolver data for this new variable expression
+    resolver_result->var_expr[var_expr] = expanded_member;
+
+    // Remove the old variable expression from the resolver data
+    resolver_result->var_expr.erase(e->variable);
+
+    // If there's just one struct_array_access fragment we replace the expression with a plain
+    // variable expression
+    if (e->struct_array_access.empty()) {
+        std::cout << "StructArrayAccess chaing is fully replaced by " << var_expr->name()
+                  << "\n";
+        return std::dynamic_pointer_cast<expr::Expression>(var_expr);
+    }
+
+    std::cout
+        << "Preserving remaining struct/array fragment chain and replacing base variable\n";
+    // Otherwise replace the variable part of the struct array access expression with the
+    // expanded global
+    e->variable = var_expr;
     return std::dynamic_pointer_cast<expr::Expression>(e);
 }
 }
