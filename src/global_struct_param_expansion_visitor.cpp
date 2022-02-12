@@ -21,11 +21,7 @@ std::any GlobalStructParamExpansionVisitor::visit_decl_global_param(
     const auto struct_decl = resolver_result->struct_type[struct_type];
     std::vector<std::shared_ptr<decl::Declaration>> expanded_decls;
     auto expanded_param = std::make_shared<ExpandedGlobalParam>();
-    std::cout << "Expanding " << d->get_text() << " to\n";
     for (const auto &m : struct_decl->members) {
-        std::cout << "\t" << d->get_text() + "_" + m->get_text()
-                  << " : type = " << m->get_type()->to_string() << "\n";
-
         auto gp = std::make_shared<decl::GlobalParam>(
             d->get_text() + "_" + m->get_text(), nullptr, m->get_type());
         expanded_decls.push_back(gp);
@@ -83,32 +79,22 @@ std::any GlobalStructParamExpansionVisitor::visit_struct_array_access(
     // Pop the struct member that's been made into its own standalone variable
     e->struct_array_access.erase(e->struct_array_access.begin());
 
-    std::cout << "Expanding struct access " << e->variable->name() << " of member "
-              << struct_fragment->name() << "\n";
-
     auto expanded_member =
         expanded_global_params[global_decl]->members[struct_fragment->name()];
-
-    std::cout << "New global param referenced: " << expanded_member->get_text() << "\n";
 
     auto var_expr = std::make_shared<expr::Variable>(expanded_member->get_text());
 
     // Update the resolver data for this new variable expression
     resolver_result->var_expr[var_expr] = expanded_member;
-
     // Remove the old variable expression from the resolver data
     resolver_result->var_expr.erase(e->variable);
 
     // If there's just one struct_array_access fragment we replace the expression with a plain
     // variable expression
     if (e->struct_array_access.empty()) {
-        std::cout << "StructArrayAccess chaing is fully replaced by " << var_expr->name()
-                  << "\n";
         return std::dynamic_pointer_cast<expr::Expression>(var_expr);
     }
 
-    std::cout
-        << "Preserving remaining struct/array fragment chain and replacing base variable\n";
     // Otherwise replace the variable part of the struct array access expression with the
     // expanded global
     e->variable = var_expr;
