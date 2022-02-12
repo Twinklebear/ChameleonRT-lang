@@ -46,6 +46,10 @@ std::any GlobalStructParamExpansionVisitor::visit_expr_variable(
     // mean that we would actually need to go rewrite the code using the struct. This would
     // most likely be the case if the code was passing the global struct param to a function in
     // some library header. Right now this kind of use case isn't supported.
+    // One option here might be to create the struct and set it up like is done for HLSL raygen
+    // parameters so that we can pass it to the function? It's difficult to do that at this
+    // point in the tree though, we would need to do this in the block containing this
+    // expression so we can insert new statements
     report_error(e->get_token(),
                  "TODO: Direct use of expanded global struct parameter is not supported");
     return std::dynamic_pointer_cast<expr::Expression>(e);
