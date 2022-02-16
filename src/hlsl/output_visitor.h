@@ -19,6 +19,7 @@ class OutputVisitor : public ast::Visitor {
         parameter_binding;
 
 public:
+    // TODO: this needs to take the global param expansion/remapping info as well
     OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
     // NOTE: Most statements don't need any rewriting but we do still need to visit
