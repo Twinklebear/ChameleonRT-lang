@@ -16,8 +16,9 @@ std::any RenameEntryPointParamVisitor::visit_decl_entry_point(
     const std::string prefix = d->get_text() + "_";
     for (auto &p : d->parameters) {
         auto &symbol = p->get_symbol();
-        symbol->name = prefix + symbol->name;
-        renamed_vars.insert(p);
+        const std::string old_name = symbol->name;
+        symbol->name = prefix + old_name;
+        renamed_vars[p] = old_name;
     }
 
     // Visit the block of the entry point to rename any references

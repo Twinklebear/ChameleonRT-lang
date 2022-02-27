@@ -15,11 +15,11 @@ struct ExpandedGlobalParam {
 class GlobalStructParamExpansionVisitor : public ast::ModifyingVisitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
+public:
     phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::GlobalParam>,
                                   std::shared_ptr<ExpandedGlobalParam>>
         expanded_global_params;
 
-public:
     GlobalStructParamExpansionVisitor(
         const std::shared_ptr<ResolverPassResult> &resolver_result);
 
