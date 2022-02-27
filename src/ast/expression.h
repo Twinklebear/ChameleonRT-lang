@@ -125,7 +125,8 @@ public:
     Constant(antlr4::Token *constant, int value);
     // TODO: unsigned int constants?
     Constant(antlr4::Token *constant, float value);
-    Constant(antlr4::Token *constant, double value);
+    // Doubles?
+    //Constant(antlr4::Token *constant, double value);
 
     std::vector<std::shared_ptr<Node>> get_children() override;
 };

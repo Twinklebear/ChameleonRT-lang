@@ -222,12 +222,14 @@ Constant::Constant(antlr4::Token *constant, float value)
 {
 }
 
+/*
 Constant::Constant(antlr4::Token *constant, double value)
     : Expression(constant, NodeType::EXPR_LITERAL_CONSTANT),
       value(value),
       constant_type(ty::PrimitiveType::DOUBLE)
 {
 }
+*/
 
 std::vector<std::shared_ptr<Node>> Constant::get_children()
 {
