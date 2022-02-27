@@ -7,6 +7,7 @@ in SceneParams scene;
 
 struct RayGenParams {
     float4 color;
+    Buffer<float3> data;
 };
 
 ray_gen RayGen(RayGenParams params, float scale_factor)
@@ -15,6 +16,6 @@ ray_gen RayGen(RayGenParams params, float scale_factor)
     // a conversion is needed here for example.
     uint2 pixel = ray_index();
     float4 c;
-    c = params.color * scene.test_constant;
+    c = params.color * scene.test_constant + params.data[0];
     scene.image[pixel] = params.color * scale_factor;
 }

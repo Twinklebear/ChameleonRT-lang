@@ -9,8 +9,9 @@ namespace hlsl {
 
 using namespace ast;
 
-OutputVisitor::OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result)
-    : resolver_result(resolver_result)
+OutputVisitor::OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result,
+                             const ParameterTransforms &param_transforms)
+    : resolver_result(resolver_result), param_transforms(param_transforms)
 {
 }
 
@@ -216,6 +217,22 @@ std::any OutputVisitor::visit_expr_variable(const std::shared_ptr<ast::expr::Var
 std::any OutputVisitor::visit_expr_constant(const std::shared_ptr<ast::expr::Constant> &e)
 {
     std::string hlsl_src;
+    switch (e->constant_type) {
+    case ty::PrimitiveType::BOOL:
+        hlsl_src = std::to_string(std::any_cast<bool>(e->value));
+        break;
+    case ty::PrimitiveType::INT:
+        hlsl_src = std::to_string(std::any_cast<int>(e->value));
+        break;
+    case ty::PrimitiveType::FLOAT:
+        hlsl_src = std::to_string(std::any_cast<float>(e->value));
+        break;
+    default:
+        report_error(e->get_token(),
+                     "HLSL Output error: Unhandled/unrecognized constant type: " +
+                         ty::to_string(e->constant_type));
+        break;
+    }
     return hlsl_src;
 }
 
@@ -258,6 +275,7 @@ std::any OutputVisitor::visit_struct_array_access(
         } else {
             auto array_access = std::dynamic_pointer_cast<expr::ArrayAccessFragment>(f);
             const std::string idx = std::any_cast<std::string>(visit(array_access->index));
+            std::cout << "transofrmed idx to " << idx << "\n";
             hlsl_src += "[" + idx + "]";
         }
     }

@@ -12,6 +12,7 @@
 #include "global_struct_param_expansion_visitor.h"
 #include "hlsl/output_visitor.h"
 #include "json_visitor.h"
+#include "parameter_transforms.h"
 #include "rename_entry_point_param_visitor.h"
 #include "resolver_visitor.h"
 
@@ -148,7 +149,11 @@ int main(int argc, char **argv)
         }
     }
 
-    crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
+    crtl::ParameterTransforms param_transforms{
+        global_struct_param_expansion_visitor.expanded_global_params,
+        rename_entry_point_params.renamed_vars};
+
+    crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved, param_transforms);
     const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
     std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
 
