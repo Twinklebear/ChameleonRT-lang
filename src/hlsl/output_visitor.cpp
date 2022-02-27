@@ -328,11 +328,6 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
         }
         parameter_binding[param->get_text()] = binding;
 
-        // TODO: Here we lose the knowledge of where our constants ended up.
-        // this needs to be tracked in the param map, it should really be a map of
-        // a ast::decl::Variable to a map of register binding info for structs,
-        // and a plain register binding info for single vars
-
         std::string cbuffer_src;
         if (!binding->constant_buffer_contents.empty()) {
             cbuffer_src = "cbuffer " + struct_name + "_cbv : " +
