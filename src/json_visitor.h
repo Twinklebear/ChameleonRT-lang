@@ -7,6 +7,9 @@ namespace crtl {
 
 class JSONVisitor : public ast::Visitor {
 public:
+    /* Visit the AST to output it to a JSON representation. Returns the nlohmann::json object
+     * containing the JSON representation of the AST
+     */
     std::any visit_ast(const std::shared_ptr<ast::AST> &ast) override;
 
     std::any visit_decl_function(const std::shared_ptr<ast::decl::Function> &d) override;
