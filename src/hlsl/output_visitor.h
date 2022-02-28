@@ -66,7 +66,7 @@ private:
      * for the binding. The ParameterRegisterBinding metadata will be stored in the
      * parameter_binding map
      */
-    std::string bind_parameter(const ast::decl::Variable *param);
+    std::string bind_parameter(const std::shared_ptr<ast::decl::Variable> &param);
 
     /* Bind the passed built in parameter type (i.e. not a struct) to a shader register.
      */

@@ -37,7 +37,7 @@ std::any OutputVisitor::visit_decl_entry_point(const std::shared_ptr<ast::decl::
     // Translate the entry point's parameters into shader input parameters for HLSL
     std::string hlsl_src;
     for (auto &p : d->parameters) {
-        hlsl_src += bind_parameter(p.get()) + "\n";
+        hlsl_src += bind_parameter(p) + "\n";
     }
 
     // Emit the entry point declaration, then translate the entry point function body
@@ -107,7 +107,7 @@ std::any OutputVisitor::visit_decl_global_param(
         report_error(d->get_token(), "Error: Global parameters should not be struct types!");
         return std::string();
     }
-    std::string hlsl_src = bind_parameter(d.get());
+    std::string hlsl_src = bind_parameter(d);
     return hlsl_src;
 }
 
@@ -288,7 +288,7 @@ std::any OutputVisitor::visit_expr_assignment(const std::shared_ptr<ast::expr::A
     return lhs + " = " + value;
 }
 
-std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
+std::string OutputVisitor::bind_parameter(const std::shared_ptr<ast::decl::Variable> &param)
 {
     std::string hlsl_src;
     const auto param_type = param->get_type();
