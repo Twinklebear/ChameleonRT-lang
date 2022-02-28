@@ -68,9 +68,9 @@ int main(int argc, char **argv)
     auto ast = ast_builder.ast;
 
     crtl::JSONVisitor json_visitor;
-    json_visitor.visit_ast(ast);
+    auto ast_json = std::any_cast<nlohmann::json>(json_visitor.visit_ast(ast));
 
-    std::cout << "AST JSON:\n" << json_visitor.ast_json.dump(4) << "\n";
+    std::cout << "AST JSON:\n" << ast_json.dump(4) << "\n";
 
     auto builtins = crtl::get_builtin_decls();
 
@@ -118,8 +118,8 @@ int main(int argc, char **argv)
     rename_entry_point_params.visit_ast(ast);
 
     // Print out the final AST and resolver info that's being passed to the HLSL translator
-    json_visitor.visit_ast(ast);
-    std::cout << "AST JSON post-modifications:\n" << json_visitor.ast_json.dump(4) << "\n";
+    ast_json = std::any_cast<nlohmann::json>(json_visitor.visit_ast(ast));
+    std::cout << "AST JSON post-modifications:\n" << ast_json.dump(4) << "\n";
 
     // Print out the resolver data again to validate that it's been updated correctly
     std::cout << "Resolver data post-modifications\n";
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         global_struct_param_expansion_visitor.expanded_global_params,
         rename_entry_point_params.renamed_vars};
 
-    crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved, param_transforms);
+    crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
     const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
     std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
 

@@ -10,7 +10,7 @@ std::any JSONVisitor::visit_ast(const std::shared_ptr<AST> &ast)
     for (auto &n : ast->top_level_decls) {
         results.push_back(std::any_cast<nlohmann::json>(visit(n)));
     }
-    ast_json = results;
+    nlohmann::json ast_json = results;
     return ast_json;
 }
 

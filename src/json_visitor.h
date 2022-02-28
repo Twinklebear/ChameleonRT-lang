@@ -7,8 +7,6 @@ namespace crtl {
 
 class JSONVisitor : public ast::Visitor {
 public:
-    nlohmann::json ast_json;
-
     std::any visit_ast(const std::shared_ptr<ast::AST> &ast) override;
 
     std::any visit_decl_function(const std::shared_ptr<ast::decl::Function> &d) override;
