@@ -325,7 +325,7 @@ std::string OutputVisitor::bind_parameter(const std::shared_ptr<ast::decl::Varia
         if (!binding->constant_buffer_contents.empty()) {
             binding->constant_buffer_register = register_allocator.bind_cbv(1);
         }
-        parameter_binding[param] = binding;
+        parameter_bindings[param] = binding;
 
         std::string cbuffer_src;
         if (!binding->constant_buffer_contents.empty()) {
@@ -366,7 +366,7 @@ std::string OutputVisitor::bind_parameter(const std::shared_ptr<ast::decl::Varia
                param_type->base_type == ty::BaseType::ACCELERATION_STRUCTURE) {
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
-        parameter_binding[param] = binding;
+        parameter_bindings[param] = binding;
 
         const std::string type_str = translate_builtin_type(param->get_type());
         hlsl_src = type_str + " " + param->get_text() + " : " +
@@ -378,7 +378,7 @@ std::string OutputVisitor::bind_parameter(const std::shared_ptr<ast::decl::Varia
         // offsets, but it'd be best to pack them all together into a single CBV
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
-        parameter_binding[param] = binding;
+        parameter_bindings[param] = binding;
 
         const std::string type_str = translate_builtin_type(param->get_type());
         hlsl_src = "cbuffer " + param->get_text() +

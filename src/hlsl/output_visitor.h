@@ -18,7 +18,7 @@ public:
     // Map of global and entry point parameter names to their register binding information
     phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::Variable>,
                                   std::shared_ptr<ParameterRegisterBinding>>
-        parameter_binding;
+        parameter_bindings;
 
     OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
