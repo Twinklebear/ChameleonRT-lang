@@ -11,6 +11,7 @@
 #include "error_listener.h"
 #include "global_struct_param_expansion_visitor.h"
 #include "hlsl/output_visitor.h"
+#include "hlsl/parameter_metadata_output_visitor.h"
 #include "json_visitor.h"
 #include "parameter_transforms.h"
 #include "rename_entry_point_param_visitor.h"
@@ -149,13 +150,20 @@ int main(int argc, char **argv)
         }
     }
 
-    crtl::ParameterTransforms param_transforms{
+    auto param_transforms = std::make_shared<crtl::ParameterTransforms>(
         global_struct_param_expansion_visitor.expanded_global_params,
-        rename_entry_point_params.renamed_vars};
+        rename_entry_point_params.renamed_vars);
 
     crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
     const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
     std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
+
+    std::cout << "Building parameter metadata JSON\n";
+    crtl::hlsl::ParameterMetadataOutputVisitor param_metadata_output(
+        resolver_visitor.resolved, param_transforms, hlsl_translator.parameter_bindings);
+    auto param_binding_json =
+        std::any_cast<nlohmann::json>(param_metadata_output.visit_ast(ast));
+    std::cout << param_binding_json.dump(4) << "\n";
 
     return 0;
 }

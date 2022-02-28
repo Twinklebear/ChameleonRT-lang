@@ -38,6 +38,7 @@ add_executable(chameleonrtc
     src/builtins.cpp
     src/rename_entry_point_param_visitor.cpp
     src/global_struct_param_expansion_visitor.cpp
+    src/parameter_transforms.cpp
 
     src/ast/node.cpp
     src/ast/symbol.cpp
@@ -53,6 +54,7 @@ add_executable(chameleonrtc
     src/hlsl/translate_builtin_type.cpp
     src/hlsl/translate_builtin_function_call.cpp
     src/hlsl/output_visitor.cpp
+    src/hlsl/parameter_metadata_output_visitor.cpp
 )
 
 target_include_directories(chameleonrtc PUBLIC

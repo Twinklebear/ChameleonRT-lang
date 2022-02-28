@@ -12,6 +12,9 @@ struct ExpandedGlobalParam {
         members;
 };
 
+// TODO: Need to not split up a struct of all constants into individual constant parameters
+// Maybe this should become more backend-specific because what we want to split or not split
+// depends on our compile target
 class GlobalStructParamExpansionVisitor : public ast::ModifyingVisitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 

@@ -24,6 +24,15 @@ struct ParameterTransforms {
      */
     phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::Variable>, std::string>
         renamed_vars;
+
+    ParameterTransforms(
+        const phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::GlobalParam>,
+                                            std::shared_ptr<ExpandedGlobalParam>>
+            &expanded_global_params,
+        const phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::Variable>, std::string>
+            &renamed_vars);
+
+    ParameterTransforms() = default;
 };
 
 }
