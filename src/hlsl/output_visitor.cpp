@@ -9,9 +9,8 @@ namespace hlsl {
 
 using namespace ast;
 
-OutputVisitor::OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result,
-                             const ParameterTransforms &param_transforms)
-    : resolver_result(resolver_result), param_transforms(param_transforms)
+OutputVisitor::OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result)
+    : resolver_result(resolver_result)
 {
 }
 
@@ -326,7 +325,7 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
         if (!binding->constant_buffer_contents.empty()) {
             binding->constant_buffer_register = register_allocator.bind_cbv(1);
         }
-        parameter_binding[param->get_text()] = binding;
+        parameter_binding[param] = binding;
 
         std::string cbuffer_src;
         if (!binding->constant_buffer_contents.empty()) {
@@ -367,7 +366,7 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
                param_type->base_type == ty::BaseType::ACCELERATION_STRUCTURE) {
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
-        parameter_binding[param->get_text()] = binding;
+        parameter_binding[param] = binding;
 
         const std::string type_str = translate_builtin_type(param->get_type());
         hlsl_src = type_str + " " + param->get_text() + " : " +
@@ -379,7 +378,7 @@ std::string OutputVisitor::bind_parameter(const ast::decl::Variable *param)
         // offsets, but it'd be best to pack them all together into a single CBV
         auto binding =
             std::make_shared<ShaderRegisterBinding>(bind_builtin_type_parameter(param_type));
-        parameter_binding[param->get_text()] = binding;
+        parameter_binding[param] = binding;
 
         const std::string type_str = translate_builtin_type(param->get_type());
         hlsl_src = "cbuffer " + param->get_text() +

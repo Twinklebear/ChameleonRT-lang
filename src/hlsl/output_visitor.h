@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ast/visitor.h"
-#include "parameter_transforms.h"
 #include "resolver_visitor.h"
 #include "shader_register_allocator.h"
 
@@ -13,17 +12,15 @@ namespace hlsl {
 class OutputVisitor : public ast::Visitor {
     std::shared_ptr<ResolverPassResult> resolver_result;
 
-    ParameterTransforms param_transforms;
-
     ShaderRegisterAllocator register_allocator;
 
+public:
     // Map of global and entry point parameter names to their register binding information
-    phmap::parallel_flat_hash_map<std::string, std::shared_ptr<ParameterRegisterBinding>>
+    phmap::parallel_flat_hash_map<std::shared_ptr<ast::decl::Variable>,
+                                  std::shared_ptr<ParameterRegisterBinding>>
         parameter_binding;
 
-public:
-    OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result,
-                  const ParameterTransforms &param_transforms);
+    OutputVisitor(const std::shared_ptr<ResolverPassResult> &resolver_result);
 
     // NOTE: Most statements don't need any rewriting but we do still need to visit
     // everything to build the HLSL source code
