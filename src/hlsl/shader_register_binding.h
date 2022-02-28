@@ -14,6 +14,8 @@ enum class ShaderRegisterType {
     INVALID
 };
 
+const std::string to_string(const ShaderRegisterType &sr_type);
+
 struct ShaderRegister {
     ShaderRegisterType type = ShaderRegisterType::INVALID;
 

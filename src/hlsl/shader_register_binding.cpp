@@ -4,6 +4,23 @@
 namespace crtl {
 namespace hlsl {
 
+const std::string to_string(const ShaderRegisterType &sr_type)
+{
+    switch (sr_type) {
+    case ShaderRegisterType::SHADER_RESOURCE_VIEW:
+        return "t";
+    case ShaderRegisterType::SAMPLER:
+        return "s";
+    case ShaderRegisterType::UNORDERED_ACCESS_VIEW:
+        return "u";
+    case ShaderRegisterType::CONSTANT_BUFFER_VIEW:
+        return "b";
+    default:
+        throw std::runtime_error("Cannot generate string for invalid register type");
+        return "";
+    }
+}
+
 ShaderRegister::ShaderRegister(ShaderRegisterType type, int slot, int space)
     : type(type), slot(slot), space(space)
 {
@@ -16,30 +33,11 @@ ShaderRegisterBinding::ShaderRegisterBinding(ShaderRegister shader_register, int
 
 std::string ShaderRegister::to_string() const
 {
-    std::string str = "register(";
-    switch (type) {
-    case ShaderRegisterType::SHADER_RESOURCE_VIEW:
-        str += "t";
-        break;
-    case ShaderRegisterType::SAMPLER:
-        str += "s";
-        break;
-    case ShaderRegisterType::UNORDERED_ACCESS_VIEW:
-        str += "u";
-        break;
-    case ShaderRegisterType::CONSTANT_BUFFER_VIEW:
-        str += "b";
-        break;
-    default:
-        throw std::runtime_error("Cannot generate string for invalid register type");
-        break;
-    }
     if (slot == -1 || space == -1) {
         throw std::runtime_error("Cannot generate string for invalid register type");
     }
-
-    str += std::to_string(slot) + ", space" + std::to_string(space) + ")";
-    return str;
+    return "register(" + hlsl::to_string(type) + std::to_string(slot) + ", space" +
+           std::to_string(space) + ")";
 }
 
 }
