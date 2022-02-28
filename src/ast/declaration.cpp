@@ -162,11 +162,11 @@ Struct::Struct(const std::string &name,
 {
 }
 
-const StructMember *Struct::get_member(const std::string &name) const
+std::shared_ptr<StructMember> Struct::get_member(const std::string &name)
 {
     for (const auto &m : members) {
         if (m->get_text() == name) {
-            return m.get();
+            return m;
         }
     }
     return nullptr;

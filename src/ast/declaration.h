@@ -112,7 +112,7 @@ public:
            antlr4::Token *token,
            const std::vector<std::shared_ptr<StructMember>> &members);
 
-    const StructMember *get_member(const std::string &name) const;
+    std::shared_ptr<StructMember> get_member(const std::string &name);
 
     std::vector<std::shared_ptr<Node>> get_children() override;
 };
