@@ -7,7 +7,7 @@ in SceneParams scene;
 
 struct RayGenParams {
     float4 color;
-    Buffer<float3> data;
+    Buffer<float4> data;
 };
 
 ray_gen RayGen(RayGenParams params, float scale_factor)

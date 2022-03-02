@@ -36,6 +36,6 @@
 compile_commands.json
 interpreter/.cache/
 .cache
-cmake-build/
+cmake-build*
 .DS_Store
 build-linux

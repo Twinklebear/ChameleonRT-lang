@@ -1,75 +1,33 @@
 cmake_minimum_required(VERSION 3.5)
 project(chameleonrtlang)
 
+include(ExternalProject)
+
+add_definitions(-DNOMINMAX -DGLM_ENABLE_EXPERIMENTAL -DSDL_MAIN_HANDLED
+    -DWIN32_LEAN_AND_MEAN)
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if (NOT WIN32)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 endif()
 
-# Setup ANTLR
-add_definitions(-DANTLR4CPP_STATIC)
-set(ANTLR4_WITH_STATIC_CRT OFF)
-include(ExternalAntlr4Cpp)
-include_directories(${ANTLR4_INCLUDE_DIRS})
-find_package(ANTLR REQUIRED)
+option(CHAMELEONRT_LANG_COMPILER "Build the ChameleonRT-Language Compiler" ON)
+if (CHAMELEONRT_LANG_COMPILER)
+    add_subdirectory(compiler)
+endif()
 
-include(ANTLRGrammarUtil)
+option(CHAMELEONRT_LANG_RUNTIME "Build the ChameleonRT-Language Runtime and Demo Renderer" OFF)
+if (CHAMELEONRT_LANG_RUNTIME)
+    find_package(Threads REQUIRED)
+    find_package(SDL2 CONFIG REQUIRED)
+    # Include glm as an external project
+    include(cmake/glm.cmake)
 
-# Add the ChameleonRT Grammar
-antlr_target(chameleonrt_grammar
-    PACKAGE crtg
-    LEXER ChameleonRTLexer.g4
-    PARSER ChameleonRTParser.g4
-    VISITOR)
+    add_subdirectory(imgui)
+    add_subdirectory(util)
 
-antlr_grammar_util(ChameleonRTGrammarUtil
-    LEXER ChameleonRTLexer.g4
-    PARSER ChameleonRTParser.g4)
-
-add_executable(chameleonrtc
-    src/chameleonrtc.cpp
-    src/ast_builder_visitor.cpp
-    src/ast_expr_builder_visitor.cpp
-    src/ast_struct_array_access_builder_visitor.cpp
-    src/error_listener.cpp
-    src/json_visitor.cpp
-    src/resolver_visitor.cpp
-    src/builtins.cpp
-    src/rename_entry_point_param_visitor.cpp
-    src/global_struct_param_expansion_visitor.cpp
-    src/parameter_transforms.cpp
-
-    src/ast/node.cpp
-    src/ast/symbol.cpp
-    src/ast/type.cpp
-    src/ast/declaration.cpp
-    src/ast/statement.cpp
-    src/ast/expression.cpp
-    src/ast/visitor.cpp
-    src/ast/modifying_visitor.cpp
-
-    src/hlsl/shader_register_binding.cpp
-    src/hlsl/shader_register_allocator.cpp
-    src/hlsl/translate_builtin_type.cpp
-    src/hlsl/translate_builtin_function_call.cpp
-    src/hlsl/output_visitor.cpp
-    src/hlsl/parameter_metadata_output_visitor.cpp
-)
-
-target_include_directories(chameleonrtc PUBLIC
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_LIST_DIR}/src/
-    external)
-
-target_link_libraries(chameleonrtc chameleonrt_grammar)
-
-set_target_properties(chameleonrtc PROPERTIES
-	CXX_STANDARD 20
-	CXX_STANDARD_REQUIRED ON)
-
-if (WIN32)
-    target_compile_definitions(chameleonrtc PRIVATE
-        _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS=1)
+    add_subdirectory(runtime)
+    add_subdirectory(renderer)
 endif()
 

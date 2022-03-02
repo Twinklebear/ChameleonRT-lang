@@ -42,7 +42,11 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: cmake ../ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DANTLR_EXECUTABLE=$ANTLR_EXECUTABLE
+      run: >
+          cmake ${env:GITHUB_WORKSPACE}
+          -A x64
+          -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          -DANTLR_EXECUTABLE=$ANTLR_EXECUTABLE
 
     - name: Build
       working-directory: ${{github.workspace}}/build

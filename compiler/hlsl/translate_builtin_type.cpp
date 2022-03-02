@@ -37,6 +37,8 @@ std::string translate_primitive_type(const std::shared_ptr<ast::ty::Primitive> &
     case ty::PrimitiveType::VOID:
         return "void";
     }
+    // Not possible, all types handled here
+    return "";
 }
 
 std::string translate_vector_type(const std::shared_ptr<ast::ty::Vector> &type)
