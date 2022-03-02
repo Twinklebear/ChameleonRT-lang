@@ -274,7 +274,6 @@ std::any OutputVisitor::visit_struct_array_access(
         } else {
             auto array_access = std::dynamic_pointer_cast<expr::ArrayAccessFragment>(f);
             const std::string idx = std::any_cast<std::string>(visit(array_access->index));
-            std::cout << "transofrmed idx to " << idx << "\n";
             hlsl_src += "[" + idx + "]";
         }
     }

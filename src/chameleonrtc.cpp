@@ -17,17 +17,45 @@
 #include "rename_entry_point_param_visitor.h"
 #include "resolver_visitor.h"
 
+const std::string USAGE =
+    R"(Usage:
+    ./chameleonrtc <file.crtl> [options]
+
+Options:
+    -t (hlsl)       Set the compilation target. Only HLSL for now
+    -o <out.ext>    Output filename
+    -m <out.json>   Parameter metadata output filename, used by the ChameleonRT runtime
+    -h              Print this information
+)";
+
 const std::string DIVIDER = "----------\n";
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) {
-        std::cerr << "Usage: chameleonrtc [file]\n";
-        return 1;
+    const std::vector<std::string> args(argv + 1, argv + argc);
+    if (args.empty() || std::find(args.begin(), args.end(), std::string("-h")) != args.end()) {
+        std::cerr << USAGE << "\n";
+    }
+
+    const std::string source_file = args[0];
+    std::string output_file;
+    std::string param_data_output_file;
+    for (size_t i = 1; i < args.size(); ++i) {
+        if (args[i] == "-t") {
+            if (args[++i] != "hlsl") {
+                std::cout << "Only HLSL is supported right now\n";
+            }
+        } else if (args[i] == "-o") {
+            output_file = args[++i];
+        } else if (args[i] == "-m") {
+            param_data_output_file = args[++i];
+        } else {
+            std::cerr << "Unhandled argument ;" << args[i] << "'\n";
+        }
     }
 
     antlr4::ANTLRFileStream input;
-    input.loadFromFile(argv[1]);
+    input.loadFromFile(source_file);
 
     crtl::ErrorListener error_listener;
 
@@ -156,14 +184,24 @@ int main(int argc, char **argv)
 
     crtl::hlsl::OutputVisitor hlsl_translator(resolver_visitor.resolved);
     const std::string hlsl_src = std::any_cast<std::string>(hlsl_translator.visit_ast(ast));
-    std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
+    if (!output_file.empty()) {
+        std::ofstream fout(output_file.c_str());
+        fout << hlsl_src;
+    } else {
+        std::cout << "CRTL shader translated to HLSL:\n" << hlsl_src << "\n";
+    }
 
     std::cout << "Building parameter metadata JSON\n";
     crtl::hlsl::ParameterMetadataOutputVisitor param_metadata_output(
         resolver_visitor.resolved, param_transforms, hlsl_translator.parameter_bindings);
     auto param_binding_json =
         std::any_cast<nlohmann::json>(param_metadata_output.visit_ast(ast));
-    std::cout << param_binding_json.dump(4) << "\n";
+    if (!param_data_output_file.empty()) {
+        std::ofstream fout(param_data_output_file.c_str());
+        fout << param_binding_json.dump(4);
+    } else {
+        std::cout << param_binding_json.dump(4) << "\n";
+    }
 
     return 0;
 }
