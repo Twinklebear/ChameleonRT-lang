@@ -43,7 +43,7 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: >
-          cmake ${env:GITHUB_WORKSPACE}
+          cmake $GITHUB_WORKSPACE
           -A x64
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DANTLR_EXECUTABLE=$ANTLR_EXECUTABLE
