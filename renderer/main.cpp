@@ -125,10 +125,11 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
         auto upload_buffer = crtr::dxr::Buffer::upload(
             display->device.Get(), sizeof(glm::vec4), D3D12_RESOURCE_STATE_GENERIC_READ);
 
-        glm::vec4 value(0.2f, 0.2f, 1.f, 1.f);
+        glm::vec4 value(0.5f, 0.5f, 0.8f, 1.f);
         std::memcpy(upload_buffer.map(), &value, sizeof(glm::vec4));
         upload_buffer.unmap();
 
+        CHECK_ERR(cmd_allocator->Reset());
         CHECK_ERR(cmd_list->Reset(cmd_allocator.Get(), nullptr));
         cmd_list->CopyResource(data_buffer.get(), upload_buffer.get());
 
@@ -169,13 +170,25 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
 
         // TODO: note here srv/uav/etc would be based on the register type
         // listed on the entry
+        // TODO: for constants embedded in root signature: we need to be careful with size and
+        // need to count the total # of 4 byte values we'll use for each constant.
+        // If the SR is getting too large, it may be good to push some into a constant buffer
+        // instead of the shader record, or if we know some would be updated often while others
+        // are more static, we'd keep the static ones in the shader record but push the
+        // frequently changing ones to a constant buffer.
+        // Maybe can expose a concept in the API of SBT inlined data vs global memory data that
+        // can let the app control this nicely
+        // The count for items in the inlined constants also needs to come from inspecting the
+        // size of the thing to get the # of 4 byte values it occupies
         local_root_sig = crtr::dxr::RootSignatureBuilder::local()
-                             .add_cbv("params.constant_buffer",
-                                      params["constant_buffer"]["slot"].get<int>(),
-                                      params["constant_buffer"]["space"].get<int>())
-                             .add_cbv("scale_factor",
-                                      scale_factor["slot"].get<int>(),
-                                      scale_factor["space"].get<int>())
+                             .add_constants("params.constant_buffer",
+                                            params["constant_buffer"]["slot"].get<int>(),
+                                            4,
+                                            params["constant_buffer"]["space"].get<int>())
+                             .add_constants("scale_factor",
+                                            scale_factor["slot"].get<int>(),
+                                            1,
+                                            scale_factor["space"].get<int>())
                              .add_srv("params.data",
                                       params_data["slot"].get<int>(),
                                       params_data["space"].get<int>())
@@ -201,13 +214,20 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
                                               scene_image["space"].get<int>())
                                .create(display->device.Get());
 
-        global_root_sig = crtr::dxr::RootSignatureBuilder::global()
-                              .add_desc_heap("cbv_srv_uav_heap", global_desc_heap)
-                              .add_constants("scene.test_constant",
-                                             scene_test_constant["slot"].get<int>(),
-                                             scene_test_constant["count"].get<int>(),
-                                             scene_test_constant["space"].get<int>())
-                              .create(display->device.Get());
+        global_root_sig =
+            crtr::dxr::RootSignatureBuilder::global()
+                // TODO: this binds the whole heap, should also allow specifying subranges for
+                // tables.
+                .add_desc_heap("cbv_srv_uav_heap", global_desc_heap)
+                // TODO: How does this constant binding work here? Inline in the
+                // global root signature? Not sure it makes sense here..
+                // Yes via
+                // https://docs.microsoft.com/en-us/windows/win32/direct3d12/using-constants-directly-in-the-root-signature
+                .add_constants("scene.test_constant",
+                               scene_test_constant["slot"].get<int>(),
+                               scene_test_constant["count"].get<int>(),
+                               scene_test_constant["space"].get<int>())
+                .create(display->device.Get());
     }
 
     // TODO: shader payload size and attrib size we could compute in the compiler?
@@ -223,7 +243,89 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
             .set_max_recursion(1)
             .create(display->device.Get());
 
+    rt_pipeline.map_shader_table();
+    {
+        // Write the raygen shader record into the SBT
+        uint8_t *map = rt_pipeline.shader_record(raygen_name);
+        const crtr::dxr::RootSignature *sig = rt_pipeline.shader_signature(raygen_name);
+
+        // Write the various parameters for the shader record
+
+        // the constant buffer, params.color
+        const glm::vec4 params_color(0.25f, 0.75f, 1.f, 1.f);
+        std::memcpy(
+            map + sig->offset("params.constant_buffer"), &params_color, sizeof(glm::vec4));
+
+        const float scale_factor = 0.75f;
+        std::memcpy(map + sig->offset("scale_factor"), &scale_factor, sizeof(float));
+
+        D3D12_GPU_VIRTUAL_ADDRESS params_data_addr = data_buffer->GetGPUVirtualAddress();
+        std::memcpy(map + sig->offset("params.data"),
+                    &params_data_addr,
+                    sizeof(D3D12_GPU_VIRTUAL_ADDRESS));
+    }
+    rt_pipeline.unmap_shader_table();
+
+    // Copy the upload SBT to the copy in device memory
+    {
+        CHECK_ERR(cmd_allocator->Reset());
+        CHECK_ERR(cmd_list->Reset(cmd_allocator.Get(), nullptr));
+        rt_pipeline.upload_shader_table(cmd_list.Get());
+        std::array<ID3D12CommandList *, 1> cmd_lists = {cmd_list.Get()};
+        CHECK_ERR(cmd_list->Close());
+        cmd_queue->ExecuteCommandLists(cmd_lists.size(), cmd_lists.data());
+        sync_gpu(cmd_queue, fence, fence_evt, fence_value);
+    }
+
+    // Finally, build the descriptor heap
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE heap_handle = global_desc_heap.cpu_desc_handle();
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uav_desc = {0};
+        uav_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        uav_desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        display->device->CreateUnorderedAccessView(
+            render_target.get(), nullptr, &uav_desc, heap_handle);
+    }
+
     ImGuiIO &io = ImGui::GetIO();
+
+    // Record the rendering commands
+    CHECK_ERR(cmd_allocator->Reset());
+    CHECK_ERR(cmd_list->Reset(cmd_allocator.Get(), nullptr));
+
+    ID3D12DescriptorHeap *desc_heap = global_desc_heap.get();
+    cmd_list->SetDescriptorHeaps(1, &desc_heap);
+    cmd_list->SetComputeRootSignature(rt_pipeline.global_sig());
+    // TODO: is there not a way to write this index into the global root signature?
+    // or it must be set at list record time like this?
+    // TODO: the constant re-packing changes the order of stuff in the descriptor table
+    // which we now need to be aware of here. This is set at 0, but it actually gets pushed
+    // to 1
+    cmd_list->SetComputeRootDescriptorTable(1, global_desc_heap.gpu_desc_handle());
+    float test_constant = 0.5f;
+    // TODO: Binding slot refers to what: binding slot in the shader code? or the index in the
+    // parameter list of the root signature? I'd guess the latter?
+    cmd_list->SetComputeRoot32BitConstants(0, 1, &test_constant, 0);
+
+    cmd_list->SetPipelineState1(rt_pipeline.get());
+    D3D12_DISPATCH_RAYS_DESC dispatch_rays_desc =
+        rt_pipeline.dispatch_rays(glm::uvec2(win_width, win_height));
+
+    // TODO: RT pipeline builder needs to handle the case when there are no hit groups or miss
+    // records
+    dispatch_rays_desc.MissShaderTable.StartAddress = 0;
+    dispatch_rays_desc.MissShaderTable.SizeInBytes = 0;
+    dispatch_rays_desc.MissShaderTable.StrideInBytes = 0;
+
+    dispatch_rays_desc.HitGroupTable.StartAddress = 0;
+    dispatch_rays_desc.HitGroupTable.SizeInBytes = 0;
+    dispatch_rays_desc.HitGroupTable.StrideInBytes = 0;
+
+    cmd_list->DispatchRays(&dispatch_rays_desc);
+    CHECK_ERR(cmd_list->Close());
+
+    ID3D12CommandList *render_cmds = cmd_list.Get();
 
     bool done = false;
     while (!done) {
@@ -254,6 +356,8 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
         }
 
         display->new_frame();
+        cmd_queue->ExecuteCommandLists(1, &render_cmds);
+        sync_gpu(cmd_queue, fence, fence_evt, fence_value);
 
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
