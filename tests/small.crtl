@@ -17,5 +17,5 @@ ray_gen RayGen(RayGenParams params, float scale_factor)
     uint2 pixel = ray_index();
     float4 c;
     c = params.color * scene.test_constant + params.data[0];
-    scene.image[pixel] = params.color * scale_factor;
+    scene.image[pixel] = params.color * scale_factor * c;
 }

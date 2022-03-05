@@ -33,7 +33,7 @@ RayGen_params.data = RayGen_params_data;
 uint2 pixel = DispatchRaysIndex().xy;
 float4 c;
 c = RayGen_params.color * scene_test_constant + RayGen_params.data[0];
-scene_image[pixel] = RayGen_params.color * RayGen_scale_factor;
+scene_image[pixel] = RayGen_params.color * RayGen_scale_factor * c;
 }
 }
 
