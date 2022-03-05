@@ -1,12 +1,14 @@
 #include <algorithm>
 #include <array>
+#include <codecvt>
+#include <locale>
 #ifdef _WIN32
 #include <intrin.h>
 #elif not defined(__aarch64__)
 #include <cpuid.h>
 #endif
-#include "util.h"
 #include <glm/ext.hpp>
+#include "util.h"
 
 std::string pretty_print_count(const double count)
 {
@@ -106,4 +108,16 @@ float linear_to_srgb(float x)
 float luminance(const glm::vec3 &c)
 {
     return 0.2126f * c.x + 0.7152f * c.y + 0.0722f * c.z;
+}
+
+std::wstring utf8_to_utf16(const std::string &utf8)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.from_bytes(utf8);
+}
+
+std::string utf16_to_utf8(const std::wstring &utf16)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(utf16);
 }

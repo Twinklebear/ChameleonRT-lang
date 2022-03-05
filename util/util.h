@@ -21,3 +21,7 @@ float srgb_to_linear(const float x);
 float linear_to_srgb(const float x);
 
 float luminance(const glm::vec3 &c);
+
+std::wstring utf8_to_utf16(const std::string &utf8);
+
+std::string utf16_to_utf8(const std::wstring &utf16);
