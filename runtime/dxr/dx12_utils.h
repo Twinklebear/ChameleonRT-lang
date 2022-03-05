@@ -8,6 +8,7 @@
 
 // Utilities for general DX12 ease of use
 
+// TODO: Should make DX specific macro name
 #define CHECK_ERR(FN)                                                                \
     {                                                                                \
         auto fn_err = FN;                                                            \
@@ -18,6 +19,7 @@
         }                                                                            \
     }
 
+namespace crtr {
 namespace dxr {
 
 extern const D3D12_HEAP_PROPERTIES UPLOAD_HEAP_PROPS;
@@ -132,4 +134,5 @@ public:
     glm::uvec2 dims() const;
 };
 
+}
 }

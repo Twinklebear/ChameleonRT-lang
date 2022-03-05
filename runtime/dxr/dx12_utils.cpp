@@ -4,6 +4,7 @@
 #include <locale>
 #include "util.h"
 
+namespace crtr {
 namespace dxr {
 
 using Microsoft::WRL::ComPtr;
@@ -340,4 +341,5 @@ glm::uvec2 Texture2D::dims() const
     return tdims;
 }
 
+}
 }

@@ -6,6 +6,9 @@
 #include "imgui_impl_dx12.h"
 #include "util.h"
 
+namespace crtr {
+namespace dxr {
+
 using Microsoft::WRL::ComPtr;
 
 DXDisplay::DXDisplay(SDL_Window *window)
@@ -307,4 +310,7 @@ void DXDisplay::display(const std::vector<uint32_t> &img)
         CHECK_ERR(fence->SetEventOnCompletion(signal_val, fence_evt));
         WaitForSingleObject(fence_evt, INFINITE);
     }
+}
+
+}
 }

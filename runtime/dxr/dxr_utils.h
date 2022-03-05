@@ -5,6 +5,7 @@
 #include <vector>
 #include "dx12_utils.h"
 
+namespace crtr {
 namespace dxr {
 
 class RootSignatureBuilder;
@@ -388,4 +389,5 @@ public:
 };
 #endif
 
+}
 }

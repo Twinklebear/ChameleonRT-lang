@@ -60,14 +60,15 @@ glm::vec2 transform_mouse(glm::vec2 in)
 
 void run_app(SDL_Window *window)
 {
-    auto display = std::make_shared<DXDisplay>(window);
+    auto display = std::make_shared<crtr::dxr::DXDisplay>(window);
     display->resize(win_width, win_height);
 
-    auto render_target = dxr::Texture2D::device(display->device.Get(),
-                                                glm::uvec2(win_width, win_height),
-                                                D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-                                                DXGI_FORMAT_R8G8B8A8_UNORM,
-                                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    auto render_target =
+        crtr::dxr::Texture2D::device(display->device.Get(),
+                                     glm::uvec2(win_width, win_height),
+                                     D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                                     DXGI_FORMAT_R8G8B8A8_UNORM,
+                                     D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
     ImGuiIO &io = ImGui::GetIO();
 

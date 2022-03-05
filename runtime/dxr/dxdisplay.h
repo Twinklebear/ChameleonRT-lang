@@ -11,6 +11,9 @@
 #include "display/display.h"
 #include "dx12_utils.h"
 
+namespace crtr {
+namespace dxr {
+
 struct DXDisplay : Display {
     HWND win_handle;
 
@@ -52,3 +55,6 @@ private:
 
     void display(const std::vector<uint32_t> &img);
 };
+
+}
+}

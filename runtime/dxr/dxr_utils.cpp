@@ -6,6 +6,7 @@
 #include <numeric>
 #include "util.h"
 
+namespace crtr {
 namespace dxr {
 
 using Microsoft::WRL::ComPtr;
@@ -1057,4 +1058,5 @@ ID3D12Resource *TopLevelBVH::get()
 }
 #endif
 
+}
 }
