@@ -5,7 +5,7 @@ on: [push]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: RelWithDebInfo
-  ANTLR_VERSION: 4.9.3
+  ANTLR_VERSION: 4.10.1
 
 jobs:
   build:
@@ -16,8 +16,8 @@ jobs:
     # Share ANTLR4 config for all runners
     env:
       # Can't seem to use ${{env.ANTLR_VERSION}} here?
-      CLASSPATH: ${{github.workspace}}/antlr-4.9.3-complete.jar
-      ANTLR_EXECUTABLE: ${{github.workspace}}/antlr-4.9.3-complete.jar
+      CLASSPATH: ${{github.workspace}}/antlr-4.10.1-complete.jar
+      ANTLR_EXECUTABLE: ${{github.workspace}}/antlr-4.10.1-complete.jar
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-java@v2
@@ -32,7 +32,7 @@ jobs:
     - name: Setup ANTLR4
       # Can't seem to use ${{env.ANTLR_VERSION}} here?
       working-directory: ${{github.workspace}}/
-      run: wget https://www.antlr.org/download/antlr-4.9.3-complete.jar
+      run: wget https://www.antlr.org/download/antlr-4.10.1-complete.jar
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build

@@ -14,51 +14,45 @@ class ASTBuilderVisitor : public crtg::ChameleonRTParserBaseVisitor, public Erro
 public:
     std::shared_ptr<ast::AST> ast = std::make_shared<ast::AST>();
 
-    virtual antlrcpp::Any visitTopLevelDeclaration(
+    virtual std::any visitTopLevelDeclaration(
         crtg::ChameleonRTParser::TopLevelDeclarationContext *ctx) override;
 
-    virtual antlrcpp::Any visitFunctionDecl(
+    virtual std::any visitFunctionDecl(
         crtg::ChameleonRTParser::FunctionDeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitStructDecl(
-        crtg::ChameleonRTParser::StructDeclContext *ctx) override;
+    virtual std::any visitStructDecl(crtg::ChameleonRTParser::StructDeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitStructMember(
+    virtual std::any visitStructMember(
         crtg::ChameleonRTParser::StructMemberContext *ctx) override;
 
-    virtual antlrcpp::Any visitParameterList(
+    virtual std::any visitParameterList(
         crtg::ChameleonRTParser::ParameterListContext *ctx) override;
 
-    virtual antlrcpp::Any visitParameter(
-        crtg::ChameleonRTParser::ParameterContext *ctx) override;
+    virtual std::any visitParameter(crtg::ChameleonRTParser::ParameterContext *ctx) override;
 
-    virtual antlrcpp::Any visitBlock(crtg::ChameleonRTParser::BlockContext *ctx) override;
+    virtual std::any visitBlock(crtg::ChameleonRTParser::BlockContext *ctx) override;
 
-    virtual antlrcpp::Any visitVarDecl(crtg::ChameleonRTParser::VarDeclContext *ctx) override;
+    virtual std::any visitVarDecl(crtg::ChameleonRTParser::VarDeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitVarDeclStmt(
+    virtual std::any visitVarDeclStmt(
         crtg::ChameleonRTParser::VarDeclStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitGlobalParamDecl(
+    virtual std::any visitGlobalParamDecl(
         crtg::ChameleonRTParser::GlobalParamDeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitIfStmt(crtg::ChameleonRTParser::IfStmtContext *ctx) override;
+    virtual std::any visitIfStmt(crtg::ChameleonRTParser::IfStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitWhileStmt(
-        crtg::ChameleonRTParser::WhileStmtContext *ctx) override;
+    virtual std::any visitWhileStmt(crtg::ChameleonRTParser::WhileStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitForStmt(crtg::ChameleonRTParser::ForStmtContext *ctx) override;
+    virtual std::any visitForStmt(crtg::ChameleonRTParser::ForStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitReturnStmt(
-        crtg::ChameleonRTParser::ReturnStmtContext *ctx) override;
+    virtual std::any visitReturnStmt(crtg::ChameleonRTParser::ReturnStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitExprStmt(
-        crtg::ChameleonRTParser::ExprStmtContext *ctx) override;
+    virtual std::any visitExprStmt(crtg::ChameleonRTParser::ExprStmtContext *ctx) override;
 
-    virtual antlrcpp::Any visitTypeName(
-        crtg::ChameleonRTParser::TypeNameContext *ctx) override;
+    virtual std::any visitTypeName(crtg::ChameleonRTParser::TypeNameContext *ctx) override;
 
-    virtual antlrcpp::Any visitTemplateParameters(
+    virtual std::any visitTemplateParameters(
         crtg::ChameleonRTParser::TemplateParametersContext *ctx) override;
 
     std::set<ast::ty::Modifier> parse_modifiers(
@@ -67,24 +61,21 @@ public:
 
     // Expression visitors are overriden for convenience, but all forward on to the
     // ASTExprBuilderVisitor
-    virtual antlrcpp::Any visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx) override;
-    virtual antlrcpp::Any visitCall(crtg::ChameleonRTParser::CallContext *ctx) override;
-    virtual antlrcpp::Any visitStructArray(
+    virtual std::any visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx) override;
+    virtual std::any visitCall(crtg::ChameleonRTParser::CallContext *ctx) override;
+    virtual std::any visitStructArray(
         crtg::ChameleonRTParser::StructArrayContext *ctx) override;
-    virtual antlrcpp::Any visitMult(crtg::ChameleonRTParser::MultContext *ctx) override;
-    virtual antlrcpp::Any visitDiv(crtg::ChameleonRTParser::DivContext *ctx) override;
-    virtual antlrcpp::Any visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx) override;
-    virtual antlrcpp::Any visitComparison(
-        crtg::ChameleonRTParser::ComparisonContext *ctx) override;
-    virtual antlrcpp::Any visitEquality(
-        crtg::ChameleonRTParser::EqualityContext *ctx) override;
-    virtual antlrcpp::Any visitLogicAnd(
-        crtg::ChameleonRTParser::LogicAndContext *ctx) override;
-    virtual antlrcpp::Any visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx) override;
-    virtual antlrcpp::Any visitAssign(crtg::ChameleonRTParser::AssignContext *ctx) override;
-    virtual antlrcpp::Any visitParens(crtg::ChameleonRTParser::ParensContext *ctx) override;
-    virtual antlrcpp::Any visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx) override;
+    virtual std::any visitMult(crtg::ChameleonRTParser::MultContext *ctx) override;
+    virtual std::any visitDiv(crtg::ChameleonRTParser::DivContext *ctx) override;
+    virtual std::any visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx) override;
+    virtual std::any visitComparison(crtg::ChameleonRTParser::ComparisonContext *ctx) override;
+    virtual std::any visitEquality(crtg::ChameleonRTParser::EqualityContext *ctx) override;
+    virtual std::any visitLogicAnd(crtg::ChameleonRTParser::LogicAndContext *ctx) override;
+    virtual std::any visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx) override;
+    virtual std::any visitAssign(crtg::ChameleonRTParser::AssignContext *ctx) override;
+    virtual std::any visitParens(crtg::ChameleonRTParser::ParensContext *ctx) override;
+    virtual std::any visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx) override;
 
-    antlrcpp::Any visit_expr(crtg::ChameleonRTParser::ExprContext *ctx);
+    std::any visit_expr(crtg::ChameleonRTParser::ExprContext *ctx);
 };
 }

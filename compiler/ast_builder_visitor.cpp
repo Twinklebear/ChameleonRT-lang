@@ -9,24 +9,24 @@ namespace crtl {
 
 using namespace ast;
 
-antlrcpp::Any ASTBuilderVisitor::visitTopLevelDeclaration(
+std::any ASTBuilderVisitor::visitTopLevelDeclaration(
     crtg::ChameleonRTParser::TopLevelDeclarationContext *ctx)
 {
     std::shared_ptr<Node> n;
     auto child = visitChildren(ctx);
-    if (child.isNotNull()) {
+    if (child.has_value()) {
         // A bit of a pain, but there's a limited number of types of top-level declarations
         // we can have so do this cast up to the generic Node type here
-        if (child.is<std::shared_ptr<decl::EntryPoint>>()) {
-            n = child.as<std::shared_ptr<decl::EntryPoint>>();
-        } else if (child.is<std::shared_ptr<decl::Function>>()) {
-            n = child.as<std::shared_ptr<decl::Function>>();
-        } else if (child.is<std::shared_ptr<decl::Struct>>()) {
-            n = child.as<std::shared_ptr<decl::Struct>>();
-        } else if (child.is<std::shared_ptr<stmt::VariableDeclaration>>()) {
-            n = child.as<std::shared_ptr<stmt::VariableDeclaration>>();
-        } else if (child.is<std::shared_ptr<decl::GlobalParam>>()) {
-            n = child.as<std::shared_ptr<decl::GlobalParam>>();
+        if (child.type() == typeid(std::shared_ptr<decl::EntryPoint>)) {
+            n = std::any_cast<std::shared_ptr<decl::EntryPoint>>(child);
+        } else if (child.type() == typeid(std::shared_ptr<decl::Function>)) {
+            n = std::any_cast<std::shared_ptr<decl::Function>>(child);
+        } else if (child.type() == typeid(std::shared_ptr<decl::Struct>)) {
+            n = std::any_cast<std::shared_ptr<decl::Struct>>(child);
+        } else if (child.type() == typeid(std::shared_ptr<stmt::VariableDeclaration>)) {
+            n = std::any_cast<std::shared_ptr<stmt::VariableDeclaration>>(child);
+        } else if (child.type() == typeid(std::shared_ptr<decl::GlobalParam>)) {
+            n = std::any_cast<std::shared_ptr<decl::GlobalParam>>(child);
         }
     }
 
@@ -37,10 +37,10 @@ antlrcpp::Any ASTBuilderVisitor::visitTopLevelDeclaration(
         report_warning(ctx->getStart(),
                        "Unhandled/unrecognized top level declaration! TODO make error later");
     }
-    return antlrcpp::Any();
+    return std::any();
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitFunctionDecl(
+std::any ASTBuilderVisitor::visitFunctionDecl(
     crtg::ChameleonRTParser::FunctionDeclContext *ctx)
 {
     antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
@@ -48,11 +48,13 @@ antlrcpp::Any ASTBuilderVisitor::visitFunctionDecl(
 
     std::vector<std::shared_ptr<decl::Variable>> params;
     if (ctx->parameterList()) {
-        params = *visitParameterList(ctx->parameterList())
-                      .as<std::shared_ptr<std::vector<std::shared_ptr<decl::Variable>>>>();
+        // TODO: Now that ANTLR4 is using std::any this could change to not return the shared
+        // ptr wrapper anymore
+        params = *std::any_cast<std::shared_ptr<std::vector<std::shared_ptr<decl::Variable>>>>(
+            visitParameterList(ctx->parameterList()));
     }
 
-    auto block = visit(ctx->block()).as<std::shared_ptr<stmt::Block>>();
+    auto block = std::any_cast<std::shared_ptr<stmt::Block>>(visit(ctx->block()));
 
     // Shader entry points just have the entry point type and no return value
     if (ctx->entryPointType()) {
@@ -73,18 +75,18 @@ antlrcpp::Any ASTBuilderVisitor::visitFunctionDecl(
         } else {
             report_error(entry_pt_type_ctx->getStart(),
                          "Invalid entry point type " + entry_pt_type_ctx->getText());
-            return antlrcpp::Any();
+            return std::any();
         }
         return std::make_shared<decl::EntryPoint>(name, token, params, entry_pt_type, block);
     }
 
     // Regular functions have a return type
-    auto return_type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
+    auto return_type =
+        std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
     return std::make_shared<decl::Function>(name, token, params, block, return_type);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitStructDecl(
-    crtg::ChameleonRTParser::StructDeclContext *ctx)
+std::any ASTBuilderVisitor::visitStructDecl(crtg::ChameleonRTParser::StructDeclContext *ctx)
 {
     const std::string name = ctx->IDENTIFIER()->getText();
 
@@ -92,82 +94,83 @@ antlrcpp::Any ASTBuilderVisitor::visitStructDecl(
     auto struct_member_decls = ctx->structMember();
     for (auto &m : struct_member_decls) {
         struct_members.push_back(
-            visitStructMember(m).as<std::shared_ptr<decl::StructMember>>());
+            std::any_cast<std::shared_ptr<decl::StructMember>>(visitStructMember(m)));
     }
     return std::make_shared<decl::Struct>(
         name, ctx->IDENTIFIER()->getSymbol(), struct_members);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitStructMember(
+std::any ASTBuilderVisitor::visitStructMember(
     crtg::ChameleonRTParser::StructMemberContext *ctx)
 {
     const std::string name = ctx->IDENTIFIER()->getText();
-    auto type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
+    auto type = std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
 
     return std::make_shared<decl::StructMember>(name, ctx->IDENTIFIER()->getSymbol(), type);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitParameterList(
+std::any ASTBuilderVisitor::visitParameterList(
     crtg::ChameleonRTParser::ParameterListContext *ctx)
 {
-    // Non trivial/POD types need to be wrapped in a shared ptr to work around antlrcpp::Any
+    // Non trivial/POD types need to be wrapped in a shared ptr to work around std::any
     // limitations
     auto parameters = std::make_shared<std::vector<std::shared_ptr<decl::Variable>>>();
     auto param_list = ctx->parameter();
     for (auto *p : param_list) {
-        auto res = visitParameter(p).as<std::shared_ptr<decl::Variable>>();
+        auto res = std::any_cast<std::shared_ptr<decl::Variable>>(visitParameter(p));
         parameters->push_back(res);
     }
     return parameters;
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitParameter(crtg::ChameleonRTParser::ParameterContext *ctx)
+std::any ASTBuilderVisitor::visitParameter(crtg::ChameleonRTParser::ParameterContext *ctx)
 {
     antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
     const std::string name = ctx->IDENTIFIER()->getText();
-    auto type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
+    auto type = std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
     type->modifiers = parse_modifiers(token, ctx->modifier());
     return std::make_shared<decl::Variable>(name, token, type);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitBlock(crtg::ChameleonRTParser::BlockContext *ctx)
+std::any ASTBuilderVisitor::visitBlock(crtg::ChameleonRTParser::BlockContext *ctx)
 {
     std::vector<std::shared_ptr<stmt::Statement>> statements;
     auto ctx_stmts = ctx->statement();
     for (auto &s : ctx_stmts) {
         auto res = visit(s);
-        if (res.isNull()) {
+        if (!res.has_value()) {
             report_warning(s->getStart(), "TODO WILL: Unimplemented statement -> AST mapping");
         } else {
-            if (res.is<std::shared_ptr<stmt::VariableDeclaration>>()) {
+            if (res.type() == typeid(std::shared_ptr<stmt::VariableDeclaration>)) {
                 // varDeclStmt can be in top level and blocks, so it returns itself as its
                 // child type, not the parent Statement class
-                auto var_decl_stmt = res.as<std::shared_ptr<stmt::VariableDeclaration>>();
+                auto var_decl_stmt =
+                    std::any_cast<std::shared_ptr<stmt::VariableDeclaration>>(res);
                 statements.push_back(
                     std::dynamic_pointer_cast<stmt::Statement>(var_decl_stmt));
-            } else if (res.is<std::shared_ptr<stmt::Block>>()) {
+            } else if (res.type() == typeid(std::shared_ptr<stmt::Block>)) {
                 // Similar case for block, where it returns as a block instead of a statement
                 // to make some other code a bit easier
-                auto block_stmt = res.as<std::shared_ptr<stmt::Block>>();
+                auto block_stmt = std::any_cast<std::shared_ptr<stmt::Block>>(res);
                 statements.push_back(std::dynamic_pointer_cast<stmt::Statement>(block_stmt));
             } else {
-                if (!res.is<std::shared_ptr<stmt::Statement>>()) {
+                if (res.type() != typeid(std::shared_ptr<stmt::Statement>)) {
                     report_error(
                         s->getStart(),
                         "Expecting statement for block statements but got non-statement!");
                 }
-                statements.push_back(res.as<std::shared_ptr<stmt::Statement>>());
+                statements.push_back(std::any_cast<std::shared_ptr<stmt::Statement>>(res));
             }
         }
     }
     return std::make_shared<stmt::Block>(ctx->getStart(), statements);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitVarDecl(crtg::ChameleonRTParser::VarDeclContext *ctx)
+std::any ASTBuilderVisitor::visitVarDecl(crtg::ChameleonRTParser::VarDeclContext *ctx)
 {
     antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
     const std::string name = ctx->IDENTIFIER()->getText();
-    auto type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
+    auto type = std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
     if (ctx->CONST()) {
         type->modifiers.insert(ty::Modifier::CONST);
     }
@@ -175,89 +178,89 @@ antlrcpp::Any ASTBuilderVisitor::visitVarDecl(crtg::ChameleonRTParser::VarDeclCo
     if (ctx->expr()) {
         // Temporarily filter out unimplemented parts of the AST visitor
         auto init_res_tmp = visit(ctx->expr());
-        if (init_res_tmp.isNull()) {
+        if (!init_res_tmp.has_value()) {
             report_warning(ctx->expr()->getStart(), "TODO WILL: Parse initializer expression");
         } else {
-            initializer = init_res_tmp.as<std::shared_ptr<expr::Expression>>();
+            initializer = std::any_cast<std::shared_ptr<expr::Expression>>(init_res_tmp);
         }
     }
     return std::make_shared<decl::Variable>(name, token, type, initializer);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitVarDeclStmt(
-    crtg::ChameleonRTParser::VarDeclStmtContext *ctx)
+std::any ASTBuilderVisitor::visitVarDeclStmt(crtg::ChameleonRTParser::VarDeclStmtContext *ctx)
 {
-    auto decl = visitVarDecl(ctx->varDecl()).as<std::shared_ptr<decl::Variable>>();
+    auto decl = std::any_cast<std::shared_ptr<decl::Variable>>(visitVarDecl(ctx->varDecl()));
     return std::make_shared<stmt::VariableDeclaration>(ctx->getStart(), decl);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitGlobalParamDecl(
+std::any ASTBuilderVisitor::visitGlobalParamDecl(
     crtg::ChameleonRTParser::GlobalParamDeclContext *ctx)
 {
     antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
     const std::string name = ctx->IDENTIFIER()->getText();
-    auto type = visitTypeName(ctx->typeName()).as<std::shared_ptr<ty::Type>>();
+    auto type = std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
     if (ctx->CONST()) {
         type->modifiers.insert(ty::Modifier::CONST);
     }
     return std::make_shared<decl::GlobalParam>(name, token, type);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitIfStmt(crtg::ChameleonRTParser::IfStmtContext *ctx)
+std::any ASTBuilderVisitor::visitIfStmt(crtg::ChameleonRTParser::IfStmtContext *ctx)
 {
-    auto condition = visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
+    auto condition = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr()));
     auto branches = ctx->statement();
     // There will always at least be an if branch
-    auto if_branch = visit(branches[0]).as<std::shared_ptr<stmt::Statement>>();
+    auto if_branch = std::any_cast<std::shared_ptr<stmt::Statement>>(visit(branches[0]));
     std::shared_ptr<stmt::Statement> else_branch;
     if (branches.size() == 2) {
-        else_branch = visit(branches[1]).as<std::shared_ptr<stmt::Statement>>();
+        else_branch = std::any_cast<std::shared_ptr<stmt::Statement>>(visit(branches[1]));
     }
     return std::dynamic_pointer_cast<stmt::Statement>(
         std::make_shared<stmt::IfElse>(ctx->getStart(), condition, if_branch, else_branch));
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitWhileStmt(crtg::ChameleonRTParser::WhileStmtContext *ctx)
+std::any ASTBuilderVisitor::visitWhileStmt(crtg::ChameleonRTParser::WhileStmtContext *ctx)
 {
-    return antlrcpp::Any();
+    return std::any();
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitForStmt(crtg::ChameleonRTParser::ForStmtContext *ctx)
+std::any ASTBuilderVisitor::visitForStmt(crtg::ChameleonRTParser::ForStmtContext *ctx)
 {
-    return antlrcpp::Any();
+    return std::any();
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitReturnStmt(
-    crtg::ChameleonRTParser::ReturnStmtContext *ctx)
+std::any ASTBuilderVisitor::visitReturnStmt(crtg::ChameleonRTParser::ReturnStmtContext *ctx)
 {
-    return antlrcpp::Any();
+    return std::any();
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitExprStmt(crtg::ChameleonRTParser::ExprStmtContext *ctx)
+std::any ASTBuilderVisitor::visitExprStmt(crtg::ChameleonRTParser::ExprStmtContext *ctx)
 {
     ASTExprBuilderVisitor expr_visitor;
     // TODO: Is some error handling needed here for malformed or invalid expressions?
     // Most errors would be checked for and handled in a later pass (types, etc)
-    auto expr = expr_visitor.visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
+    auto expr =
+        std::any_cast<std::shared_ptr<expr::Expression>>(expr_visitor.visit(ctx->expr()));
     return std::dynamic_pointer_cast<stmt::Statement>(
         std::make_shared<stmt::Expression>(ctx->getStart(), expr));
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameContext *ctx)
+std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameContext *ctx)
 {
     std::vector<std::shared_ptr<ty::Type>> template_parameters;
     if (ctx->templateParameters()) {
         // Note: must return shared_ptr wrapper to work around antlrcpp::Any limitation
+        // TODO: Now that ANTLR4 C++ uses std::any this workaround is no longer needed
         template_parameters =
-            *visitTemplateParameters(ctx->templateParameters())
-                 .as<std::shared_ptr<std::vector<std::shared_ptr<ty::Type>>>>();
+            *std::any_cast<std::shared_ptr<std::vector<std::shared_ptr<ty::Type>>>>(
+                visitTemplateParameters(ctx->templateParameters()));
     }
 
     if (template_parameters.size() > 1) {
         // TODO: Haven't implemented template struct parsing/mapping in AST
         report_error(ctx->templateParameters()->getStart(),
                      "Error: Unsupported number of template parameters");
-        return antlrcpp::Any();
+        return std::any();
     }
 
     if (ctx->IDENTIFIER()) {
@@ -416,16 +419,16 @@ antlrcpp::Any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeName
     }
 
     report_error(ctx->getStart(), "Unhandled type string " + ctx->getText());
-    return antlrcpp::Any();
+    return std::any();
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitTemplateParameters(
+std::any ASTBuilderVisitor::visitTemplateParameters(
     crtg::ChameleonRTParser::TemplateParametersContext *ctx)
 {
     auto template_params = std::make_shared<std::vector<std::shared_ptr<ty::Type>>>();
     auto type_list = ctx->typeName();
     for (auto &t : type_list) {
-        template_params->push_back(visitTypeName(t).as<std::shared_ptr<ty::Type>>());
+        template_params->push_back(std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(t)));
     }
     return template_params;
 }
@@ -461,62 +464,60 @@ std::set<ty::Modifier> ASTBuilderVisitor::parse_modifiers(
     return modifiers;
 }
 
-antlrcpp::Any ASTBuilderVisitor::visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx)
+std::any ASTBuilderVisitor::visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallContext *ctx)
+std::any ASTBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitStructArray(
-    crtg::ChameleonRTParser::StructArrayContext *ctx)
+std::any ASTBuilderVisitor::visitStructArray(crtg::ChameleonRTParser::StructArrayContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitMult(crtg::ChameleonRTParser::MultContext *ctx)
+std::any ASTBuilderVisitor::visitMult(crtg::ChameleonRTParser::MultContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitDiv(crtg::ChameleonRTParser::DivContext *ctx)
+std::any ASTBuilderVisitor::visitDiv(crtg::ChameleonRTParser::DivContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx)
+std::any ASTBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitComparison(
-    crtg::ChameleonRTParser::ComparisonContext *ctx)
+std::any ASTBuilderVisitor::visitComparison(crtg::ChameleonRTParser::ComparisonContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitEquality(crtg::ChameleonRTParser::EqualityContext *ctx)
+std::any ASTBuilderVisitor::visitEquality(crtg::ChameleonRTParser::EqualityContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitLogicAnd(crtg::ChameleonRTParser::LogicAndContext *ctx)
+std::any ASTBuilderVisitor::visitLogicAnd(crtg::ChameleonRTParser::LogicAndContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx)
+std::any ASTBuilderVisitor::visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitAssign(crtg::ChameleonRTParser::AssignContext *ctx)
+std::any ASTBuilderVisitor::visitAssign(crtg::ChameleonRTParser::AssignContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitParens(crtg::ChameleonRTParser::ParensContext *ctx)
+std::any ASTBuilderVisitor::visitParens(crtg::ChameleonRTParser::ParensContext *ctx)
 {
     return visit_expr(ctx);
 }
-antlrcpp::Any ASTBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx)
+std::any ASTBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx)
 {
     return visit_expr(ctx);
 }
 
-antlrcpp::Any ASTBuilderVisitor::visit_expr(crtg::ChameleonRTParser::ExprContext *ctx)
+std::any ASTBuilderVisitor::visit_expr(crtg::ChameleonRTParser::ExprContext *ctx)
 {
     ASTExprBuilderVisitor expr_visitor;
     return expr_visitor.visit(ctx);

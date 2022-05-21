@@ -16,10 +16,10 @@ class ASTStructArrayAccessBuilderVisitor : public crtg::ChameleonRTParserBaseVis
 public:
     std::vector<std::shared_ptr<ast::expr::StructArrayAccessFragment>> struct_array_chain;
 
-    virtual antlrcpp::Any visitStructAccess(
+    virtual std::any visitStructAccess(
         crtg::ChameleonRTParser::StructAccessContext *ctx) override;
 
-    virtual antlrcpp::Any visitArrayAccess(
+    virtual std::any visitArrayAccess(
         crtg::ChameleonRTParser::ArrayAccessContext *ctx) override;
 };
 

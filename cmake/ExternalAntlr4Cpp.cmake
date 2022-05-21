@@ -8,7 +8,7 @@ set(ANTLR4_GIT_REPOSITORY https://github.com/antlr/antlr4.git)
 if(NOT DEFINED ANTLR4_TAG)
   # Set to branch name to keep library updated at the cost of needing to rebuild after 'clean'
   # Set to commit hash to keep the build stable and does not need to rebuild after 'clean'
-  set(ANTLR4_TAG 4.9.3)
+  set(ANTLR4_TAG 4.10.1)
 endif()
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
@@ -38,7 +38,7 @@ else()
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
     set(ANTLR4_RUNTIME_LIBRARIES
-        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.9.3.dll)
+        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-${ANTLR4_TAG}.dll)
   elseif(APPLE)
     set(ANTLR4_RUNTIME_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dylib)

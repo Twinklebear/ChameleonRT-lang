@@ -5,9 +5,9 @@ namespace crtl {
 
 using namespace ast;
 
-antlrcpp::Any ASTExprBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallContext *ctx)
+std::any ASTExprBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallContext *ctx)
 {
-    auto call = visit(ctx->functionCall()).as<std::shared_ptr<expr::FunctionCall>>();
+    auto call = std::any_cast<std::shared_ptr<expr::FunctionCall>>(visit(ctx->functionCall()));
     if (ctx->structArrayAccessChain()) {
         ASTStructArrayAccessBuilderVisitor struct_array_access_visitor;
         struct_array_access_visitor.visitChildren(ctx->structArrayAccessChain());
@@ -16,19 +16,19 @@ antlrcpp::Any ASTExprBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallCont
     return std::dynamic_pointer_cast<expr::Expression>(call);
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx)
+std::any ASTExprBuilderVisitor::visitLogicOr(crtg::ChameleonRTParser::LogicOrContext *ctx)
 {
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     return std::dynamic_pointer_cast<expr::Expression>(
         expr::Binary::logic_and(ctx->BOOL_OR()->getSymbol(), lhs, rhs));
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx)
+std::any ASTExprBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSubContext *ctx)
 {
     // Note/TODO: type checking that this operation is actually valid will be in a later pass
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     std::shared_ptr<expr::Expression> expr;
     if (ctx->PLUS()) {
         expr = expr::Binary::add(ctx->PLUS()->getSymbol(), lhs, rhs);
@@ -38,16 +38,16 @@ antlrcpp::Any ASTExprBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSub
     return expr;
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitParens(crtg::ChameleonRTParser::ParensContext *ctx)
+std::any ASTExprBuilderVisitor::visitParens(crtg::ChameleonRTParser::ParensContext *ctx)
 {
     // The parens are only needed to tell the parser how to group things. So we just pass on to
     // the expression in the parenthesis.
     return visit(ctx->expr());
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx)
+std::any ASTExprBuilderVisitor::visitUnary(crtg::ChameleonRTParser::UnaryContext *ctx)
 {
-    auto operand = visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
+    auto operand = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr()));
     std::shared_ptr<expr::Expression> expr;
     if (ctx->MINUS()) {
         expr = expr::Unary::negate(ctx->MINUS()->getSymbol(), operand);
@@ -57,7 +57,7 @@ antlrcpp::Any ASTExprBuilderVisitor::visitUnary(crtg::ChameleonRTParser::UnaryCo
     return expr;
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitStructArray(
+std::any ASTExprBuilderVisitor::visitStructArray(
     crtg::ChameleonRTParser::StructArrayContext *ctx)
 {
     // Visit any struct/array access chain that we may have in the expression
@@ -70,30 +70,30 @@ antlrcpp::Any ASTExprBuilderVisitor::visitStructArray(
     return std::dynamic_pointer_cast<expr::Expression>(expr);
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitDiv(crtg::ChameleonRTParser::DivContext *ctx)
+std::any ASTExprBuilderVisitor::visitDiv(crtg::ChameleonRTParser::DivContext *ctx)
 {
     // Note/TODO: type checking that this operation is actually valid will be in a later pass
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     return std::dynamic_pointer_cast<expr::Expression>(
         expr::Binary::divide(ctx->SLASH()->getSymbol(), lhs, rhs));
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitMult(crtg::ChameleonRTParser::MultContext *ctx)
+std::any ASTExprBuilderVisitor::visitMult(crtg::ChameleonRTParser::MultContext *ctx)
 {
     // Note/TODO: type checking that this operation is actually valid will be in a later pass
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     return std::dynamic_pointer_cast<expr::Expression>(
         expr::Binary::multiply(ctx->STAR()->getSymbol(), lhs, rhs));
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitComparison(
+std::any ASTExprBuilderVisitor::visitComparison(
     crtg::ChameleonRTParser::ComparisonContext *ctx)
 {
     // Note/TODO: type checking that this operation is actually valid will be in a later pass
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     std::shared_ptr<expr::Expression> expr;
     if (ctx->LESS()) {
         expr = expr::Binary::cmp_less(ctx->LESS()->getSymbol(), lhs, rhs);
@@ -107,7 +107,7 @@ antlrcpp::Any ASTExprBuilderVisitor::visitComparison(
     return expr;
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx)
+std::any ASTExprBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::PrimaryContext *ctx)
 {
     std::shared_ptr<expr::Expression> expr;
     if (ctx->IDENTIFIER()) {
@@ -126,9 +126,9 @@ antlrcpp::Any ASTExprBuilderVisitor::visitPrimary(crtg::ChameleonRTParser::Prima
     return expr;
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitAssign(crtg::ChameleonRTParser::AssignContext *ctx)
+std::any ASTExprBuilderVisitor::visitAssign(crtg::ChameleonRTParser::AssignContext *ctx)
 {
-    auto value = visit(ctx->expr()).as<std::shared_ptr<expr::Expression>>();
+    auto value = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr()));
     std::shared_ptr<expr::Expression> lhs;
     if (ctx->structArrayAccessChain()) {
         ASTStructArrayAccessBuilderVisitor struct_array_access_visitor;
@@ -144,11 +144,10 @@ antlrcpp::Any ASTExprBuilderVisitor::visitAssign(crtg::ChameleonRTParser::Assign
     return std::dynamic_pointer_cast<expr::Expression>(assignment);
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitEquality(
-    crtg::ChameleonRTParser::EqualityContext *ctx)
+std::any ASTExprBuilderVisitor::visitEquality(crtg::ChameleonRTParser::EqualityContext *ctx)
 {
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     std::shared_ptr<expr::Expression> expr;
     if (ctx->NOT_EQUAL()) {
         expr = expr::Binary::cmp_not_equal(ctx->NOT_EQUAL()->getSymbol(), lhs, rhs);
@@ -158,16 +157,15 @@ antlrcpp::Any ASTExprBuilderVisitor::visitEquality(
     return expr;
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitLogicAnd(
-    crtg::ChameleonRTParser::LogicAndContext *ctx)
+std::any ASTExprBuilderVisitor::visitLogicAnd(crtg::ChameleonRTParser::LogicAndContext *ctx)
 {
-    auto lhs = visit(ctx->expr(0)).as<std::shared_ptr<expr::Expression>>();
-    auto rhs = visit(ctx->expr(1)).as<std::shared_ptr<expr::Expression>>();
+    auto lhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(0)));
+    auto rhs = std::any_cast<std::shared_ptr<expr::Expression>>(visit(ctx->expr(1)));
     return std::dynamic_pointer_cast<expr::Expression>(
         expr::Binary::logic_and(ctx->BOOL_AND()->getSymbol(), lhs, rhs));
 }
 
-antlrcpp::Any ASTExprBuilderVisitor::visitFunctionCall(
+std::any ASTExprBuilderVisitor::visitFunctionCall(
     crtg::ChameleonRTParser::FunctionCallContext *ctx)
 {
     auto callee = ctx->IDENTIFIER()->getSymbol();
@@ -175,7 +173,7 @@ antlrcpp::Any ASTExprBuilderVisitor::visitFunctionCall(
     if (ctx->arguments()) {
         auto ctx_args = ctx->arguments()->expr();
         for (auto *a : ctx_args) {
-            args.push_back(visit(a).as<std::shared_ptr<expr::Expression>>());
+            args.push_back(std::any_cast<std::shared_ptr<expr::Expression>>(visit(a)));
         }
     }
     return std::make_shared<expr::FunctionCall>(callee, args);
