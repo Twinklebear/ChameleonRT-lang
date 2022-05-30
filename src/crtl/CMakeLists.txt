@@ -31,6 +31,7 @@ add_library(crtl STATIC
     compiler/hlsl/parameter_metadata_output_visitor.cpp
 
     shader_library.cpp
+    shader_entry_point.cpp
 )
 
 # TODO: Later these includes will be private

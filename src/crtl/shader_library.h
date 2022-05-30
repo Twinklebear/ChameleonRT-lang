@@ -5,12 +5,15 @@
 #include <vector>
 #include "compiler/ast/node.h"
 #include "compiler/resolver_visitor.h"
+#include "shader_entry_point.h"
 
 namespace crtl {
 class ShaderLibrary {
 public:
     ShaderLibrary() = default;
     ShaderLibrary(const std::string &shader_string);
+
+    // ShaderEntryPoint get_entry_point(const std::string &name);
 
     // private:
 

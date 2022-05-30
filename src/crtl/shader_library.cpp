@@ -109,5 +109,20 @@ ShaderLibrary::ShaderLibrary(const std::string &shader_string) : input_stream(sh
         std::cout << "Error during resolver pass, exiting\n";
         throw std::runtime_error("Resolver error");
     }
+
+    // TODO: These depend on the target API backend
+    /*
+    GlobalStructParamExpansionVisitor global_struct_param_expansion_visitor(
+        resolver_result);
+    ast = std::any_cast<std::shared_ptr<crtl::ast::AST>>(
+        global_struct_param_expansion_visitor.visit_ast(ast));
+
+    RenameEntryPointParamVisitor rename_entry_point_params(resolver_result);
+    rename_entry_point_params.visit_ast(ast);
+
+    auto param_transforms = std::make_shared<crtl::ParameterTransforms>(
+        global_struct_param_expansion_visitor.expanded_global_params,
+        rename_entry_point_params.renamed_vars);
+        */
 }
 }
