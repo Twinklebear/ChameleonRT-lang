@@ -134,7 +134,7 @@ if (ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
             ${ANTLR4_INCLUDE_DIRS}
             ${ANTLR_OUTPUT_DIR})
         set_target_properties(${ANTLR_TARGET_NAME} PROPERTIES
-            CXX_STANDARD 17
+            CXX_STANDARD 20
             CXX_STANDARD_REQUIRED ON)
 
     endfunction(ANTLR_TARGET)
