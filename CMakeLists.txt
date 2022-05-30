@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(chameleonrtlang)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include(ExternalProject)
 
 add_definitions(-DNOMINMAX -DGLM_ENABLE_EXPERIMENTAL -DSDL_MAIN_HANDLED
