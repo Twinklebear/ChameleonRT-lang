@@ -29,12 +29,15 @@ add_library(crtl STATIC
     compiler/hlsl/translate_builtin_function_call.cpp
     compiler/hlsl/output_visitor.cpp
     compiler/hlsl/parameter_metadata_output_visitor.cpp
+
+    shader_library.cpp
 )
 
 # TODO: Later these includes will be private
 target_include_directories(crtl PUBLIC
+    # TODO: Eventually remove the compiler include path here
     ${CMAKE_CURRENT_LIST_DIR}/compiler/
-    ${CMAKE_CURRENT_LIST_DIR}/rhi/
+    ${CMAKE_CURRENT_LIST_DIR}
     ${PROJECT_SOURCE_DIR}/external)
 
 target_link_libraries(crtl PUBLIC chameleonrt_grammar)
