@@ -26,6 +26,8 @@ ShaderLibrary::ShaderLibrary(const std::string &shader_string) : input_stream(sh
 {
     const std::string DIVIDER = "----------\n";
 
+    // TODO: This compilation step needs to be done in the crtl_compiler library
+    // so that the ANTLR parts don't need to be looked at by the RHI
     crtl::ErrorListener error_listener;
 
     crtg::ChameleonRTLexer lexer(&input_stream);

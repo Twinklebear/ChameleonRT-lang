@@ -9,11 +9,11 @@
 #include <SDL.h>
 #include "display/display.h"
 #include "display/imgui_impl_sdl.h"
-#include "dx12_utils.h"
-#include "dxdisplay.h"
-#include "dxr_utils.h"
 #include "imgui.h"
 #include "json.hpp"
+#include "rhi/dxr/dx12_utils.h"
+#include "rhi/dxr/dxdisplay.h"
+#include "rhi/dxr/dxr_utils.h"
 #include "util.h"
 
 // TODO Note: The precompiled shaders would be included into the app and would need to be in
