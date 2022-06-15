@@ -2,7 +2,7 @@ add_executable(chameleonrtc
     chameleonrtc.cpp)
 
 target_link_libraries(chameleonrtc PUBLIC
-    crtl)
+    crtl_compiler)
 
 if (WIN32)
     target_compile_definitions(chameleonrtc PRIVATE

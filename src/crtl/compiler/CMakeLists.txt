@@ -25,7 +25,7 @@ add_library(crtl_compiler SHARED
     hlsl/translate_builtin_function_call.cpp
     hlsl/output_visitor.cpp
     hlsl/parameter_metadata_output_visitor.cpp
-
+    hlsl/crtl_to_hlsl.cpp
 )
 
 # TODO: Later these includes will be private
