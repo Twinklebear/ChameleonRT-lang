@@ -10,6 +10,10 @@ namespace hlsl {
 struct ShaderCompilationResult {
     std::string hlsl_src;
     nlohmann::json shader_info;
+
+    ShaderCompilationResult() = default;
+
+    ShaderCompilationResult(const std::string &hlsl_src, nlohmann::json &shader_info);
 };
 
 std::shared_ptr<ShaderCompilationResult> compile_crtl(const std::string &crtl_src);

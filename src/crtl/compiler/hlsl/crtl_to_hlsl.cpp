@@ -19,6 +19,12 @@
 namespace crtl {
 namespace hlsl {
 
+ShaderCompilationResult::ShaderCompilationResult(const std::string &hlsl_src,
+                                                 nlohmann::json &shader_info)
+    : hlsl_src(hlsl_src), shader_info(shader_info)
+{
+}
+
 std::shared_ptr<ShaderCompilationResult> compile_crtl(const std::string &crtl_src)
 {
     const std::string DIVIDER(8, '-');
