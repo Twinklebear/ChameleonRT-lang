@@ -9,8 +9,6 @@ namespace crtl {
 
 class ShaderLibrary {
 public:
-    ShaderLibrary() = default;
-
     virtual ~ShaderLibrary() = default;
 
     // TODO: Maybe a free-function that takes the shader lib shared ptr to keep it alive?

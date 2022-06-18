@@ -3,8 +3,6 @@
 namespace crtl {
 class ShaderEntryPoint {
 public:
-    ShaderEntryPoint() = default;
-
     virtual ~ShaderEntryPoint() = default;
 
     // TODO: An API to get the layout for the parameters.
