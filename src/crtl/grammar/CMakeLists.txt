@@ -23,3 +23,6 @@ target_include_directories(crtl_grammar PUBLIC
 target_compile_definitions(crtl_grammar PUBLIC
     -DANTLR4CPP_STATIC)
 
+set_target_properties(crtl_grammar PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS ON)
+

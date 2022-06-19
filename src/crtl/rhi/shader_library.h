@@ -7,6 +7,12 @@
 
 namespace crtl {
 
+/* A ShaderLibrary stores the entire set of entry points that may be called within a given
+ * RayTracingPipeline.
+ *
+ * A future TODO is to allow this library to be created from multiple source files and perform
+ * some form of name-based linking for global parameters and etc.
+ */
 class ShaderLibrary {
 public:
     virtual ~ShaderLibrary() = default;

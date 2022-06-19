@@ -1,6 +1,10 @@
 #pragma once
 
 namespace crtl {
+/* A ShaderEntryPoint is a single callable shader function that can be called during rendering
+ * or as a compute shader (depending on the entry point type). E.g., a raygen function,
+ * closesthit function, or compute kernel.
+ */
 class ShaderEntryPoint {
 public:
     virtual ~ShaderEntryPoint() = default;

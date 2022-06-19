@@ -28,10 +28,12 @@ add_library(crtl_compiler SHARED
     hlsl/crtl_to_hlsl.cpp
 )
 
-# TODO: Later these includes will be private
 target_include_directories(crtl_compiler PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
     ${PROJECT_SOURCE_DIR}/external)
 
 target_link_libraries(crtl_compiler PRIVATE crtl_grammar)
+
+set_target_properties(crtl_compiler PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
