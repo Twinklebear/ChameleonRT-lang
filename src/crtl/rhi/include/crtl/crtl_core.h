@@ -1,6 +1,7 @@
 #pragma once
 
 #include "crtl_rhi_export.h"
+#include <stddef.h>
 
 enum CRTL_DATA_TYPE {
     CRTL_TYPE_BOOL,
