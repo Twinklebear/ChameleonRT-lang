@@ -1,39 +1,41 @@
 #pragma once
 
+#include "api_object.h"
 #include "buffer_view.h"
-#include "data_type.h"
+#include "crtl/crtl_enums.h"
 
 namespace crtl {
 
-/* The BufferBase allows backends to implement the appropriate mapping
- * for the Buffer and for buffers to be passed to the backend's module
- * without pulling in the backend code.
+/* A Buffer is a region of untyped memory allocated on the device or in
+ * device-visible host memory.
  */
-class BufferBase {
-    MemorySpace memory_space;
+class Buffer : APIObject {
+    CRTL_MEMORY_SPACE memory_space;
     size_t size_bytes;
 
 public:
-    virtual ~BufferBase() = default;
+    virtual ~Buffer() = default;
+
+    std::shared_ptr<BufferView> make_view();
 };
 
-/* A Buffer is a region of untyped memory allocated on the device or in
- * device-visible host memory. The Buffer<M> implements the Buffer templated over the memory
- * space to enforce requirements in the API
+/* The BufferM template is a utility for backend implementations to enforce internal compile
+ * time requirements about memory spaces
  */
-template <MemorySpace M>
-class Buffer {
-    std::shared_ptr<BufferBase> buffer;
-
+template <CRTL_MEMORY_SPACE M>
+class BufferM : public Buffer {
 public:
+    BufferM() = default;
+
     template <typename T>
-    std::shared_ptr<BufferView<T, M>> make_view();
+    std::shared_ptr<BufferViewT<T, M>> make_typed_view();
 };
 
-template <MemorySpace M>
+template <CRTL_MEMORY_SPACE M>
 template <typename T>
-std::shared_ptr<BufferView<T, M>> Buffer<M>::make_view()
+std::shared_ptr<BufferViewT<T, M>> BufferM<M>::make_typed_view()
 {
+    // TODO: validate the buffer memory space
     return nullptr;
 }
 

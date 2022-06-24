@@ -1,20 +1,7 @@
 #pragma once
 
 #include "crtl_device.h"
-
-/* The MemorySpace defines where a buffer's memory is located.
- * - Device: memory is on the GPU and not visible to the CPU (TODO: Maybe with resizable BAR,
- *           should still make it CPU visible?)
- *
- * - Upload: memory is on the CPU and is visible to both the GPU and CPU.
- *
- * - Readback: memory is on the GPU and readable from the CPU
- */
-enum CRTL_MEMORY_SPACE {
-    CRTL_MEMORY_DEVICE,
-    CRTL_MEMORY_UPLOAD,
-    CRTL_MEMORY_READBACK,
-};
+#include "crtl_enums.h"
 
 #ifdef __cplusplus
 namespace crtl_rhi {

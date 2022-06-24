@@ -4,6 +4,7 @@ add_library(crtl_rhi SHARED
     crtl_device.cpp
     crtl_shader_library.cpp
     crtl_buffer.cpp
+    backend_plugin.cpp
 )
 
 target_include_directories(crtl_rhi PRIVATE

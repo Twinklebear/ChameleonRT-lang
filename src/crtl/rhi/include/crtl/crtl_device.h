@@ -1,8 +1,7 @@
 #pragma once
 
 #include "crtl_core.h"
-
-enum DEVICE_API { DX12, VULKAN, METAL, OPTIX, EMBREE };
+#include "crtl_enums.h"
 
 #ifdef __cplusplus
 namespace crtl_rhi {
