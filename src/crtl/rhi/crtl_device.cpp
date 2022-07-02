@@ -9,7 +9,7 @@
 
 std::array<std::unique_ptr<crtl::BackendPlugin>, UNKNOWN> backends;
 
-extern "C" CRTL_RHI_EXPORT CRTLDevice crtl_create_device(const DEVICE_API api)
+extern "C" CRTL_RHI_EXPORT CRTLDevice crtl_new_device(const DEVICE_API api)
 {
     if (!backends[api]) {
         backends[api] = std::make_unique<crtl::BackendPlugin>(api);

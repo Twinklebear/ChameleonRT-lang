@@ -18,7 +18,7 @@ extern "C" {
 
 // Create a device for the desired API. Will load the backend for the device if not already
 // loaded
-CRTL_RHI_EXPORT CRTLDevice crtl_create_device(const DEVICE_API api);
+CRTL_RHI_EXPORT CRTLDevice crtl_new_device(const DEVICE_API api);
 
 // Increase the application refcount for the specified object
 CRTL_RHI_EXPORT void crtl_retain(CRTLDevice device, CRTLAPIObject object);

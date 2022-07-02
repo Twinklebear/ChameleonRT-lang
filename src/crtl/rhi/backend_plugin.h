@@ -41,8 +41,8 @@ public:
     void release(Device *d, APIObject *o) const;
 
 private:
-    /* Load a function pointer from the shared library. Returns nullptr if the function was not
-     * found
+    /* Load a function pointer from the shared library. Returns nullptr if the function
+     * was not found
      */
     template <typename T>
     T get_fn(const std::string &fcn_name)

@@ -22,9 +22,9 @@ extern "C" {
 /* Allocate a buffer of the specified size in the desired memory location.
  * Buffers represent untyped blocks of device or host memory.
  */
-CRTL_RHI_EXPORT CRTLBuffer crtl_allocate_buffer(CRTLDevice device,
-                                                CRTL_MEMORY_SPACE memory,
-                                                size_t size_bytes);
+CRTL_RHI_EXPORT CRTLBuffer crtl_new_buffer(CRTLDevice device,
+                                           CRTL_MEMORY_SPACE memory,
+                                           size_t size_bytes);
 
 /* Create a typed view of the specified buffer. The view can be created at a desired offset in
  * bytes from the start of the buffer, and will contain n_elements elements of the specified
@@ -42,11 +42,11 @@ CRTL_RHI_EXPORT CRTLBuffer crtl_allocate_buffer(CRTLDevice device,
  * CUDA: I think it is by default
  * Metal: Also might be by default?
  */
-CRTL_RHI_EXPORT CRTLBufferView crtl_make_view(CRTLDevice device,
-                                              CRTLBuffer buffer,
-                                              CRTL_DATA_TYPE type,
-                                              size_t offset_bytes,
-                                              size_t n_elements);
+CRTL_RHI_EXPORT CRTLBufferView crtl_new_view(CRTLDevice device,
+                                             CRTLBuffer buffer,
+                                             CRTL_DATA_TYPE type,
+                                             size_t offset_bytes,
+                                             size_t n_elements);
 
 CRTL_RHI_EXPORT void *crtl_map_view(CRTLDevice device, CRTLBufferView view);
 
