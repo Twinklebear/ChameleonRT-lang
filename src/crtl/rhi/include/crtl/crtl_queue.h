@@ -1,8 +1,12 @@
 #pragma once
 
+#include <stdint.h>
 #include "crtl_buffer.h"
 #include "crtl_device.h"
 #include "crtl_event.h"
+#include "crtl_geometry.h"
+#include "crtl_parameter_block.h"
+#include "crtl_rtpipeline.h"
 
 #ifdef __cplusplus
 namespace crtl_rhi {
@@ -62,6 +66,38 @@ CRTL_RHI_EXPORT void crtl_copy_buffer_to_buffer(CRTLDevice device,
                                                 CRTLBuffer dst,
                                                 uint64_t dst_offset,
                                                 uint64_t size);
+
+CRTL_RHI_EXPORT void crtl_build_blas(CRTLDevice device,
+                                     CRTLCommandBuffer cmd_buffer,
+                                     CRTLGroup group);
+
+CRTL_RHI_EXPORT void crtl_compact_blas(CRTLDevice device,
+                                       CRTLCommandBuffer cmd_buffer,
+                                       CRTLGroup group);
+
+CRTL_RHI_EXPORT void crtl_build_tlas(CRTLDevice device,
+                                     CRTLCommandBuffer cmd_buffer,
+                                     CRTLScene scene);
+
+CRTL_RHI_EXPORT void crtl_upload_shader_table(CRTLDevice device,
+                                              CRTLCommandBuffer cmd_buffer,
+                                              CRTLRTPipeline pipeline);
+
+CRTL_RHI_EXPORT void crtl_set_rtpipeline(CRTLDevice device,
+                                         CRTLCommandBuffer cmd_buffer,
+                                         CRTLRTPipeline pipeline);
+
+CRTL_RHI_EXPORT void crtl_set_global_parameter_block(
+    CRTLDevice device,
+    CRTLCommandBuffer cmd_buffer,
+    CRTLGlobalParameterBlock parameter_block);
+
+CRTL_RHI_EXPORT void crtl_dispatch_rays(CRTLDevice device,
+                                        CRTLCommandBuffer cmd_buffer,
+                                        uint32_t width,
+                                        uint32_t height);
+
+// TODO: Need APIs for barrier, resource transitions, etc. to match up with D3D12 & Vulkan
 
 #ifdef __cplusplus
 }

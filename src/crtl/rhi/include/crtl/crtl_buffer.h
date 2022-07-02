@@ -21,6 +21,8 @@ extern "C" {
 
 /* Allocate a buffer of the specified size in the desired memory location.
  * Buffers represent untyped blocks of device or host memory.
+ * TODO: May need read/write flag or other usage flags here as well?
+ * Or just need those for transitioning the resource using barrier
  */
 CRTL_RHI_EXPORT CRTLBuffer crtl_new_buffer(CRTLDevice device,
                                            CRTL_MEMORY_SPACE memory,

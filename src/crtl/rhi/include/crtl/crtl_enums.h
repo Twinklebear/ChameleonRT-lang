@@ -106,6 +106,7 @@ enum CRTL_DATA_TYPE {
     CRTL_TYPE_DOUBLE2X4,
     CRTL_TYPE_DOUBLE3X4,
     CRTL_TYPE_DOUBLE4X4,
+    // TODO: For params, buffer should be bufferview
     CRTL_TYPE_BUFFER,
     CRTL_TYPE_RWBUFFER,
     CRTL_TYPE_TEXTURE,
@@ -119,8 +120,8 @@ enum CRTL_DATA_TYPE {
 enum DEVICE_API { DX12, VULKAN, METAL, OPTIX, EMBREE, UNKNOWN };
 
 /* The MemorySpace defines where a buffer's memory is located.
- * - Device: memory is on the GPU and not visible to the CPU (TODO: Maybe with resizable BAR,
- *           should still make it CPU visible?)
+ * - Device: memory is on the GPU and not visible to the CPU (TODO: Maybe with resizable
+ * BAR, should still make it CPU visible?)
  *
  * - Upload: memory is on the CPU and is visible to both the GPU and CPU.
  *
