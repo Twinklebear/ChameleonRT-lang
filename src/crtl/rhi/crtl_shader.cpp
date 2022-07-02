@@ -20,15 +20,6 @@ crtl_new_parameter_block(CRTLDevice device, CRTLShaderEntryPoint entry_point)
     return nullptr;
 }
 
-extern "C" CRTL_RHI_EXPORT void crtl_set_parameter(
-    CRTLDevice device,
-    CRTLShaderParameterBlock parameter_block,
-    const char *name,
-    CRTL_DATA_TYPE data_type,
-    void *parameter)
-{
-}
-
 extern "C" CRTL_RHI_EXPORT CRTLShaderRecord
 crtl_new_shader_record(CRTLDevice device, CRTLShaderEntryPoint entry_point)
 {
