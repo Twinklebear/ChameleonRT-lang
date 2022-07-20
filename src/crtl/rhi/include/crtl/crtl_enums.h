@@ -132,3 +132,17 @@ enum CRTL_MEMORY_SPACE {
     CRTL_MEMORY_UPLOAD,
     CRTL_MEMORY_READBACK,
 };
+
+enum CRTL_TEXTURE_TYPE {
+    CRTL_TEXTURE_1D,
+    CRTL_TEXTURE_2D,
+    CRTL_TEXTURE_3D,
+    // TODO: texture arrays, cubemaps, etc?
+};
+
+enum CRTL_IMAGE_FORMAT {
+    CRTL_FORMAT_R8G8B8A8_UNORM,
+    CRTL_FORMAT_R8G8B8A8_UNORM_SRGB,
+    CRTL_FORMAT_R32G32B32A32_FLOAT,
+    // TODO: fill in the rest of the texture types
+};

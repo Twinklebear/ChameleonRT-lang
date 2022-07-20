@@ -1,9 +1,15 @@
 include(GenerateExportHeader)
 
 add_library(crtl_rhi SHARED
-    crtl_device.cpp
-    crtl_shader.cpp
     crtl_buffer.cpp
+    crtl_device.cpp
+    crtl_event.cpp
+    crtl_geometry.cpp
+    crtl_parameter_block.cpp
+    crtl_queue.cpp
+    crtl_rtpipeline.cpp
+    crtl_shader.cpp
+    crtl_texture.cpp
     backend_plugin.cpp
 )
 

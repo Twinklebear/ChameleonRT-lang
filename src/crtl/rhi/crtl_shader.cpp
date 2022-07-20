@@ -1,5 +1,3 @@
-#pragma once
-
 #include "crtl/crtl_shader.h"
 
 extern "C" CRTL_RHI_EXPORT CRTLShaderLibrary

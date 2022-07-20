@@ -23,7 +23,6 @@ typedef CRTLAPIObject CRTLGlobalParameterBlock;
 extern "C" {
 #endif
 
-// TODO: data type enums need to match the types we actually take here
 CRTL_RHI_EXPORT void crtl_set_parameter(CRTLDevice device,
                                         CRTLParameterBlock parameter_block,
                                         const char *name,

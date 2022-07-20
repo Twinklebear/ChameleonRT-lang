@@ -9,3 +9,4 @@
 #include "crtl_queue.h"
 #include "crtl_rtpipeline.h"
 #include "crtl_shader.h"
+#include "crtl_texture.h"
