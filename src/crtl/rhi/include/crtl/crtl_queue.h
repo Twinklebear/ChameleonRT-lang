@@ -73,14 +73,14 @@ CRTL_RHI_EXPORT void crtl_copy_buffer_to_buffer(CRTLDevice device,
                                                 uint64_t dst_offset,
                                                 uint64_t size);
 
-CRTL_RHI_EXPORT void crtl_copy_buffer_to_texture(CRTLDevice,
+CRTL_RHI_EXPORT void crtl_copy_buffer_to_texture(CRTLDevice device,
                                                  CRTLCommandBuffer cmd_buffer,
                                                  CRTLBuffer src,
                                                  uint64_t src_offset,
                                                  CRTLTexture dst,
                                                  CRTLBox3D region);
 
-CRTL_RHI_EXPORT void crtl_copy_texture_to_buffer(CRTLDevice,
+CRTL_RHI_EXPORT void crtl_copy_texture_to_buffer(CRTLDevice device,
                                                  CRTLCommandBuffer cmd_buffer,
                                                  CRTLTexture src,
                                                  CRTLBox3D region,

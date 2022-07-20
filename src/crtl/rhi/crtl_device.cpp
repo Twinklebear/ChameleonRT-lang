@@ -3,7 +3,6 @@
 #include "crtl/crtl_device.h"
 #include <array>
 #include <memory>
-#include "api_object.h"
 #include "backend_plugin.h"
 #include "device.h"
 
@@ -20,13 +19,11 @@ extern "C" CRTL_RHI_EXPORT CRTLDevice crtl_new_device(const DEVICE_API api)
 extern "C" CRTL_RHI_EXPORT void crtl_retain(CRTLDevice device, CRTLAPIObject object)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    crtl::APIObject *o = reinterpret_cast<crtl::APIObject *>(object);
-    backends[d->device_api()]->retain(d, o);
+    backends[d->device_api()]->retain(d, object);
 }
 
 extern "C" CRTL_RHI_EXPORT void crtl_release(CRTLDevice device, CRTLAPIObject object)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    crtl::APIObject *o = reinterpret_cast<crtl::APIObject *>(object);
-    backends[d->device_api()]->release(d, o);
+    backends[d->device_api()]->release(d, object);
 }

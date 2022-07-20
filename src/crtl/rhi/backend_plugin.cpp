@@ -33,8 +33,9 @@ const std::string device_api_to_string(const DEVICE_API api)
 BackendPlugin::BackendPlugin(DEVICE_API api) : api(api)
 {
     const std::string backend_name = device_api_to_string(api);
-    const std::string backend_file_name =
-        std::string(SHARED_LIBRARY_PREFIX) + backend_name + std::string(SHARED_LIBRARY_SUFFIX);
+    const std::string backend_file_name = std::string(SHARED_LIBRARY_PREFIX) +
+                                          backend_name +
+                                          std::string(SHARED_LIBRARY_SUFFIX);
     std::string error_msg;
 #ifdef _WIN32
     module_handle = LoadLibrary(backend_file_name.c_str());
@@ -72,7 +73,8 @@ BackendPlugin::BackendPlugin(DEVICE_API api) : api(api)
         std::cerr << base_error_message << "Library did not contain function '"
                   << create_device_fn_name << "'\n"
                   << std::flush;
-        throw std::runtime_error(base_error_message + "Library did not contain function '" +
+        throw std::runtime_error(base_error_message +
+                                 "Library did not contain function '" +
                                  create_device_fn_name + "'");
     }
 
@@ -82,8 +84,9 @@ BackendPlugin::BackendPlugin(DEVICE_API api) : api(api)
         std::cerr << base_error_message << "Library did not contain function '"
                   << retain_fn_name << "'\n"
                   << std::flush;
-        throw std::runtime_error(base_error_message + "Library did not contain function '" +
-                                 retain_fn_name + "'");
+        throw std::runtime_error(base_error_message +
+                                 "Library did not contain function '" + retain_fn_name +
+                                 "'");
     }
 
     const std::string release_fn_name = "crtl_" + backend_name + "_release";
@@ -92,8 +95,9 @@ BackendPlugin::BackendPlugin(DEVICE_API api) : api(api)
         std::cerr << base_error_message << "Library did not contain function '"
                   << release_fn_name << "'\n"
                   << std::flush;
-        throw std::runtime_error(base_error_message + "Library did not contain function '" +
-                                 release_fn_name + "'");
+        throw std::runtime_error(base_error_message +
+                                 "Library did not contain function '" + release_fn_name +
+                                 "'");
     }
 }
 
@@ -111,12 +115,12 @@ Device *BackendPlugin::create_device() const
     return create_device_fn();
 }
 
-void BackendPlugin::retain(Device *d, APIObject *o) const
+void BackendPlugin::retain(Device *d, CRTLAPIObject o) const
 {
     retain_fn(d, o);
 }
 
-void BackendPlugin::release(Device *d, APIObject *o) const
+void BackendPlugin::release(Device *d, CRTLAPIObject o) const
 {
     release_fn(d, o);
 }

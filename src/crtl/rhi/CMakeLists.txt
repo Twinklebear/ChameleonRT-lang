@@ -10,6 +10,7 @@ add_library(crtl_rhi SHARED
     crtl_rtpipeline.cpp
     crtl_shader.cpp
     crtl_texture.cpp
+
     backend_plugin.cpp
 )
 
