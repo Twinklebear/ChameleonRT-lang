@@ -1,15 +1,13 @@
-#pragma once
-
 #include "crtl/crtl_buffer.h"
+#include "device.h"
 
 extern "C" CRTL_RHI_EXPORT CRTLBuffer crtl_new_buffer(CRTLDevice device,
                                                       CRTL_MEMORY_SPACE memory,
                                                       CRTL_BUFFER_USAGE usages,
                                                       size_t size_bytes)
 {
-    // TODO: Here load the backend module and do a dlsym if it's not loaded already,
-    // then create the device using the module
-    return nullptr;
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->new_buffer(memory, usages, size_bytes);
 }
 
 extern "C" CRTL_RHI_EXPORT CRTLBufferView crtl_new_view(CRTLDevice device,
@@ -18,16 +16,18 @@ extern "C" CRTL_RHI_EXPORT CRTLBufferView crtl_new_view(CRTLDevice device,
                                                         size_t offset_bytes,
                                                         size_t n_elements)
 {
-    // TODO:
-    return nullptr;
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->new_view(buffer, type, offset_bytes, n_elements);
 }
 
 extern "C" CRTL_RHI_EXPORT void *crtl_map_view(CRTLDevice device, CRTLBufferView view)
 {
-    return nullptr;
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->map_view(view);
 }
 
 extern "C" CRTL_RHI_EXPORT void crtl_unmap_view(CRTLDevice device, CRTLBufferView view)
 {
-    // TODO
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    d->unmap_view(view);
 }

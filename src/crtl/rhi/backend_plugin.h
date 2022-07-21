@@ -8,14 +8,13 @@
 
 #include <string>
 #include "crtl/crtl.h"
-#include "crtl/crtl_enums.h"
 #include "device.h"
 
 namespace crtl {
 class BackendPlugin {
     using CreateDeviceFn = Device *(*)();
-    using RetainFn = void (*)(Device *, CRTLAPIObject);
-    using ReleaseFn = void (*)(Device *, CRTLAPIObject);
+    using RetainFn = CRTL_ERROR (*)(Device *, CRTLAPIObject);
+    using ReleaseFn = CRTL_ERROR (*)(Device *, CRTLAPIObject);
 
     DEVICE_API api = UNKNOWN;
 
@@ -38,9 +37,9 @@ public:
 
     // Retain/release not managed by the device so that we can also retain/release the
     // device
-    void retain(Device *d, CRTLAPIObject o) const;
+    CRTL_ERROR retain(Device *d, CRTLAPIObject o) const;
 
-    void release(Device *d, CRTLAPIObject o) const;
+    CRTL_ERROR release(Device *d, CRTLAPIObject o) const;
 
 private:
     /* Load a function pointer from the shared library. Returns nullptr if the function

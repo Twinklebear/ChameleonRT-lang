@@ -115,13 +115,13 @@ Device *BackendPlugin::create_device() const
     return create_device_fn();
 }
 
-void BackendPlugin::retain(Device *d, CRTLAPIObject o) const
+CRTL_ERROR BackendPlugin::retain(Device *d, CRTLAPIObject o) const
 {
-    retain_fn(d, o);
+    return retain_fn(d, o);
 }
 
-void BackendPlugin::release(Device *d, CRTLAPIObject o) const
+CRTL_ERROR BackendPlugin::release(Device *d, CRTLAPIObject o) const
 {
-    release_fn(d, o);
+    return release_fn(d, o);
 }
 }

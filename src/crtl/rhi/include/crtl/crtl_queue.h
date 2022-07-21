@@ -41,9 +41,6 @@ extern "C" {
  */
 CRTL_RHI_EXPORT CRTLQueue crtl_new_queue(CRTLDevice device);
 
-CRTL_RHI_EXPORT CRTLEvent crtl_submit_command_buffer(CRTLDevice device,
-                                                     CRTLCommandBuffer cmd_buffer);
-
 /* Create a new command allocator that can be shared by command encoders to encode
  * rendering commands
  * Will note: here the API is a bit in between WebGPU and DX12/Vulkan, WebGPU doesn't
@@ -64,6 +61,10 @@ crtl_new_command_buffer(CRTLDevice device, CRTLCommandAllocator cmd_allocator);
 
 CRTL_RHI_EXPORT void crtl_close_command_buffer(CRTLDevice device,
                                                CRTLCommandBuffer cmd_buffer);
+
+CRTL_RHI_EXPORT CRTLEvent crtl_submit_command_buffer(CRTLDevice device,
+                                                     CRTLQueue queue,
+                                                     CRTLCommandBuffer cmd_buffer);
 
 CRTL_RHI_EXPORT void crtl_copy_buffer_to_buffer(CRTLDevice device,
                                                 CRTLCommandBuffer cmd_buffer,
@@ -87,6 +88,9 @@ CRTL_RHI_EXPORT void crtl_copy_texture_to_buffer(CRTLDevice device,
                                                  CRTLBuffer dst,
                                                  uint64_t dst_offset);
 
+/* TODO/Note to include: build and compaction cannot be done in the same command buffer
+ * since we need to readback the compact size and allocate room for it
+ */
 CRTL_RHI_EXPORT void crtl_build_blas(CRTLDevice device,
                                      CRTLCommandBuffer cmd_buffer,
                                      CRTLGroup group);

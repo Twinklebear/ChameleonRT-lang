@@ -46,6 +46,9 @@ CRTL_RHI_EXPORT CRTLBufferView crtl_new_view(CRTLDevice device,
                                              size_t offset_bytes,
                                              size_t n_elements);
 
+/* Map the view to read or write data on the host. Only buffers created in the upload
+ * or readback memory space can be mapped
+ */
 CRTL_RHI_EXPORT void *crtl_map_view(CRTLDevice device, CRTLBufferView view);
 
 CRTL_RHI_EXPORT void crtl_unmap_view(CRTLDevice device, CRTLBufferView view);

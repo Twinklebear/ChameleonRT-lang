@@ -13,6 +13,8 @@ public:
 
     virtual DEVICE_API device_api() const = 0;
 
+    virtual CRTL_ERROR register_error_callback(CRTLErrorCallback error_callback) = 0;
+
     // Buffer APIs ====
 
     virtual CRTLBuffer new_buffer(CRTL_MEMORY_SPACE memory,
@@ -72,8 +74,6 @@ public:
 
     virtual CRTLQueue new_queue() = 0;
 
-    virtual CRTLEvent submit_command_buffer(CRTLCommandBuffer cmd_buffer) = 0;
-
     virtual CRTLCommandAllocator new_command_allocator(CRTLQueue queue) = 0;
 
     virtual void reset_command_allocator(CRTLCommandAllocator cmd_allocator) = 0;
@@ -81,6 +81,9 @@ public:
     virtual CRTLCommandBuffer new_command_buffer(CRTLCommandAllocator cmd_allocator) = 0;
 
     virtual void close_command_buffer(CRTLCommandBuffer cmd_buffer) = 0;
+
+    virtual CRTLEvent submit_command_buffer(CRTLQueue queue,
+                                            CRTLCommandBuffer cmd_buffer) = 0;
 
     virtual void copy_buffer_to_buffer(CRTLCommandBuffer cmd_buffer,
                                        CRTLBuffer src,
