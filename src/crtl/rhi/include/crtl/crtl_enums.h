@@ -141,8 +141,30 @@ enum CRTL_TEXTURE_TYPE {
 };
 
 enum CRTL_IMAGE_FORMAT {
-    CRTL_FORMAT_R8G8B8A8_UNORM,
-    CRTL_FORMAT_R8G8B8A8_UNORM_SRGB,
-    CRTL_FORMAT_R32G32B32A32_FLOAT,
+    CRTL_IMAGE_FORMAT_R8G8B8A8_UNORM,
+    CRTL_IMAGE_FORMAT_R8G8B8A8_UNORM_SRGB,
+    CRTL_IMAGE_FORMAT_R32G32B32A32_FLOAT,
     // TODO: fill in the rest of the texture types
+};
+
+/* Buffer usage modes that buffers can be created supporting
+ * The set of modes can be bitwise OR'd together
+ */
+enum CRTL_BUFFER_USAGE {
+    CRTL_BUFFER_COPY_SRC = 0x00000001,
+    CRTL_BUFFER_COPY_DST = 0x00000002,
+    CRTL_BUFFER_SHADER_READ = 0x00000004,
+    CRTL_BUFFER_SHADER_READ_WRITE = 0x00000008,
+    CRTL_BUFFER_ACCELERATION_STRUCTURE_BUILD_INPUT = 0x00000010,
+    // TODO: Expose the AS storage buffer and SBT storage buffer?
+};
+
+/* Image usage modes that images can be created supporting
+ * The set of modes can be bitwise OR'd together
+ */
+enum CRTL_IMAGE_USAGE {
+    CRTL_IMAGE_COPY_SRC = 0x00000001,
+    CRTL_IMAGE_COPY_DST = 0x00000002,
+    CRTL_IMAGE_SHADER_SAMPLED = 0x00000004,
+    CRTL_IMAGE_SHADER_READ_WRITE = 0x00000008,
 };

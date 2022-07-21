@@ -4,6 +4,7 @@
 
 extern "C" CRTL_RHI_EXPORT CRTLBuffer crtl_new_buffer(CRTLDevice device,
                                                       CRTL_MEMORY_SPACE memory,
+                                                      CRTL_BUFFER_USAGE usages,
                                                       size_t size_bytes)
 {
     // TODO: Here load the backend module and do a dlsym if it's not loaded already,

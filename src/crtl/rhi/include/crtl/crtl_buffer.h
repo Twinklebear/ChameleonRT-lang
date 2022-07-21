@@ -21,12 +21,10 @@ extern "C" {
 
 /* Allocate a buffer of the specified size in the desired memory location.
  * Buffers represent untyped blocks of device or host memory.
- * TODO: May need read/write flag or other usage flags here as well?
- * Or just need those for transitioning the resource using barrier
- * TODO: Also need to pass usage modes here, for vulkan/dx12
  */
 CRTL_RHI_EXPORT CRTLBuffer crtl_new_buffer(CRTLDevice device,
                                            CRTL_MEMORY_SPACE memory,
+                                           CRTL_BUFFER_USAGE usages,
                                            size_t size_bytes);
 
 /* Create a typed view of the specified buffer. The view can be created at a desired
