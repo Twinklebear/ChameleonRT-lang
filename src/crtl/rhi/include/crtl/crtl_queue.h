@@ -39,7 +39,7 @@ extern "C" {
 
 /* Create a new queue to submit commands to the GPU
  */
-CRTL_RHI_EXPORT CRTLQueue crtl_new_queue(CRTLDevice device);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_queue(CRTLDevice device, CRTLQueue *queue);
 
 /* Create a new command allocator that can be shared by command encoders to encode
  * rendering commands
@@ -47,79 +47,81 @@ CRTL_RHI_EXPORT CRTLQueue crtl_new_queue(CRTLDevice device);
  * split the command allocator out from the Command Encoder while DX12/Vulkan do expose
  * this detail, and I think it can be useful to have that lower level of control
  */
-CRTL_RHI_EXPORT CRTLCommandAllocator crtl_new_command_allocator(CRTLDevice device,
-                                                                CRTLQueue queue);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_command_allocator(
+    CRTLDevice device, CRTLQueue queue, CRTLCommandAllocator *cmd_allocator);
 
 /* Reset all commands allocated from this command allocator, all command encoders/buffers
  * will be invalid
  */
-CRTL_RHI_EXPORT void crtl_reset_command_allocator(CRTLDevice device,
-                                                  CRTLCommandAllocator cmd_allocator);
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_reset_command_allocator(CRTLDevice device, CRTLCommandAllocator cmd_allocator);
 
-CRTL_RHI_EXPORT CRTLCommandBuffer
-crtl_new_command_buffer(CRTLDevice device, CRTLCommandAllocator cmd_allocator);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_command_buffer(CRTLDevice device,
+                                                   CRTLCommandAllocator cmd_allocator,
+                                                   CRTLCommandBuffer *cmd_buffer);
 
-CRTL_RHI_EXPORT void crtl_close_command_buffer(CRTLDevice device,
-                                               CRTLCommandBuffer cmd_buffer);
-
-CRTL_RHI_EXPORT CRTLEvent crtl_submit_command_buffer(CRTLDevice device,
-                                                     CRTLQueue queue,
+CRTL_RHI_EXPORT CRTL_ERROR crtl_close_command_buffer(CRTLDevice device,
                                                      CRTLCommandBuffer cmd_buffer);
 
-CRTL_RHI_EXPORT void crtl_copy_buffer_to_buffer(CRTLDevice device,
-                                                CRTLCommandBuffer cmd_buffer,
-                                                CRTLBuffer src,
-                                                uint64_t src_offset,
-                                                CRTLBuffer dst,
-                                                uint64_t dst_offset,
-                                                uint64_t size);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_submit_command_buffer(CRTLDevice device,
+                                                      CRTLQueue queue,
+                                                      CRTLCommandBuffer cmd_buffer,
+                                                      CRTLEvent event);
 
-CRTL_RHI_EXPORT void crtl_copy_buffer_to_texture(CRTLDevice device,
-                                                 CRTLCommandBuffer cmd_buffer,
-                                                 CRTLBuffer src,
-                                                 uint64_t src_offset,
-                                                 CRTLTexture dst,
-                                                 CRTLBox3D region);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_copy_buffer_to_buffer(CRTLDevice device,
+                                                      CRTLCommandBuffer cmd_buffer,
+                                                      CRTLBuffer src,
+                                                      uint64_t src_offset,
+                                                      CRTLBuffer dst,
+                                                      uint64_t dst_offset,
+                                                      uint64_t size);
 
-CRTL_RHI_EXPORT void crtl_copy_texture_to_buffer(CRTLDevice device,
-                                                 CRTLCommandBuffer cmd_buffer,
-                                                 CRTLTexture src,
-                                                 CRTLBox3D region,
-                                                 CRTLBuffer dst,
-                                                 uint64_t dst_offset);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_copy_buffer_to_texture(CRTLDevice device,
+                                                       CRTLCommandBuffer cmd_buffer,
+                                                       CRTLBuffer src,
+                                                       uint64_t src_offset,
+                                                       CRTLTexture dst,
+                                                       CRTLBox3D region);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_copy_texture_to_buffer(CRTLDevice device,
+                                                       CRTLCommandBuffer cmd_buffer,
+                                                       CRTLTexture src,
+                                                       CRTLBox3D region,
+                                                       CRTLBuffer dst,
+                                                       uint64_t dst_offset);
 
 /* TODO/Note to include: build and compaction cannot be done in the same command buffer
  * since we need to readback the compact size and allocate room for it
  */
-CRTL_RHI_EXPORT void crtl_build_blas(CRTLDevice device,
-                                     CRTLCommandBuffer cmd_buffer,
-                                     CRTLGroup group);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_build_blas(CRTLDevice device,
+                                           CRTLCommandBuffer cmd_buffer,
+                                           CRTLGroup group);
 
-CRTL_RHI_EXPORT void crtl_compact_blas(CRTLDevice device,
-                                       CRTLCommandBuffer cmd_buffer,
-                                       CRTLGroup group);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_compact_blas(CRTLDevice device,
+                                             CRTLCommandBuffer cmd_buffer,
+                                             CRTLGroup group);
 
-CRTL_RHI_EXPORT void crtl_build_tlas(CRTLDevice device,
-                                     CRTLCommandBuffer cmd_buffer,
-                                     CRTLScene scene);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_build_tlas(CRTLDevice device,
+                                           CRTLCommandBuffer cmd_buffer,
+                                           CRTLScene scene);
 
-CRTL_RHI_EXPORT void crtl_upload_shader_table(CRTLDevice device,
+CRTL_RHI_EXPORT CRTL_ERROR crtl_upload_shader_table(CRTLDevice device,
+                                                    CRTLCommandBuffer cmd_buffer,
+                                                    CRTLRTPipeline pipeline);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_set_rtpipeline(CRTLDevice device,
+                                               CRTLCommandBuffer cmd_buffer,
+                                               CRTLRTPipeline pipeline);
+
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_set_global_parameter_block(CRTLDevice device,
+                                CRTLCommandBuffer cmd_buffer,
+                                CRTLGlobalParameterBlock parameter_block);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_dispatch_rays(CRTLDevice device,
                                               CRTLCommandBuffer cmd_buffer,
-                                              CRTLRTPipeline pipeline);
-
-CRTL_RHI_EXPORT void crtl_set_rtpipeline(CRTLDevice device,
-                                         CRTLCommandBuffer cmd_buffer,
-                                         CRTLRTPipeline pipeline);
-
-CRTL_RHI_EXPORT void crtl_set_global_parameter_block(
-    CRTLDevice device,
-    CRTLCommandBuffer cmd_buffer,
-    CRTLGlobalParameterBlock parameter_block);
-
-CRTL_RHI_EXPORT void crtl_dispatch_rays(CRTLDevice device,
-                                        CRTLCommandBuffer cmd_buffer,
-                                        uint32_t width,
-                                        uint32_t height);
+                                              uint32_t width,
+                                              uint32_t height);
 
 // TODO: Need APIs for barrier, resource transitions, etc. to match up with D3D12 & Vulkan
 // At least do need barriers, might be possible to do the resource transitions internally

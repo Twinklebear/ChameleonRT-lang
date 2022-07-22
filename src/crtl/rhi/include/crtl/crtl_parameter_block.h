@@ -23,11 +23,11 @@ typedef CRTLAPIObject CRTLGlobalParameterBlock;
 extern "C" {
 #endif
 
-CRTL_RHI_EXPORT void crtl_set_parameter(CRTLDevice device,
-                                        CRTLParameterBlock parameter_block,
-                                        const char *name,
-                                        CRTL_DATA_TYPE data_type,
-                                        void *parameter);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_set_parameter(CRTLDevice device,
+                                              CRTLParameterBlock parameter_block,
+                                              const char *name,
+                                              CRTL_DATA_TYPE data_type,
+                                              void *parameter);
 
 #ifdef __cplusplus
 }

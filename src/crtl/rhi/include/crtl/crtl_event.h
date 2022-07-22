@@ -15,7 +15,9 @@ typedef CRTLAPIObject CRTLEvent;
 extern "C" {
 #endif
 
-CRTL_RHI_EXPORT void crtl_await_event(CRTLDevice device, CRTLEvent event);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_event(CRTLDevice device, CRTLEvent *event);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_await_event(CRTLDevice device, CRTLEvent event);
 
 #ifdef __cplusplus
 }

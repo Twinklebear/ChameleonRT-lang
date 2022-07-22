@@ -17,111 +17,122 @@ public:
 
     // Buffer APIs ====
 
-    virtual CRTLBuffer new_buffer(CRTL_MEMORY_SPACE memory,
+    virtual CRTL_ERROR new_buffer(CRTL_MEMORY_SPACE memory,
                                   CRTL_BUFFER_USAGE usages,
-                                  size_t size_bytes) = 0;
+                                  size_t size_bytes,
+                                  CRTLBuffer *buffer) = 0;
 
-    virtual CRTLBufferView new_view(CRTLBuffer buffer,
-                                    CRTL_DATA_TYPE type,
-                                    size_t offset_bytes,
-                                    size_t n_elements) = 0;
+    virtual CRTL_ERROR new_view(CRTLBuffer buffer,
+                                CRTL_DATA_TYPE type,
+                                size_t offset_bytes,
+                                size_t n_elements,
+                                CRTLBufferView *view) = 0;
 
-    virtual void *map_view(CRTLBufferView view) = 0;
+    virtual CRTL_ERROR map_view(CRTLBufferView view, void **mapping) = 0;
 
-    virtual void unmap_view(CRTLBufferView view) = 0;
+    virtual CRTL_ERROR unmap_view(CRTLBufferView view) = 0;
 
     // Event APIs ====
 
-    virtual void await_event(CRTLEvent event) = 0;
+    virtual CRTL_ERROR new_event(CRTLEvent *event) = 0;
+
+    virtual CRTL_ERROR await_event(CRTLEvent event) = 0;
 
     // Geometry APIs ====
 
-    virtual CRTLTriangleGeometry new_triangle_geometry(CRTLBufferView vertices,
-                                                       CRTLBufferView indices) = 0;
+    virtual CRTL_ERROR new_triangle_geometry(CRTLBufferView vertices,
+                                             CRTLBufferView indices,
+                                             CRTLTriangleGeometry *geometry) = 0;
 
-    virtual CRTLRenderable new_renderable(CRTLGeometry geometry,
-                                          uint32_t n_ray_types) = 0;
+    virtual CRTL_ERROR new_renderable(CRTLGeometry geometry,
+                                      uint32_t n_ray_types,
+                                      CRTLRenderable *renderable) = 0;
 
-    virtual void set_renderable_shader_record(CRTLRenderable renderable,
-                                              uint32_t index,
-                                              CRTLShaderRecord shader_record) = 0;
+    virtual CRTL_ERROR set_renderable_shader_record(CRTLRenderable renderable,
+                                                    uint32_t index,
+                                                    CRTLShaderRecord shader_record) = 0;
 
-    virtual CRTLGroup new_group(uint32_t n_renderables) = 0;
+    virtual CRTL_ERROR new_group(uint32_t n_renderables, CRTLGroup *group) = 0;
 
-    virtual void set_group_renderable(CRTLGroup group,
-                                      uint32_t index,
-                                      CRTLRenderable renderable) = 0;
+    virtual CRTL_ERROR set_group_renderable(CRTLGroup group,
+                                            uint32_t index,
+                                            CRTLRenderable renderable) = 0;
 
-    virtual CRTLInstance new_instance(CRTLGroup group) = 0;
+    virtual CRTL_ERROR new_instance(CRTLGroup group, CRTLInstance *instance) = 0;
 
-    virtual void set_instance_transform(CRTLInstance instance,
-                                        const float *transform_3x4) = 0;
+    virtual CRTL_ERROR set_instance_transform(CRTLInstance instance,
+                                              const float *transform_3x4) = 0;
 
-    virtual CRTLScene new_scene(uint32_t n_instances, uint32_t n_ray_types) = 0;
+    virtual CRTL_ERROR new_scene(uint32_t n_instances,
+                                 uint32_t n_ray_types,
+                                 CRTLScene *scene) = 0;
 
-    virtual void set_scene_instance(CRTLScene scene,
-                                    uint32_t index,
-                                    CRTLInstance instance) = 0;
+    virtual CRTL_ERROR set_scene_instance(CRTLScene scene,
+                                          uint32_t index,
+                                          CRTLInstance instance) = 0;
 
     // Parameter Block APIs ====
 
-    virtual void set_parameter(CRTLParameterBlock parameter_block,
-                               const char *name,
-                               CRTL_DATA_TYPE data_type,
-                               void *parameter) = 0;
+    virtual CRTL_ERROR set_parameter(CRTLParameterBlock parameter_block,
+                                     const char *name,
+                                     CRTL_DATA_TYPE data_type,
+                                     void *parameter) = 0;
 
     // Queue APIs ====
 
-    virtual CRTLQueue new_queue() = 0;
+    virtual CRTL_ERROR new_queue(CRTLQueue *queue) = 0;
 
-    virtual CRTLCommandAllocator new_command_allocator(CRTLQueue queue) = 0;
+    virtual CRTL_ERROR new_command_allocator(CRTLQueue queue,
+                                             CRTLCommandAllocator *cmd_allocator) = 0;
 
-    virtual void reset_command_allocator(CRTLCommandAllocator cmd_allocator) = 0;
+    virtual CRTL_ERROR reset_command_allocator(CRTLCommandAllocator cmd_allocator) = 0;
 
-    virtual CRTLCommandBuffer new_command_buffer(CRTLCommandAllocator cmd_allocator) = 0;
+    virtual CRTL_ERROR new_command_buffer(CRTLCommandAllocator cmd_allocator,
+                                          CRTLCommandBuffer *cmd_buffer) = 0;
 
-    virtual void close_command_buffer(CRTLCommandBuffer cmd_buffer) = 0;
+    virtual CRTL_ERROR close_command_buffer(CRTLCommandBuffer cmd_buffer) = 0;
 
-    virtual CRTLEvent submit_command_buffer(CRTLQueue queue,
-                                            CRTLCommandBuffer cmd_buffer) = 0;
+    virtual CRTL_ERROR submit_command_buffer(CRTLQueue queue,
+                                             CRTLCommandBuffer cmd_buffer,
+                                             CRTLEvent event) = 0;
 
-    virtual void copy_buffer_to_buffer(CRTLCommandBuffer cmd_buffer,
-                                       CRTLBuffer src,
-                                       uint64_t src_offset,
-                                       CRTLBuffer dst,
-                                       uint64_t dst_offset,
-                                       uint64_t size) = 0;
+    virtual CRTL_ERROR copy_buffer_to_buffer(CRTLCommandBuffer cmd_buffer,
+                                             CRTLBuffer src,
+                                             uint64_t src_offset,
+                                             CRTLBuffer dst,
+                                             uint64_t dst_offset,
+                                             uint64_t size) = 0;
 
-    virtual void copy_buffer_to_texture(CRTLCommandBuffer cmd_buffer,
-                                        CRTLBuffer src,
-                                        uint64_t src_offset,
-                                        CRTLTexture dst,
-                                        CRTLBox3D region);
+    virtual CRTL_ERROR copy_buffer_to_texture(CRTLCommandBuffer cmd_buffer,
+                                              CRTLBuffer src,
+                                              uint64_t src_offset,
+                                              CRTLTexture dst,
+                                              CRTLBox3D region);
 
-    virtual void copy_texture_to_buffer(CRTLCommandBuffer cmd_buffer,
-                                        CRTLTexture src,
-                                        CRTLBox3D region,
-                                        CRTLBuffer dst,
-                                        uint64_t dst_offset) = 0;
+    virtual CRTL_ERROR copy_texture_to_buffer(CRTLCommandBuffer cmd_buffer,
+                                              CRTLTexture src,
+                                              CRTLBox3D region,
+                                              CRTLBuffer dst,
+                                              uint64_t dst_offset) = 0;
 
-    virtual void build_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
+    virtual CRTL_ERROR build_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
 
-    virtual void compact_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
+    virtual CRTL_ERROR compact_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
 
-    virtual void build_tlas(CRTLCommandBuffer cmd_buffer, CRTLScene scene) = 0;
+    virtual CRTL_ERROR build_tlas(CRTLCommandBuffer cmd_buffer, CRTLScene scene) = 0;
 
-    virtual void upload_shader_table(CRTLCommandBuffer cmd_buffer,
-                                     CRTLRTPipeline pipeline) = 0;
+    virtual CRTL_ERROR upload_shader_table(CRTLCommandBuffer cmd_buffer,
+                                           CRTLRTPipeline pipeline) = 0;
 
-    virtual void set_rtpipeline(CRTLCommandBuffer cmd_buffer,
-                                CRTLRTPipeline pipeline) = 0;
+    virtual CRTL_ERROR set_rtpipeline(CRTLCommandBuffer cmd_buffer,
+                                      CRTLRTPipeline pipeline) = 0;
 
-    virtual void set_global_parameter_block(CRTLCommandBuffer cmd_buffer,
-                                            CRTLGlobalParameterBlock parameter_block) = 0;
+    virtual CRTL_ERROR set_global_parameter_block(
+        CRTLCommandBuffer cmd_buffer, CRTLGlobalParameterBlock parameter_block) = 0;
 
-    virtual void dispatch_rays(CRTLCommandBuffer cmd_buffer,
-                               uint32_t width,
-                               uint32_t height) = 0;
+    virtual CRTL_ERROR dispatch_rays(CRTLCommandBuffer cmd_buffer,
+                                     uint32_t width,
+                                     uint32_t height) = 0;
 
     // RT Pipeline APIs ====
 
