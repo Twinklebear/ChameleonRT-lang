@@ -23,22 +23,28 @@ typedef CRTLAPIObject CRTLShaderRecord;
 extern "C" {
 #endif
 
-CRTL_RHI_EXPORT CRTLShaderLibrary crtl_new_shader_library(CRTLDevice device,
-                                                          const char *library_src);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_shader_library(CRTLDevice device,
+                                                   const char *library_src,
+                                                   CRTLShaderLibrary *shader_library);
 
-CRTL_RHI_EXPORT CRTLShaderEntryPoint crtl_get_shader_entry_point(
-    CRTLDevice device, CRTLShaderLibrary shader_library, const char *entry_point);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_get_shader_entry_point(CRTLDevice device,
+                                                       CRTLShaderLibrary shader_library,
+                                                       const char *entry_point_name,
+                                                       CRTLShaderEntryPoint *entry_point);
 
-CRTL_RHI_EXPORT CRTLShaderParameterBlock
-crtl_new_shader_parameter_block(CRTLDevice device, CRTLShaderEntryPoint entry_point);
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_new_shader_parameter_block(CRTLDevice device,
+                                CRTLShaderEntryPoint entry_point,
+                                CRTLShaderParameterBlock *parameter_block);
 
-CRTL_RHI_EXPORT CRTLShaderRecord crtl_new_shader_record(CRTLDevice device,
-                                                        CRTLShaderEntryPoint entry_point);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_shader_record(CRTLDevice device,
+                                                  CRTLShaderEntryPoint entry_point,
+                                                  CRTLShaderRecord *shader_record);
 
-CRTL_RHI_EXPORT void crtl_set_shader_parameter_block(
-    CRTLDevice device,
-    CRTLShaderRecord shader_record,
-    CRTLShaderParameterBlock parameter_block);
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_set_shader_parameter_block(CRTLDevice device,
+                                CRTLShaderRecord shader_record,
+                                CRTLShaderParameterBlock parameter_block);
 
 #ifdef __cplusplus
 }

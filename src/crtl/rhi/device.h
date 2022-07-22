@@ -136,43 +136,48 @@ public:
 
     // RT Pipeline APIs ====
 
-    virtual CRTLRTPipeline new_rtpipeline(CRTLShaderLibrary shader_library,
-                                          uint32_t n_miss_records) = 0;
+    virtual CRTL_ERROR new_rtpipeline(CRTLShaderLibrary shader_library,
+                                      uint32_t n_miss_records,
+                                      CRTLRTPipeline *pipeline) = 0;
 
-    virtual void set_raygen_record(CRTLRTPipeline pipeline,
-                                   CRTLShaderRecord raygen_record) = 0;
+    virtual CRTL_ERROR set_raygen_record(CRTLRTPipeline pipeline,
+                                         CRTLShaderRecord raygen_record) = 0;
 
-    virtual void set_miss_record(CRTLRTPipeline pipeline,
-                                 uint32_t index,
-                                 CRTLShaderRecord miss_record) = 0;
+    virtual CRTL_ERROR set_miss_record(CRTLRTPipeline pipeline,
+                                       uint32_t index,
+                                       CRTLShaderRecord miss_record) = 0;
 
-    virtual void set_scene(CRTLRTPipeline pipeline, CRTLScene scene) = 0;
+    virtual CRTL_ERROR set_scene(CRTLRTPipeline pipeline, CRTLScene scene) = 0;
 
-    virtual void build_shader_table(CRTLRTPipeline pipeline) = 0;
+    virtual CRTL_ERROR build_shader_table(CRTLRTPipeline pipeline) = 0;
 
-    virtual CRTLGlobalParameterBlock new_global_parameter_block(
-        CRTLRTPipeline pipeline) = 0;
+    virtual CRTL_ERROR new_global_parameter_block(
+        CRTLRTPipeline pipeline, CRTLGlobalParameterBlock *parameter_block) = 0;
 
     // Shader APIs ====
 
-    virtual CRTLShaderLibrary new_shader_library(const char *library_src) = 0;
+    virtual CRTL_ERROR new_shader_library(const char *library_src,
+                                          CRTLShaderLibrary *shader_library) = 0;
 
-    virtual CRTLShaderEntryPoint get_shader_entry_point(CRTLShaderLibrary shader_library,
-                                                        const char *entry_point) = 0;
+    virtual CRTL_ERROR get_shader_entry_point(CRTLShaderLibrary shader_library,
+                                              const char *entry_point_name,
+                                              CRTLShaderEntryPoint *entry_point) = 0;
 
-    virtual CRTLShaderParameterBlock new_shader_parameter_block(
-        CRTLShaderEntryPoint entry_point) = 0;
+    virtual CRTL_ERROR new_shader_parameter_block(
+        CRTLShaderEntryPoint entry_point, CRTLShaderParameterBlock *parameter_block) = 0;
 
-    virtual CRTLShaderRecord new_shader_record(CRTLShaderEntryPoint entry_point) = 0;
+    virtual CRTL_ERROR new_shader_record(CRTLShaderEntryPoint entry_point,
+                                         CRTLShaderRecord *shader_record) = 0;
 
-    virtual void set_shader_parameter_block(CRTLShaderRecord shader_record,
-                                            CRTLShaderParameterBlock parameter_block) = 0;
+    virtual CRTL_ERROR set_shader_parameter_block(
+        CRTLShaderRecord shader_record, CRTLShaderParameterBlock parameter_block) = 0;
 
     // Texture APIs ====
 
-    virtual CRTLTexture new_texture(CRTL_TEXTURE_TYPE texture_type,
-                                    CRTL_IMAGE_FORMAT format,
-                                    CRTL_IMAGE_USAGE usages,
-                                    uint32_t dimensions[3]) = 0;
+    virtual CRTL_ERROR new_texture(CRTL_TEXTURE_TYPE texture_type,
+                                   CRTL_IMAGE_FORMAT format,
+                                   CRTL_IMAGE_USAGE usages,
+                                   uint32_t dimensions[3],
+                                   CRTLTexture *texture) = 0;
 };
 }

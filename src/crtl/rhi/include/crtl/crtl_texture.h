@@ -20,11 +20,12 @@ extern "C" {
 /* Allocate a new texture with the desired format and dimensionality
  * TODO: Also need to pass usage modes here, for vulkan/dx12
  */
-CRTL_RHI_EXPORT CRTLTexture crtl_new_texture(CRTLDevice device,
-                                             CRTL_TEXTURE_TYPE texture_type,
-                                             CRTL_IMAGE_FORMAT format,
-                                             CRTL_IMAGE_USAGE usages,
-                                             uint32_t dimensions[3]);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_texture(CRTLDevice device,
+                                            CRTL_TEXTURE_TYPE texture_type,
+                                            CRTL_IMAGE_FORMAT format,
+                                            CRTL_IMAGE_USAGE usages,
+                                            uint32_t dimensions[3],
+                                            CRTLTexture *texture);
 
 #ifdef __cplusplus
 }
