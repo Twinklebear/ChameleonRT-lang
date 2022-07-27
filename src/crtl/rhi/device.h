@@ -134,6 +134,28 @@ public:
                                      uint32_t width,
                                      uint32_t height) = 0;
 
+    virtual CRTL_ERROR barrier_global(CRTLCommandBuffer cmd_buffer,
+                                      CRTL_BARRIER_STAGE src_stages,
+                                      CRTL_BARRIER_STAGE dst_stages,
+                                      CRTL_BARRIER_ACCESS src_accesses,
+                                      CRTL_BARRIER_ACCESS dst_accesses) = 0;
+
+    virtual CRTL_ERROR barrier_buffer(CRTLCommandBuffer cmd_buffer,
+                                      CRTL_BARRIER_STAGE src_stages,
+                                      CRTL_BARRIER_STAGE dst_stages,
+                                      CRTL_BARRIER_ACCESS src_accesses,
+                                      CRTL_BARRIER_ACCESS dst_accesses,
+                                      CRTLBuffer buffer,
+                                      uint64_t offset,
+                                      uint64_t size) = 0;
+
+    virtual CRTL_ERROR barrier_texture(CRTLCommandBuffer cmd_buffer,
+                                       CRTL_BARRIER_STAGE src_stages,
+                                       CRTL_BARRIER_STAGE dst_stages,
+                                       CRTL_BARRIER_ACCESS src_accesses,
+                                       CRTL_BARRIER_ACCESS dst_accesses,
+                                       CRTLTexture texture) = 0;
+
     // RT Pipeline APIs ====
 
     virtual CRTL_ERROR new_rtpipeline(CRTLShaderLibrary shader_library,

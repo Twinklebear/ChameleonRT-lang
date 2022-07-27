@@ -63,6 +63,9 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_new_command_buffer(CRTLDevice device,
 CRTL_RHI_EXPORT CRTL_ERROR crtl_close_command_buffer(CRTLDevice device,
                                                      CRTLCommandBuffer cmd_buffer);
 
+/* Submit the command buffer to be run on the queue. If an event is passed,
+ * it will be signaled when the command buffer is complete
+ */
 CRTL_RHI_EXPORT CRTL_ERROR crtl_submit_command_buffer(CRTLDevice device,
                                                       CRTLQueue queue,
                                                       CRTLCommandBuffer cmd_buffer,
@@ -123,10 +126,30 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_dispatch_rays(CRTLDevice device,
                                               uint32_t width,
                                               uint32_t height);
 
-// TODO: Need APIs for barrier, resource transitions, etc. to match up with D3D12 & Vulkan
-// At least do need barriers, might be possible to do the resource transitions internally
-// but it needs knowledge of how the objects are used in the shaders, what parameters
-// things are mapping too etc, might require tracking too much state to do well
+CRTL_RHI_EXPORT CRTL_ERROR crtl_barrier_global(CRTLDevice device,
+                                               CRTLCommandBuffer cmd_buffer,
+                                               CRTL_BARRIER_STAGE src_stages,
+                                               CRTL_BARRIER_STAGE dst_stages,
+                                               CRTL_BARRIER_ACCESS src_accesses,
+                                               CRTL_BARRIER_ACCESS dst_accesses);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_barrier_buffer(CRTLDevice device,
+                                               CRTLCommandBuffer cmd_buffer,
+                                               CRTL_BARRIER_STAGE src_stages,
+                                               CRTL_BARRIER_STAGE dst_stages,
+                                               CRTL_BARRIER_ACCESS src_accesses,
+                                               CRTL_BARRIER_ACCESS dst_accesses,
+                                               CRTLBuffer buffer,
+                                               uint64_t offset,
+                                               uint64_t size);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_barrier_texture(CRTLDevice device,
+                                                CRTLCommandBuffer cmd_buffer,
+                                                CRTL_BARRIER_STAGE src_stages,
+                                                CRTL_BARRIER_STAGE dst_stages,
+                                                CRTL_BARRIER_ACCESS src_accesses,
+                                                CRTL_BARRIER_ACCESS dst_accesses,
+                                                CRTLTexture texture);
 
 #ifdef __cplusplus
 }

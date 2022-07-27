@@ -135,3 +135,52 @@ extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_dispatch_rays(CRTLDevice device,
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->dispatch_rays(cmd_buffer, width, height);
 }
+
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR
+crtl_barrier_global(CRTLDevice device,
+                    CRTLCommandBuffer cmd_buffer,
+                    CRTL_BARRIER_STAGE src_stages,
+                    CRTL_BARRIER_STAGE dst_stages,
+                    CRTL_BARRIER_ACCESS src_accesses,
+                    CRTL_BARRIER_ACCESS dst_accesses)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->barrier_global(
+        cmd_buffer, src_stages, dst_stages, src_accesses, dst_accesses);
+}
+
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR
+crtl_barrier_buffer(CRTLDevice device,
+                    CRTLCommandBuffer cmd_buffer,
+                    CRTL_BARRIER_STAGE src_stages,
+                    CRTL_BARRIER_STAGE dst_stages,
+                    CRTL_BARRIER_ACCESS src_accesses,
+                    CRTL_BARRIER_ACCESS dst_accesses,
+                    CRTLBuffer buffer,
+                    uint64_t offset,
+                    uint64_t size)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->barrier_buffer(cmd_buffer,
+                             src_stages,
+                             dst_stages,
+                             src_accesses,
+                             dst_accesses,
+                             buffer,
+                             offset,
+                             size);
+}
+
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR
+crtl_barrier_texture(CRTLDevice device,
+                     CRTLCommandBuffer cmd_buffer,
+                     CRTL_BARRIER_STAGE src_stages,
+                     CRTL_BARRIER_STAGE dst_stages,
+                     CRTL_BARRIER_ACCESS src_accesses,
+                     CRTL_BARRIER_ACCESS dst_accesses,
+                     CRTLTexture texture)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->barrier_texture(
+        cmd_buffer, src_stages, dst_stages, src_accesses, dst_accesses, texture);
+}
