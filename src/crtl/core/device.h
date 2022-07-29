@@ -7,13 +7,17 @@ namespace crtl {
 /* A Device is an API + HW that we will execute rendering on,
  * e.g. DX12 + a GPU, Embree + a CPU, etc.
  */
-class Device {
+class CRTL_EXPORT Device {
+    CRTLErrorCallback error_callback = nullptr;
+
 public:
+    Device() = default;
+
     virtual ~Device() = default;
 
     virtual CRTL_DEVICE_API device_api() const = 0;
 
-    virtual CRTL_ERROR register_error_callback(CRTLErrorCallback error_callback) = 0;
+    CRTL_ERROR register_error_callback(CRTLErrorCallback error_callback);
 
     // Buffer APIs ====
 
@@ -115,7 +119,7 @@ public:
                                               CRTLBuffer src,
                                               uint64_t src_offset,
                                               CRTLTexture dst,
-                                              CRTLBox3D region);
+                                              CRTLBox3D region) = 0;
 
     virtual CRTL_ERROR copy_texture_to_buffer(CRTLCommandBuffer cmd_buffer,
                                               CRTLTexture src,
@@ -213,5 +217,11 @@ public:
                                    CRTL_IMAGE_USAGE usages,
                                    uint32_t dimensions[3],
                                    CRTLTexture *texture) = 0;
+
+protected:
+    /* Internal convenience API for device implementations to report error's to the
+     * application's callback
+     */
+    void report_error(CRTL_ERROR error, const std::string &message);
 };
 }

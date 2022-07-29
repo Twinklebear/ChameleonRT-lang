@@ -12,6 +12,7 @@ add_library(crtl SHARED
     crtl_texture.cpp
 
     backend_plugin.cpp
+    device.cpp
     util.cpp
 )
 
