@@ -1,4 +1,4 @@
 add_subdirectory(grammar)
 add_subdirectory(compiler)
-add_subdirectory(rhi)
+add_subdirectory(core)
 

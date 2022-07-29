@@ -1,3 +1,6 @@
+# The device implementations will use GLM, so just build it here at the top level
+include(${PROJECT_SOURCE_DIR}/cmake/glm.cmake)
+
 add_library(crtl_compiler SHARED
     ast_builder_visitor.cpp
     ast_expr_builder_visitor.cpp
