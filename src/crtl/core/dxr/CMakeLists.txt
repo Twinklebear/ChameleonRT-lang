@@ -11,6 +11,8 @@ endif()
 find_package(D3D12 REQUIRED)
 
 add_library(crtl_dxr SHARED
+    crtl_dxr.cpp
+    dxr_device.cpp
     # TODO: cross platform windowing interaction is a different 
     # question, should allow getting native handles to objects in the API
     # The windowing stuff can be in a separate CRTL utility that uses
@@ -24,12 +26,11 @@ set_target_properties(crtl_dxr PROPERTIES
 	CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(crtl_dxr PRIVATE
-	$<BUILD_INTERFACE:${D3D12_INCLUDE_DIRS}>)
+	${D3D12_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR})
 
-target_include_directories(crtl_dxr PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>)
-
-target_link_libraries(crtl_dxr PUBLIC
+target_link_libraries(crtl_dxr PRIVATE
     crtl
     ${D3D12_LIBRARIES})
 

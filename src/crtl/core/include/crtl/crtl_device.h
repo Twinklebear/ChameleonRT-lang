@@ -12,6 +12,7 @@ typedef crtl_rhi::Device *CRTLDevice;
 typedef CRTLAPIObject CRTLDevice;
 #endif
 
+typedef void *CRTLNativeHandle;
 typedef void (*CRTLErrorCallback)(CRTL_ERROR error, const char *message);
 
 #ifdef __cplusplus
@@ -39,6 +40,13 @@ CRTL_EXPORT CRTL_ERROR crtl_retain(CRTLDevice device, CRTLAPIObject object);
  * referenced by any internal objects
  */
 CRTL_EXPORT CRTL_ERROR crtl_release(CRTLDevice device, CRTLAPIObject object);
+
+/* Get the native handle for buffers or textures, the CRTLNativeHandle can then
+ * be reinterpret_cast'd to a pointer to the native API type
+ */
+CRTL_EXPORT CRTL_ERROR crtl_get_native_handle(CRTLDevice device,
+                                              CRTLAPIObject object,
+                                              CRTLNativeHandle *native_handle);
 
 #ifdef __cplusplus
 }

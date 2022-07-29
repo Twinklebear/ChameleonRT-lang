@@ -52,3 +52,11 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_release(CRTLDevice device, CRTLAPIObject 
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return backends[d->device_api()]->release(d, object);
 }
+
+extern "C" CRTL_EXPORT CRTL_ERROR crtl_get_native_handle(CRTLDevice device,
+                                                         CRTLAPIObject object,
+                                                         CRTLNativeHandle *native_handle)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->get_native_handle(object, native_handle);
+}

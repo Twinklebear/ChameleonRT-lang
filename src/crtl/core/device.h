@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api_object.h"
 #include "crtl/crtl.h"
 #include "shader_library.h"
 
@@ -7,7 +8,7 @@ namespace crtl {
 /* A Device is an API + HW that we will execute rendering on,
  * e.g. DX12 + a GPU, Embree + a CPU, etc.
  */
-class CRTL_EXPORT Device {
+class CRTL_EXPORT Device : public APIObject {
     CRTLErrorCallback error_callback = nullptr;
 
 public:
@@ -18,6 +19,9 @@ public:
     virtual CRTL_DEVICE_API device_api() const = 0;
 
     CRTL_ERROR register_error_callback(CRTLErrorCallback error_callback);
+
+    virtual CRTL_ERROR get_native_handle(CRTLAPIObject object,
+                                         CRTLNativeHandle *native_handle) = 0;
 
     // Buffer APIs ====
 
