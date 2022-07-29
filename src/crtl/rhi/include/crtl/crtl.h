@@ -4,6 +4,7 @@
 #include "crtl_core.h"
 #include "crtl_device.h"
 #include "crtl_enums.h"
+#include "crtl_event.h"
 #include "crtl_geometry.h"
 #include "crtl_parameter_block.h"
 #include "crtl_queue.h"

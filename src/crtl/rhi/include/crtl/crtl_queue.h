@@ -100,6 +100,10 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_build_blas(CRTLDevice device,
                                            CRTLCommandBuffer cmd_buffer,
                                            CRTLGroup group);
 
+CRTL_RHI_EXPORT CRTL_ERROR crtl_update_blas(CRTLDevice device,
+                                            CRTLCommandBuffer cmd_buffer,
+                                            CRTLGroup group);
+
 CRTL_RHI_EXPORT CRTL_ERROR crtl_compact_blas(CRTLDevice device,
                                              CRTLCommandBuffer cmd_buffer,
                                              CRTLGroup group);
@@ -107,6 +111,10 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_compact_blas(CRTLDevice device,
 CRTL_RHI_EXPORT CRTL_ERROR crtl_build_tlas(CRTLDevice device,
                                            CRTLCommandBuffer cmd_buffer,
                                            CRTLScene scene);
+
+CRTL_RHI_EXPORT CRTL_ERROR crtl_update_tlas(CRTLDevice device,
+                                            CRTLCommandBuffer cmd_buffer,
+                                            CRTLScene scene);
 
 CRTL_RHI_EXPORT CRTL_ERROR crtl_upload_shader_table(CRTLDevice device,
                                                     CRTLCommandBuffer cmd_buffer,

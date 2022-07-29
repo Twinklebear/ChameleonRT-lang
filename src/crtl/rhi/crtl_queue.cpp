@@ -87,6 +87,14 @@ extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_build_blas(CRTLDevice device,
     return d->build_blas(cmd_buffer, group);
 }
 
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_update_blas(CRTLDevice device,
+                                                       CRTLCommandBuffer cmd_buffer,
+                                                       CRTLGroup group)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->update_blas(cmd_buffer, group);
+}
+
 extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_compact_blas(CRTLDevice device,
                                                         CRTLCommandBuffer cmd_buffer,
                                                         CRTLGroup group)
@@ -101,6 +109,14 @@ extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_build_tlas(CRTLDevice device,
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->build_tlas(cmd_buffer, scene);
+}
+
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_update_tlas(CRTLDevice device,
+                                                       CRTLCommandBuffer cmd_buffer,
+                                                       CRTLScene scene)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->update_tlas(cmd_buffer, scene);
 }
 
 extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_upload_shader_table(

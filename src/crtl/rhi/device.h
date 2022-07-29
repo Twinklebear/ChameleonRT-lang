@@ -11,7 +11,7 @@ class Device {
 public:
     virtual ~Device() = default;
 
-    virtual DEVICE_API device_api() const = 0;
+    virtual CRTL_DEVICE_API device_api() const = 0;
 
     virtual CRTL_ERROR register_error_callback(CRTLErrorCallback error_callback) = 0;
 
@@ -42,6 +42,7 @@ public:
 
     virtual CRTL_ERROR new_triangle_geometry(CRTLBufferView vertices,
                                              CRTLBufferView indices,
+                                             CRTL_GEOMETRY_FLAG flags,
                                              CRTLTriangleGeometry *geometry) = 0;
 
     virtual CRTL_ERROR new_renderable(CRTLGeometry geometry,
@@ -52,20 +53,27 @@ public:
                                                     uint32_t index,
                                                     CRTLShaderRecord shader_record) = 0;
 
-    virtual CRTL_ERROR new_group(uint32_t n_renderables, CRTLGroup *group) = 0;
+    virtual CRTL_ERROR new_group(
+        uint32_t n_renderables,
+        CRTL_ACCELERATION_STRUCTURE_BUILD_FLAG acceleration_structure_flags,
+        CRTLGroup *group) = 0;
 
     virtual CRTL_ERROR set_group_renderable(CRTLGroup group,
                                             uint32_t index,
                                             CRTLRenderable renderable) = 0;
 
-    virtual CRTL_ERROR new_instance(CRTLGroup group, CRTLInstance *instance) = 0;
+    virtual CRTL_ERROR new_instance(CRTLGroup group,
+                                    CRTL_INSTANCE_FLAG flags,
+                                    CRTLInstance *instance) = 0;
 
     virtual CRTL_ERROR set_instance_transform(CRTLInstance instance,
                                               const float *transform_3x4) = 0;
 
-    virtual CRTL_ERROR new_scene(uint32_t n_instances,
-                                 uint32_t n_ray_types,
-                                 CRTLScene *scene) = 0;
+    virtual CRTL_ERROR new_scene(
+        uint32_t n_instances,
+        uint32_t n_ray_types,
+        CRTL_ACCELERATION_STRUCTURE_BUILD_FLAG acceleration_structure_flags,
+        CRTLScene *scene) = 0;
 
     virtual CRTL_ERROR set_scene_instance(CRTLScene scene,
                                           uint32_t index,
@@ -119,7 +127,11 @@ public:
 
     virtual CRTL_ERROR compact_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
 
+    virtual CRTL_ERROR update_blas(CRTLCommandBuffer cmd_buffer, CRTLGroup group) = 0;
+
     virtual CRTL_ERROR build_tlas(CRTLCommandBuffer cmd_buffer, CRTLScene scene) = 0;
+
+    virtual CRTL_ERROR update_tlas(CRTLCommandBuffer cmd_buffer, CRTLScene scene) = 0;
 
     virtual CRTL_ERROR upload_shader_table(CRTLCommandBuffer cmd_buffer,
                                            CRTLRTPipeline pipeline) = 0;

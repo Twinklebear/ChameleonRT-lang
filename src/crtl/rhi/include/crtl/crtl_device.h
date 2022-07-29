@@ -21,7 +21,7 @@ extern "C" {
 /* Create a device for the desired API. Will load the backend for the device if not
  * already loaded
  */
-CRTL_RHI_EXPORT CRTL_ERROR crtl_new_device(const DEVICE_API api, CRTLDevice *device);
+CRTL_RHI_EXPORT CRTL_ERROR crtl_new_device(const CRTL_DEVICE_API api, CRTLDevice *device);
 
 /* Register a callback to be called each time an error occurs to receive a more detailed
  * error message from the device

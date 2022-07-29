@@ -38,6 +38,7 @@ extern "C" {
 CRTL_RHI_EXPORT CRTL_ERROR crtl_new_triangle_geometry(CRTLDevice device,
                                                       CRTLBufferView vertices,
                                                       CRTLBufferView indices,
+                                                      CRTL_GEOMETRY_FLAG flags,
                                                       CRTLTriangleGeometry *geometry);
 
 CRTL_RHI_EXPORT CRTL_ERROR crtl_new_renderable(CRTLDevice device,
@@ -52,9 +53,12 @@ crtl_set_renderable_shader_record(CRTLDevice device,
                                   uint32_t index,
                                   CRTLShaderRecord shader_record);
 
-CRTL_RHI_EXPORT CRTL_ERROR crtl_new_group(CRTLDevice device,
-                                          uint32_t n_renderables,
-                                          CRTLGroup *group);
+// TODO: Group vs BLAS name?
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_new_group(CRTLDevice device,
+               uint32_t n_renderables,
+               CRTL_ACCELERATION_STRUCTURE_BUILD_FLAG acceleration_structure_flags,
+               CRTLGroup *group);
 
 // TODO: Can also have an API that takes an array of renderables for convenience
 CRTL_RHI_EXPORT CRTL_ERROR crtl_set_group_renderable(CRTLDevice device,
@@ -64,6 +68,7 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_set_group_renderable(CRTLDevice device,
 
 CRTL_RHI_EXPORT CRTL_ERROR crtl_new_instance(CRTLDevice device,
                                              CRTLGroup group,
+                                             CRTL_INSTANCE_FLAG flags,
                                              CRTLInstance *instance);
 
 /* Set the instance transformation matrix. transform_3x4 should be a 3x4 row-major matrix
@@ -74,10 +79,12 @@ CRTL_RHI_EXPORT CRTL_ERROR crtl_set_instance_transform(CRTLDevice device,
 
 // TODO: Also need to take some flags about dynamic scene etc.
 // Does taking the n_instances and n_shader_records flags make sense here?
-CRTL_RHI_EXPORT CRTL_ERROR crtl_new_scene(CRTLDevice device,
-                                          uint32_t n_instances,
-                                          uint32_t n_ray_types,
-                                          CRTLScene *scene);
+CRTL_RHI_EXPORT CRTL_ERROR
+crtl_new_scene(CRTLDevice device,
+               uint32_t n_instances,
+               uint32_t n_ray_types,
+               CRTL_ACCELERATION_STRUCTURE_BUILD_FLAG acceleration_structure_flags,
+               CRTLScene *scene);
 
 // TODO: Can also have API that takes an array for convenience
 CRTL_RHI_EXPORT CRTL_ERROR crtl_set_scene_instance(CRTLDevice device,

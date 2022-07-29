@@ -12,25 +12,25 @@
 
 namespace crtl {
 
-const std::string device_api_to_string(const DEVICE_API api)
+const std::string device_api_to_string(const CRTL_DEVICE_API api)
 {
     switch (api) {
-    case DX12:
+    case CRTL_DEVICE_API_DX12:
         return "dx12";
-    case VULKAN:
+    case CRTL_DEVICE_API_VULKAN:
         return "vulkan";
-    case METAL:
+    case CRTL_DEVICE_API_METAL:
         return "metal";
-    case OPTIX:
+    case CRTL_DEVICE_API_OPTIX:
         return "optix";
-    case EMBREE:
+    case CRTL_DEVICE_API_EMBREE:
         return "embree";
     default:
         return "unknown";
     }
 }
 
-BackendPlugin::BackendPlugin(DEVICE_API api) : api(api)
+BackendPlugin::BackendPlugin(CRTL_DEVICE_API api) : api(api)
 {
     const std::string backend_name = device_api_to_string(api);
     const std::string backend_file_name = std::string(SHARED_LIBRARY_PREFIX) +

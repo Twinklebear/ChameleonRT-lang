@@ -4,9 +4,9 @@
 #include "backend_plugin.h"
 #include "device.h"
 
-std::array<std::unique_ptr<crtl::BackendPlugin>, UNKNOWN> backends;
+std::array<std::unique_ptr<crtl::BackendPlugin>, CRTL_DEVICE_API_UNKNOWN> backends;
 
-extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_new_device(const DEVICE_API api,
+extern "C" CRTL_RHI_EXPORT CRTL_ERROR crtl_new_device(const CRTL_DEVICE_API api,
                                                       CRTLDevice *device)
 {
     if (!backends[api]) {

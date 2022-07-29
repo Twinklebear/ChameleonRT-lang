@@ -16,7 +16,7 @@ class BackendPlugin {
     using RetainFn = CRTL_ERROR (*)(Device *, CRTLAPIObject);
     using ReleaseFn = CRTL_ERROR (*)(Device *, CRTLAPIObject);
 
-    DEVICE_API api = UNKNOWN;
+    CRTL_DEVICE_API api = CRTL_DEVICE_API_UNKNOWN;
 
 #ifdef _WIN32
     HMODULE module_handle = 0;
@@ -29,7 +29,7 @@ class BackendPlugin {
     ReleaseFn release_fn = nullptr;
 
 public:
-    BackendPlugin(DEVICE_API api);
+    BackendPlugin(CRTL_DEVICE_API api);
 
     ~BackendPlugin();
 
