@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include "dxr_descriptor_heap.h"
 #include "dxr_root_parameter.h"
 #include "dxr_utils.h"
+#include "parallel_hashmap/phmap.h"
 
 namespace crtl {
 namespace dxr {
@@ -60,8 +60,7 @@ class RootSignature {
 
     // The offsets of the parameters into the shader arguments part
     // of the shader record. The offsets returned account for the shader identifier size
-    // TODO: replace with parallel hashmap for perf
-    std::unordered_map<std::string, RootParam> param_offsets;
+    phmap::flat_hash_map<std::string, RootParam> param_offsets;
 
     friend class RootSignatureBuilder;
     friend class RTPipelineBuilder;

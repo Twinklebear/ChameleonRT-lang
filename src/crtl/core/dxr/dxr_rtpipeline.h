@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include <glm/glm.hpp>
 #include "dxr_buffer.h"
@@ -10,6 +9,7 @@
 #include "dxr_shader_record.h"
 #include "dxr_texture.h"
 #include "dxr_utils.h"
+#include "parallel_hashmap/phmap.h"
 
 namespace crtl {
 namespace dxr {
@@ -79,7 +79,7 @@ class RTPipeline {
 
     D3D12_DISPATCH_RAYS_DESC dispatch_desc = {0};
     Buffer cpu_shader_table, shader_table;
-    std::unordered_map<std::wstring, size_t> record_offsets;
+    phmap::flat_hash_map<std::wstring, size_t> record_offsets;
     uint8_t *sbt_mapping = nullptr;
 
     friend class RTPipelineBuilder;

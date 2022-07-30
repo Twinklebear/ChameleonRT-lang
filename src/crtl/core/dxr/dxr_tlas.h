@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include "dxr_buffer.h"
 #include "dxr_geometry.h"
