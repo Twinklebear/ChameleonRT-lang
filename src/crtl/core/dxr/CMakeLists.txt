@@ -13,13 +13,18 @@ find_package(D3D12 REQUIRED)
 add_library(crtl_dxr SHARED
     crtl_dxr.cpp
     dxr_device.cpp
+    dxr_utils.cpp
+    dxr_resource.cpp
+    dxr_buffer.cpp
+    dxr_texture.cpp
+    dxr_wrappers.cpp
+
     # TODO: cross platform windowing interaction is a different 
     # question, should allow getting native handles to objects in the API
     # The windowing stuff can be in a separate CRTL utility that uses
     # this native API handling
     #dxdisplay.cpp
-    dx12_utils.cpp
-    dxr_utils.cpp)
+)
 
 set_target_properties(crtl_dxr PROPERTIES
 	CXX_STANDARD 17
