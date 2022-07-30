@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include "crtl_export.h"
 
+namespace crtl {
+
 // Format the count as #G, #M, #K, depending on its magnitude
 std::string pretty_print_count(const double count);
 
@@ -26,3 +28,4 @@ float luminance(const glm::vec3 &c);
 std::wstring utf8_to_utf16(const std::string &utf8);
 
 std::string utf16_to_utf8(const std::wstring &utf16);
+}

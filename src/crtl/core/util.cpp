@@ -10,6 +10,8 @@
 #include <glm/ext.hpp>
 #include "util.h"
 
+namespace crtl {
+
 std::string pretty_print_count(const double count)
 {
     const double giga = 1000000000;
@@ -120,4 +122,6 @@ std::string utf16_to_utf8(const std::wstring &utf16)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.to_bytes(utf16);
+}
+
 }

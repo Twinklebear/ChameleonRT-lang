@@ -13,11 +13,20 @@ find_package(D3D12 REQUIRED)
 add_library(crtl_dxr SHARED
     crtl_dxr.cpp
     dxr_device.cpp
-    dxr_utils.cpp
-    dxr_resource.cpp
+
+    dxr_blas.cpp
     dxr_buffer.cpp
+    dxr_descriptor_heap.cpp
+    dxr_geometry.cpp
+    dxr_resource.cpp
+    dxr_root_parameter.cpp
+    dxr_root_signature.cpp
+    dxr_rtpipeline.cpp
+    dxr_shader_library.cpp
+    dxr_shader_record.cpp
     dxr_texture.cpp
-    dxr_wrappers.cpp
+    dxr_tlas.cpp
+    dxr_utils.cpp
 
     # TODO: cross platform windowing interaction is a different 
     # question, should allow getting native handles to objects in the API
