@@ -1,9 +1,18 @@
 #include "crtl_dxr_export.h"
 #include "device.h"
+#include "parallel_hashmap/phmap.h"
 
 namespace crtl {
 namespace dxr {
 class CRTL_DXR_EXPORT DXRDevice : public Device {
+    /* We return a raw pointer to the app representing its reference(s) to the object and
+     * track the internal shared_ptr and reference count in the api_objects map. The one
+     * or more application references to the object are represented through the shared ptr
+     * stored in the map. When the app ref count reaches 0, the entry is removed from the
+     * map
+     */
+    phmap::flat_hash_map<crtl::APIObject *, std::shared_ptr<crtl::APIObject>> api_objects;
+
 public:
     int app_ref_count = 0;
 

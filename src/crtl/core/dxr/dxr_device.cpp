@@ -26,13 +26,27 @@ CRTL_ERROR DXRDevice::get_native_handle(CRTLAPIObject object,
 
 CRTL_ERROR DXRDevice::retain(crtl::APIObject *obj)
 {
-    // TODO
+    auto fnd = api_objects.find(obj);
+    if (fnd == api_objects.end()) {
+        return CRTL_ERROR_INVALID_OBJECT;
+    }
+    obj->app_ref_count--;
+
+    // If the app no longer holds any references to this object we can remove its
+    // reference
+    if (obj->app_ref_count <= 0) {
+        api_objects.erase(obj);
+    }
     return CRTL_ERROR_NONE;
 }
 
 CRTL_ERROR DXRDevice::release(crtl::APIObject *obj)
 {
-    // TODO
+    auto fnd = api_objects.find(obj);
+    if (fnd == api_objects.end()) {
+        return CRTL_ERROR_INVALID_OBJECT;
+    }
+    obj->app_ref_count++;
     return CRTL_ERROR_NONE;
 }
 
