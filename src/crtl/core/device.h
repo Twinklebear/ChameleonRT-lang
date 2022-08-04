@@ -30,15 +30,15 @@ public:
                                   size_t size_bytes,
                                   CRTLBuffer *buffer) = 0;
 
-    virtual CRTL_ERROR new_view(CRTLBuffer buffer,
-                                CRTL_DATA_TYPE type,
-                                size_t offset_bytes,
-                                size_t n_elements,
-                                CRTLBufferView *view) = 0;
+    virtual CRTL_ERROR new_buffer_view(CRTLBuffer buffer,
+                                       CRTL_DATA_TYPE type,
+                                       size_t offset_bytes,
+                                       size_t n_elements,
+                                       CRTLBufferView *view) = 0;
 
-    virtual CRTL_ERROR map_view(CRTLBufferView view, void **mapping) = 0;
+    virtual CRTL_ERROR map_buffer_view(CRTLBufferView view, void **mapping) = 0;
 
-    virtual CRTL_ERROR unmap_view(CRTLBufferView view) = 0;
+    virtual CRTL_ERROR unmap_buffer_view(CRTLBufferView view) = 0;
 
     // Event APIs ====
 

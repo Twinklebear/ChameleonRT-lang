@@ -43,5 +43,7 @@ private:
     void build_library_desc();
 };
 
+// TODO: Shader entry point class can be in here, likely just a string + ref to the
+// library
 }
 }

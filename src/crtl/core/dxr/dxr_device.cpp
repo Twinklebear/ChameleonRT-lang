@@ -60,21 +60,21 @@ CRTL_ERROR DXRDevice::new_buffer(CRTL_MEMORY_SPACE memory,
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::new_view(CRTLBuffer buffer,
-                               CRTL_DATA_TYPE type,
-                               size_t offset_bytes,
-                               size_t n_elements,
-                               CRTLBufferView *view)
+CRTL_ERROR DXRDevice::new_buffer_view(CRTLBuffer buffer,
+                                      CRTL_DATA_TYPE type,
+                                      size_t offset_bytes,
+                                      size_t n_elements,
+                                      CRTLBufferView *view)
 {
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::map_view(CRTLBufferView view, void **mapping)
+CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view, void **mapping)
 {
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::unmap_view(CRTLBufferView view)
+CRTL_ERROR DXRDevice::unmap_buffer_view(CRTLBufferView view)
 {
     return CRTL_ERROR_NONE;
 }

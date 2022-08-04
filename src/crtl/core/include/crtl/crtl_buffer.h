@@ -41,21 +41,21 @@ CRTL_EXPORT CRTL_ERROR crtl_new_buffer(CRTLDevice device,
  * Or just avoid using the builtin short vector types. DX12: probably? CUDA: I think it is
  * by default Metal: Also might be by default?
  */
-CRTL_EXPORT CRTL_ERROR crtl_new_view(CRTLDevice device,
-                                     CRTLBuffer buffer,
-                                     CRTL_DATA_TYPE type,
-                                     size_t offset_bytes,
-                                     size_t n_elements,
-                                     CRTLBufferView *view);
+CRTL_EXPORT CRTL_ERROR crtl_new_buffer_view(CRTLDevice device,
+                                            CRTLBuffer buffer,
+                                            CRTL_DATA_TYPE type,
+                                            size_t offset_bytes,
+                                            size_t n_elements,
+                                            CRTLBufferView *view);
 
 /* Map the view to read or write data on the host. Only buffers created in the upload
  * or readback memory space can be mapped
  */
-CRTL_EXPORT CRTL_ERROR crtl_map_view(CRTLDevice device,
-                                     CRTLBufferView view,
-                                     void **mapping);
+CRTL_EXPORT CRTL_ERROR crtl_map_buffer_view(CRTLDevice device,
+                                            CRTLBufferView view,
+                                            void **mapping);
 
-CRTL_EXPORT CRTL_ERROR crtl_unmap_view(CRTLDevice device, CRTLBufferView view);
+CRTL_EXPORT CRTL_ERROR crtl_unmap_buffer_view(CRTLDevice device, CRTLBufferView view);
 
 #ifdef __cplusplus
 }

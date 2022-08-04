@@ -36,15 +36,15 @@ public:
                           size_t size_bytes,
                           CRTLBuffer *buffer) override;
 
-    CRTL_ERROR new_view(CRTLBuffer buffer,
-                        CRTL_DATA_TYPE type,
-                        size_t offset_bytes,
-                        size_t n_elements,
-                        CRTLBufferView *view) override;
+    CRTL_ERROR new_buffer_view(CRTLBuffer buffer,
+                               CRTL_DATA_TYPE type,
+                               size_t offset_bytes,
+                               size_t n_elements,
+                               CRTLBufferView *view) override;
 
-    CRTL_ERROR map_view(CRTLBufferView view, void **mapping) override;
+    CRTL_ERROR map_buffer_view(CRTLBufferView view, void **mapping) override;
 
-    CRTL_ERROR unmap_view(CRTLBufferView view) override;
+    CRTL_ERROR unmap_buffer_view(CRTLBufferView view) override;
 
     // Event APIs ====
 

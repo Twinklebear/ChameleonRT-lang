@@ -1,14 +1,13 @@
-#include "dxr_geometry.h"
-#include <wingdi.h>
+#include "dxr_triangle_geometry.h"
 
 namespace crtl {
 namespace dxr {
 
-Geometry::Geometry(Buffer verts,
-                   Buffer indices,
-                   Buffer normals,
-                   Buffer uvs,
-                   D3D12_RAYTRACING_GEOMETRY_FLAGS geom_flags)
+TriangleGeometry::TriangleGeometry(Buffer verts,
+                                   Buffer indices,
+                                   Buffer normals,
+                                   Buffer uvs,
+                                   D3D12_RAYTRACING_GEOMETRY_FLAGS geom_flags)
     : vertex_buf(verts), index_buf(indices), normal_buf(normals), uv_buf(uvs)
 {
     desc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;

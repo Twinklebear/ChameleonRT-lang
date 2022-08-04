@@ -37,6 +37,7 @@ public:
                            D3D12_RESOURCE_STATES state,
                            D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE);
 
+    // TODO: Keep? Or go all through the views internally too?
     // Map the whole range for potentially being read
     void *map();
 
