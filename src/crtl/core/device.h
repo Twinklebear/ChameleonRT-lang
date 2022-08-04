@@ -25,7 +25,7 @@ public:
 
     // Buffer APIs ====
 
-    virtual CRTL_ERROR new_buffer(CRTL_MEMORY_SPACE memory,
+    virtual CRTL_ERROR new_buffer(CRTL_MEMORY_SPACE memory_space,
                                   CRTL_BUFFER_USAGE usages,
                                   size_t size_bytes,
                                   CRTLBuffer *buffer) = 0;

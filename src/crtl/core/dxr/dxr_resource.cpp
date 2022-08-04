@@ -23,11 +23,11 @@ const ID3D12Resource *Resource::get() const
 }
 D3D12_HEAP_TYPE Resource::heap() const
 {
-    return rheap;
+    return heap_type;
 }
 D3D12_RESOURCE_STATES Resource::state() const
 {
-    return rstate;
+    return res_states;
 }
 }
 }

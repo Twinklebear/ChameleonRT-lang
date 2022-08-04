@@ -2,13 +2,17 @@
 #include "device.h"
 
 extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_buffer(CRTLDevice device,
-                                                  CRTL_MEMORY_SPACE memory,
+                                                  CRTL_MEMORY_SPACE memory_space,
                                                   CRTL_BUFFER_USAGE usages,
                                                   size_t size_bytes,
                                                   CRTLBuffer *buffer)
 {
+    if (size_bytes == 0) {
+        return CRTL_ERROR_INVALID_BUFFER_SIZE;
+    }
+    // TODO: need to filter invalid memory space/buffer usage combinations
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->new_buffer(memory, usages, size_bytes, buffer);
+    return d->new_buffer(memory_space, usages, size_bytes, buffer);
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_buffer_view(CRTLDevice device,

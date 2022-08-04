@@ -14,6 +14,7 @@ add_library(crtl SHARED
     backend_plugin.cpp
     device.cpp
     util.cpp
+    error.cpp
 )
 
 set_target_properties(crtl PROPERTIES

@@ -23,7 +23,7 @@ extern "C" {
  * Buffers represent untyped blocks of device or host memory.
  */
 CRTL_EXPORT CRTL_ERROR crtl_new_buffer(CRTLDevice device,
-                                       CRTL_MEMORY_SPACE memory,
+                                       CRTL_MEMORY_SPACE memory_space,
                                        CRTL_BUFFER_USAGE usages,
                                        size_t size_bytes,
                                        CRTLBuffer *buffer);

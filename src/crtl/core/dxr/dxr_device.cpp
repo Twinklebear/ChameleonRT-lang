@@ -2,6 +2,9 @@
 
 namespace crtl {
 namespace dxr {
+
+using Microsoft::WRL::ComPtr;
+
 DXRDevice::DXRDevice()
 {
     // TODO
@@ -396,5 +399,10 @@ CRTL_ERROR DXRDevice::new_texture(CRTL_TEXTURE_TYPE texture_type,
     return CRTL_ERROR_NONE;
 }
 
+ComPtr<ID3D12Device5> DXRDevice::d3d12_device()
+{
+    // TODO
+    return nullptr;
+}
 }
 }

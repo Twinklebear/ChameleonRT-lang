@@ -14,13 +14,14 @@ add_library(crtl_dxr SHARED
     crtl_dxr.cpp
     dxr_device.cpp
 
-    dxr_blas.cpp
-    dxr_tlas.cpp
+    #dxr_blas.cpp
+    #dxr_tlas.cpp
     dxr_descriptor_heap.cpp
     dxr_resource.cpp
     dxr_root_parameter.cpp
     dxr_root_signature.cpp
     dxr_utils.cpp
+    dxr_enums.cpp
 
     dxr_buffer.cpp
     dxr_buffer_view.cpp
@@ -40,9 +41,9 @@ add_library(crtl_dxr SHARED
     dxr_parameter_block.cpp
     dxr_global_parameter_block.cpp
     dxr_shader_parameter_block.cpp
-    dxr_rtpipeline.cpp
     dxr_shader_library.cpp
     dxr_shader_record.cpp
+    #dxr_rtpipeline.cpp
 
     # TODO: cross platform windowing interaction is a different 
     # question, should allow getting native handles to objects in the API

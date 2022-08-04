@@ -10,30 +10,6 @@ namespace dxr {
 
 using Microsoft::WRL::ComPtr;
 
-const D3D12_HEAP_PROPERTIES UPLOAD_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_UPLOAD,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0,
-};
-
-const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_DEFAULT,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0,
-};
-
-const D3D12_HEAP_PROPERTIES READBACK_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_READBACK,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0,
-};
-
 ComPtr<ID3D12Device5> create_dxr_device(ComPtr<IDXGIFactory2> &factory)
 {
     IDXGIAdapter1 *adapter;
@@ -86,7 +62,7 @@ D3D12_RESOURCE_BARRIER barrier_transition(Microsoft::WRL::ComPtr<ID3D12Resource>
 D3D12_RESOURCE_BARRIER barrier_transition(Resource &res, D3D12_RESOURCE_STATES after)
 {
     D3D12_RESOURCE_BARRIER b = barrier_transition(res.get(), res.state(), after);
-    res.rstate = after;
+    res.res_states = after;
     return b;
 }
 

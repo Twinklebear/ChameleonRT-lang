@@ -1,5 +1,6 @@
 #include "crtl_dxr_export.h"
 #include "device.h"
+#include "dxr_utils.h"
 #include "parallel_hashmap/phmap.h"
 
 namespace crtl {
@@ -19,6 +20,8 @@ public:
     DXRDevice();
 
     ~DXRDevice() override;
+
+    // CRTL APIs
 
     CRTL_DEVICE_API device_api() const override;
 
@@ -229,6 +232,9 @@ public:
                            CRTL_IMAGE_USAGE usages,
                            uint32_t dimensions[3],
                            CRTLTexture *texture) override;
+
+    // Internal APIs for DXRDevice
+    Microsoft::WRL::ComPtr<ID3D12Device5> d3d12_device();
 };
 }
 }

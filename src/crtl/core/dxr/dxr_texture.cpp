@@ -1,4 +1,5 @@
 #include "dxr_texture.h"
+#include "dxr_enums.h"
 #include "util.h"
 
 namespace crtl {
@@ -9,7 +10,7 @@ Texture Texture::device(ID3D12Device *device,
                         DXGI_FORMAT img_format,
                         D3D12_RESOURCE_FLAGS flags)
 {
-    D3D12_RESOURCE_DESC desc = {0};
+    D3D12_RESOURCE_DESC desc = {};
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     desc.Width = dims.x;
     desc.Height = dims.y;
@@ -23,15 +24,14 @@ Texture Texture::device(ID3D12Device *device,
 
     Texture t;
     t.tdims = dims;
-    t.rstate = state;
-    t.rheap = D3D12_HEAP_TYPE_DEFAULT;
+    t.res_states = state;
+    t.heap_type = D3D12_HEAP_TYPE_DEFAULT;
     t.format = img_format;
-    CHECK_ERR(device->CreateCommittedResource(&DEFAULT_HEAP_PROPS,
-                                              D3D12_HEAP_FLAG_NONE,
-                                              &desc,
-                                              state,
-                                              nullptr,
-                                              IID_PPV_ARGS(&t.res)));
+
+    const auto heap_props = memory_space_to_heap_properties(CRTL_MEMORY_SPACE_DEVICE);
+
+    CHECK_ERR(device->CreateCommittedResource(
+        &heap_props, D3D12_HEAP_FLAG_NONE, &desc, state, nullptr, IID_PPV_ARGS(&t.res)));
     return t;
 }
 
