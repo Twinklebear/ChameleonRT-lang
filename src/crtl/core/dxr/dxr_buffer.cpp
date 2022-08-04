@@ -29,9 +29,6 @@ Buffer::Buffer(DXRDevice *device,
     } else if (heap_type == D3D12_HEAP_TYPE_READBACK) {
         res_states = D3D12_RESOURCE_STATE_COPY_DEST;
     } else {
-        // At most, only one read/write bit can be set for any resource. If a write bit is
-        // set, then no read-only bit may be set for that resource. If no write bit is
-        // set, then any number of read bits may be set.
         if (usages & CRTL_BUFFER_USAGE_SHADER_READ_WRITE) {
             res_flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
             res_states = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
