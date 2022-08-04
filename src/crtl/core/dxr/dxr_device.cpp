@@ -1,4 +1,5 @@
 #include "dxr_device.h"
+#include "dxr_buffer.h"
 
 namespace crtl {
 namespace dxr {
@@ -55,11 +56,13 @@ CRTL_ERROR DXRDevice::release(crtl::APIObject *obj)
 
 // Buffer APIs ====
 
-CRTL_ERROR DXRDevice::new_buffer(CRTL_MEMORY_SPACE memory,
+CRTL_ERROR DXRDevice::new_buffer(CRTL_MEMORY_SPACE memory_space,
                                  CRTL_BUFFER_USAGE usages,
                                  size_t size_bytes,
                                  CRTLBuffer *buffer)
 {
+    auto buf = make_api_object<Buffer>(this, memory_space, usages, size_bytes);
+    *buffer = reinterpret_cast<CRTLBuffer>(buf.get());
     return CRTL_ERROR_NONE;
 }
 
@@ -399,10 +402,9 @@ CRTL_ERROR DXRDevice::new_texture(CRTL_TEXTURE_TYPE texture_type,
     return CRTL_ERROR_NONE;
 }
 
-ComPtr<ID3D12Device5> DXRDevice::d3d12_device()
+ComPtr<ID3D12Device5> DXRDevice::get_d3d12_device()
 {
-    // TODO
-    return nullptr;
+    return d3d12_device;
 }
 }
 }

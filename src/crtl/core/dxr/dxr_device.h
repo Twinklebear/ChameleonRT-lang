@@ -1,11 +1,13 @@
-#include "crtl_dxr_export.h"
+#pragma once
+
+#include <memory>
 #include "device.h"
 #include "dxr_utils.h"
 #include "parallel_hashmap/phmap.h"
 
 namespace crtl {
 namespace dxr {
-class CRTL_DXR_EXPORT DXRDevice : public Device {
+class DXRDevice : public Device {
     /* We return a raw pointer to the app representing its reference(s) to the object and
      * track the internal shared_ptr and reference count in the api_objects map. The one
      * or more application references to the object are represented through the shared ptr
@@ -13,6 +15,9 @@ class CRTL_DXR_EXPORT DXRDevice : public Device {
      * map
      */
     phmap::flat_hash_map<crtl::APIObject *, std::shared_ptr<crtl::APIObject>> api_objects;
+
+    // D3D12 API Objects
+    Microsoft::WRL::ComPtr<ID3D12Device5> d3d12_device;
 
 public:
     int app_ref_count = 0;
@@ -234,7 +239,16 @@ public:
                            CRTLTexture *texture) override;
 
     // Internal APIs for DXRDevice
-    Microsoft::WRL::ComPtr<ID3D12Device5> d3d12_device();
+    template <typename T, typename... Args>
+    std::shared_ptr<T> make_api_object(Args &&...args)
+    {
+        auto o = std::make_shared<T>(std::forward<Args>(args)...);
+        o->app_ref_count = 1;
+        api_objects[o.get()] = o;
+        return o;
+    }
+
+    Microsoft::WRL::ComPtr<ID3D12Device5> get_d3d12_device();
 };
 }
 }

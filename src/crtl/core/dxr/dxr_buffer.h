@@ -10,14 +10,14 @@ namespace crtl {
 namespace dxr {
 
 class Buffer : public crtl::APIObject, public Resource {
-    size_t buf_size = 0;
+    size_t size_bytes = 0;
     D3D12_RESOURCE_FLAGS res_flags = D3D12_RESOURCE_FLAG_NONE;
 
 public:
     Buffer(DXRDevice *device,
            CRTL_MEMORY_SPACE memory_space,
            CRTL_BUFFER_USAGE usages,
-           size_t bytes);
+           size_t size_bytes);
 
     // TODO: Keep? Or go all through the views internally too?
     // Map the whole range for potentially being read

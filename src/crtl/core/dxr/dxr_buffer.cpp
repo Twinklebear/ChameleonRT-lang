@@ -9,10 +9,10 @@ namespace dxr {
 Buffer::Buffer(DXRDevice *device,
                CRTL_MEMORY_SPACE memory_space,
                CRTL_BUFFER_USAGE usages,
-               size_t bytes)
-    : buf_size(bytes)
+               size_t sz_bytes)
+    : size_bytes(sz_bytes)
 {
-    if (buf_size == 0) {
+    if (size_bytes == 0) {
         throw Error("Buffer size must be > 0", CRTL_ERROR_INVALID_BUFFER_SIZE);
     }
 
@@ -46,12 +46,12 @@ Buffer::Buffer(DXRDevice *device,
         }
     }
     const D3D12_RESOURCE_DESC desc = res_desc();
-    CHECK_ERR(device->d3d12_device()->CreateCommittedResource(&heap_props,
-                                                              D3D12_HEAP_FLAG_NONE,
-                                                              &desc,
-                                                              res_states,
-                                                              nullptr,
-                                                              IID_PPV_ARGS(&res)));
+    CHECK_ERR(device->get_d3d12_device()->CreateCommittedResource(&heap_props,
+                                                                  D3D12_HEAP_FLAG_NONE,
+                                                                  &desc,
+                                                                  res_states,
+                                                                  nullptr,
+                                                                  IID_PPV_ARGS(&res)));
 }
 
 void *Buffer::map()
@@ -60,7 +60,7 @@ void *Buffer::map()
     void *mapping = nullptr;
     D3D12_RANGE range = {0};
     // Explicitly note we want the whole range to silence debug layer warnings
-    range.End = buf_size;
+    range.End = size_bytes;
     CHECK_ERR(res->Map(0, &range, &mapping));
     return mapping;
 }
@@ -85,14 +85,14 @@ void Buffer::unmap(D3D12_RANGE written)
 
 size_t Buffer::size() const
 {
-    return buf_size;
+    return size_bytes;
 }
 
 D3D12_RESOURCE_DESC Buffer::res_desc()
 {
     D3D12_RESOURCE_DESC desc = {};
     desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    desc.Width = buf_size;
+    desc.Width = size_bytes;
     desc.Height = 1;
     desc.DepthOrArraySize = 1;
     desc.MipLevels = 1;
