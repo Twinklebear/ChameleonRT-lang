@@ -10,7 +10,7 @@ namespace dxr {
 
 using Microsoft::WRL::ComPtr;
 
-ComPtr<ID3D12Device5> create_dxr_device(ComPtr<IDXGIFactory2> &factory)
+CRTL_DXR_EXPORT ComPtr<ID3D12Device5> create_dxr_device(ComPtr<IDXGIFactory2> &factory)
 {
     IDXGIAdapter1 *adapter;
     for (uint32_t i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND;
@@ -38,9 +38,9 @@ ComPtr<ID3D12Device5> create_dxr_device(ComPtr<IDXGIFactory2> &factory)
     return nullptr;
 }
 
-D3D12_RESOURCE_BARRIER barrier_transition(ID3D12Resource *res,
-                                          D3D12_RESOURCE_STATES before,
-                                          D3D12_RESOURCE_STATES after)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER barrier_transition(ID3D12Resource *res,
+                                                          D3D12_RESOURCE_STATES before,
+                                                          D3D12_RESOURCE_STATES after)
 {
     D3D12_RESOURCE_BARRIER b = {0};
     b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -52,21 +52,23 @@ D3D12_RESOURCE_BARRIER barrier_transition(ID3D12Resource *res,
     return b;
 }
 
-D3D12_RESOURCE_BARRIER barrier_transition(Microsoft::WRL::ComPtr<ID3D12Resource> &res,
-                                          D3D12_RESOURCE_STATES before,
-                                          D3D12_RESOURCE_STATES after)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER
+barrier_transition(Microsoft::WRL::ComPtr<ID3D12Resource> &res,
+                   D3D12_RESOURCE_STATES before,
+                   D3D12_RESOURCE_STATES after)
 {
     return barrier_transition(res.Get(), before, after);
 }
 
-D3D12_RESOURCE_BARRIER barrier_transition(Resource &res, D3D12_RESOURCE_STATES after)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER barrier_transition(Resource &res,
+                                                          D3D12_RESOURCE_STATES after)
 {
     D3D12_RESOURCE_BARRIER b = barrier_transition(res.get(), res.state(), after);
     res.res_states = after;
     return b;
 }
 
-D3D12_RESOURCE_BARRIER barrier_uav(ID3D12Resource *res)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER barrier_uav(ID3D12Resource *res)
 {
     D3D12_RESOURCE_BARRIER b = {0};
     b.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -75,12 +77,13 @@ D3D12_RESOURCE_BARRIER barrier_uav(ID3D12Resource *res)
     return b;
 }
 
-D3D12_RESOURCE_BARRIER barrier_uav(Microsoft::WRL::ComPtr<ID3D12Resource> &res)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER
+barrier_uav(Microsoft::WRL::ComPtr<ID3D12Resource> &res)
 {
     return barrier_uav(res.Get());
 }
 
-D3D12_RESOURCE_BARRIER barrier_uav(Resource &res)
+CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER barrier_uav(Resource &res)
 {
     return barrier_uav(res.get());
 }

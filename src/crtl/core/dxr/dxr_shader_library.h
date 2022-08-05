@@ -2,12 +2,13 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_utils.h"
 
 namespace crtl {
 namespace dxr {
 
-class ShaderLibrary {
+class CRTL_DXR_EXPORT ShaderLibrary {
     D3D12_SHADER_BYTECODE bytecode = {0};
     D3D12_DXIL_LIBRARY_DESC slibrary = {0};
 

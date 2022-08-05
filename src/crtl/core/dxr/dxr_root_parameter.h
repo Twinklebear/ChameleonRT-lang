@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include "crtl_dxr_export.h"
 #include "dxr_utils.h"
 
 namespace crtl {
 namespace dxr {
 
-class RootParam {
+class CRTL_DXR_EXPORT RootParam {
 public:
     D3D12_ROOT_PARAMETER param = {0};
     std::string name;
@@ -16,6 +17,5 @@ public:
     RootParam() = default;
     RootParam(D3D12_ROOT_PARAMETER param, const std::string &name);
 };
-
 }
 }

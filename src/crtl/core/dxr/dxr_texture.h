@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api_object.h"
+#include "crtl_dxr_export.h"
 #include "dxr_buffer.h"
 #include "dxr_resource.h"
 #include "dxr_utils.h"
@@ -9,7 +10,7 @@ namespace crtl {
 namespace dxr {
 
 // TODO: Generalize to support 3D textures
-class Texture : public crtl::APIObject, public Resource {
+class CRTL_DXR_EXPORT Texture : public crtl::APIObject, public Resource {
     glm::uvec2 tdims = glm::uvec2(0);
     DXGI_FORMAT format;
 
@@ -38,6 +39,5 @@ public:
 
     glm::uvec2 dims() const;
 };
-
 }
 }

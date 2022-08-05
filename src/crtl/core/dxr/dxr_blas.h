@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_buffer.h"
 #include "dxr_geometry.h"
 #include "dxr_utils.h"
@@ -11,7 +12,7 @@ namespace dxr {
 
 // TODO: This will be used by the group, needs to support mix of triangle geometries and
 // user geometries
-class BottomLevelBVH {
+class CRTL_DXR_EXPORT BottomLevelBVH {
     D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS build_flags;
     D3D12_RAYTRACING_ACCELERATION_STRUCTURE_POSTBUILD_INFO_DESC post_build_info_desc = {
         0};
@@ -52,6 +53,5 @@ public:
     ID3D12Resource *operator->();
     ID3D12Resource *get();
 };
-
 }
 }

@@ -2,13 +2,14 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_root_signature.h"
 #include "dxr_utils.h"
 
 namespace crtl {
 namespace dxr {
 
-struct HitGroup {
+struct CRTL_DXR_EXPORT HitGroup {
     std::wstring name, closest_hit, any_hit, intersection;
     D3D12_HIT_GROUP_TYPE type;
 
@@ -25,7 +26,7 @@ struct HitGroup {
 
 // TODO: Also miss and raygen records
 
-struct RootSignatureAssociation {
+struct CRTL_DXR_EXPORT RootSignatureAssociation {
     std::vector<std::wstring> shaders;
     RootSignature signature;
 
@@ -33,6 +34,5 @@ struct RootSignatureAssociation {
     RootSignatureAssociation(const std::vector<std::wstring> &shaders,
                              const RootSignature &signature);
 };
-
 }
 }

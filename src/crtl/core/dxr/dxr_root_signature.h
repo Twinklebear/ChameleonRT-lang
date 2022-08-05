@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_descriptor_heap.h"
 #include "dxr_root_parameter.h"
 #include "dxr_utils.h"
@@ -21,7 +22,7 @@ class RTPipeline;
 // anything into the actual shader table. I wonder why the RT gems book and other
 // resources seem to imply this? Because it seems like you can't read from a different
 // heap than the one which is bound.
-class RootSignatureBuilder {
+class CRTL_DXR_EXPORT RootSignatureBuilder {
     D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     std::vector<RootParam> params;
 
@@ -54,7 +55,7 @@ public:
     RootSignature create(ID3D12Device *device);
 };
 
-class RootSignature {
+class CRTL_DXR_EXPORT RootSignature {
     D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> sig;
 
@@ -83,6 +84,5 @@ public:
     ID3D12RootSignature *operator->();
     ID3D12RootSignature *get();
 };
-
 }
 }

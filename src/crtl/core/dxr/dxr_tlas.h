@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_buffer.h"
 #include "dxr_geometry.h"
 #include "dxr_utils.h"
@@ -11,7 +12,7 @@ namespace dxr {
 
 #if 0
 // TODO: Will be used by the Scene
-class TopLevelBVH {
+class CRTL_DXR_EXPORT TopLevelBVH {
     D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS build_flags =
         D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
     Buffer scratch;

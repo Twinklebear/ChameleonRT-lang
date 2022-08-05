@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "crtl_dxr_export.h"
 #include "dxr_root_parameter.h"
 #include "dxr_utils.h"
 
@@ -10,7 +11,7 @@ namespace dxr {
 
 class DescriptorHeap;
 
-class DescriptorHeapBuilder {
+class CRTL_DXR_EXPORT DescriptorHeapBuilder {
     std::vector<D3D12_DESCRIPTOR_RANGE> ranges;
 
     void add_range(D3D12_DESCRIPTOR_RANGE_TYPE type,
@@ -41,7 +42,7 @@ public:
     DescriptorHeap create(ID3D12Device *device);
 };
 
-class DescriptorHeap : public RootParam {
+class CRTL_DXR_EXPORT DescriptorHeap : public RootParam {
     D3D12_DESCRIPTOR_HEAP_DESC desc = {0};
     std::vector<D3D12_DESCRIPTOR_RANGE> ranges;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap = nullptr;
@@ -62,6 +63,5 @@ public:
     ID3D12DescriptorHeap *operator->();
     ID3D12DescriptorHeap *get();
 };
-
 }
 }

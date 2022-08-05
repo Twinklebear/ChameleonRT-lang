@@ -2,6 +2,7 @@
 
 #include "api_object.h"
 #include "crtl/crtl_enums.h"
+#include "crtl_dxr_export.h"
 #include "dxr_device.h"
 #include "dxr_resource.h"
 #include "dxr_utils.h"
@@ -9,7 +10,7 @@
 namespace crtl {
 namespace dxr {
 
-class Buffer : public crtl::APIObject, public Resource {
+class CRTL_DXR_EXPORT Buffer : public crtl::APIObject, public Resource {
     size_t size_bytes = 0;
     D3D12_RESOURCE_FLAGS res_flags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -37,6 +38,5 @@ public:
 private:
     D3D12_RESOURCE_DESC res_desc();
 };
-
 }
 }

@@ -1,14 +1,15 @@
 #include "crtl/crtl.h"
+#include "crtl_dxr_export.h"
 #include "dxr_device.h"
 
-extern "C" crtl::Device *crtl_dxr_create_device()
+extern "C" CRTL_DXR_EXPORT crtl::Device *crtl_dxr_create_device()
 {
     auto *d = new crtl::dxr::DXRDevice();
     d->app_ref_count = 1;
     return d;
 }
 
-extern "C" CRTL_ERROR crtl_dxr_retain(crtl::Device *d, CRTLAPIObject o)
+extern "C" CRTL_DXR_EXPORT CRTL_ERROR crtl_dxr_retain(crtl::Device *d, CRTLAPIObject o)
 {
     crtl::APIObject *obj = reinterpret_cast<crtl::APIObject *>(o);
     if (!obj) {
@@ -29,7 +30,7 @@ extern "C" CRTL_ERROR crtl_dxr_retain(crtl::Device *d, CRTLAPIObject o)
     return dxd->retain(obj);
 }
 
-extern "C" CRTL_ERROR crtl_dxr_release(crtl::Device *d, CRTLAPIObject o)
+extern "C" CRTL_DXR_EXPORT CRTL_ERROR crtl_dxr_release(crtl::Device *d, CRTLAPIObject o)
 {
     crtl::APIObject *obj = reinterpret_cast<crtl::APIObject *>(o);
     if (!obj) {

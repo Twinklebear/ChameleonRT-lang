@@ -58,9 +58,12 @@ set_target_properties(crtl_dxr PROPERTIES
 
 target_include_directories(crtl_dxr PRIVATE
 	${D3D12_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(crtl_dxr PRIVATE
     crtl
     ${D3D12_LIBRARIES})
+
+generate_export_header(crtl_dxr)
 

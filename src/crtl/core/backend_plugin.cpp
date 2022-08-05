@@ -16,7 +16,7 @@ const std::string device_api_to_string(const CRTL_DEVICE_API api)
 {
     switch (api) {
     case CRTL_DEVICE_API_DX12:
-        return "dx12";
+        return "dxr";
     case CRTL_DEVICE_API_VULKAN:
         return "vulkan";
     case CRTL_DEVICE_API_METAL:
@@ -33,7 +33,7 @@ const std::string device_api_to_string(const CRTL_DEVICE_API api)
 BackendPlugin::BackendPlugin(CRTL_DEVICE_API api) : api(api)
 {
     const std::string backend_name = device_api_to_string(api);
-    const std::string backend_file_name = std::string(SHARED_LIBRARY_PREFIX) +
+    const std::string backend_file_name = std::string(SHARED_LIBRARY_PREFIX) + "crtl_" +
                                           backend_name +
                                           std::string(SHARED_LIBRARY_SUFFIX);
     std::string error_msg;

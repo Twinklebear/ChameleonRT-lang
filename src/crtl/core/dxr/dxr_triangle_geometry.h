@@ -1,12 +1,13 @@
 #pragma once
 
+#include "crtl_dxr_export.h"
 #include "dxr_buffer.h"
 #include "dxr_geometry.h"
 
 namespace crtl {
 namespace dxr {
 
-class TriangleGeometry : public Geometry {
+class CRTL_DXR_EXPORT TriangleGeometry : public Geometry {
 public:
     Buffer vertex_buf, index_buf, normal_buf, uv_buf;
 
@@ -19,6 +20,5 @@ public:
                      D3D12_RAYTRACING_GEOMETRY_FLAGS geom_flags =
                          D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE);
 };
-
 }
 }

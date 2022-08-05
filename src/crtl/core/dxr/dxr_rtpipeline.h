@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <glm/glm.hpp>
+#include "crtl_dxr_export.h"
 #include "dxr_buffer.h"
 #include "dxr_root_signature.h"
 #include "dxr_shader_library.h"
@@ -26,7 +27,7 @@ struct ShaderPayloadConfig {
 
 class RTPipeline;
 
-class RTPipelineBuilder {
+class CRTL_DXR_EXPORT RTPipelineBuilder {
     std::vector<ShaderLibrary> shader_libs;
     std::wstring ray_gen;
     std::vector<std::wstring> miss_shaders;
@@ -67,7 +68,7 @@ private:
                                   size_t &num_associated_fcns) const;
 };
 
-class RTPipeline {
+class CRTL_DXR_EXPORT RTPipeline {
     RootSignature rt_global_sig;
     Microsoft::WRL::ComPtr<ID3D12StateObject> state;
     ID3D12StateObjectProperties *pipeline_props = nullptr;
@@ -119,6 +120,5 @@ public:
 private:
     size_t compute_shader_record_size(const std::wstring &shader) const;
 };
-
 }
 }

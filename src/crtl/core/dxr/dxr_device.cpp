@@ -1,5 +1,6 @@
 #include "dxr_device.h"
 #include "dxr_buffer.h"
+#include "error.h"
 
 namespace crtl {
 namespace dxr {
@@ -8,7 +9,30 @@ using Microsoft::WRL::ComPtr;
 
 DXRDevice::DXRDevice()
 {
-    // TODO
+    // Enable debugging for D3D12
+#ifdef _DEBUG
+    {
+        ComPtr<ID3D12Debug> debug_controller;
+        auto err = D3D12GetDebugInterface(IID_PPV_ARGS(&debug_controller));
+        if (FAILED(err)) {
+            throw std::runtime_error("DXRDevice failed to enable debug layer");
+        }
+        debug_controller->EnableDebugLayer();
+    }
+#endif
+
+#ifdef _DEBUG
+    const uint32_t factory_flags = DXGI_CREATE_FACTORY_DEBUG;
+#else
+    const uint32_t factory_flags = 0;
+#endif
+    CHECK_ERR(CreateDXGIFactory2(factory_flags, IID_PPV_ARGS(&dxgi_factory)));
+
+    d3d12_device = dxr::create_dxr_device(dxgi_factory);
+    if (!d3d12_device) {
+        throw Error("DXRDevice failed to find a DXR capable GPU",
+                    CRTL_ERROR_UNSUPPORTED_SYSTEM);
+    }
 }
 
 DXRDevice::~DXRDevice()
@@ -400,6 +424,10 @@ CRTL_ERROR DXRDevice::new_texture(CRTL_TEXTURE_TYPE texture_type,
                                   CRTLTexture *texture)
 {
     return CRTL_ERROR_NONE;
+}
+ComPtr<IDXGIFactory2> DXRDevice::get_dxgi_factory()
+{
+    return dxgi_factory;
 }
 
 ComPtr<ID3D12Device5> DXRDevice::get_d3d12_device()

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "crtl_dxr_export.h"
 #include "dxr_utils.h"
 
 namespace crtl {
 namespace dxr {
 
-class Resource {
+class CRTL_DXR_EXPORT Resource {
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> res = nullptr;
     D3D12_HEAP_TYPE heap_type;
@@ -29,6 +30,5 @@ public:
 
     D3D12_RESOURCE_STATES state() const;
 };
-
 }
 }
