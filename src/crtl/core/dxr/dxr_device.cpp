@@ -60,7 +60,7 @@ CRTL_ERROR DXRDevice::retain(crtl::APIObject *obj)
     }
     obj->app_ref_count--;
 
-    // If the app no longer holds any references to this object we can remove its
+    // If the app no longer holds any rceferences to this object we can remove its
     // reference
     if (obj->app_ref_count <= 0) {
         api_objects.erase(obj);
@@ -99,7 +99,9 @@ CRTL_ERROR DXRDevice::new_buffer_view(CRTLBuffer buffer,
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view, void **mapping)
+CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view,
+                                      CRTL_BUFFER_MAP_MODE map_mode,
+                                      void **mapping)
 {
     return CRTL_ERROR_NONE;
 }

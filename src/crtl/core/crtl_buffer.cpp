@@ -11,6 +11,9 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_buffer(CRTLDevice device,
         return CRTL_ERROR_INVALID_BUFFER_SIZE;
     }
     // TODO: need to filter invalid memory space/buffer usage combinations
+    // Note: map write with readback and map read with upload heap should also be
+    // considered invalid, device heap cannot be mapped,a buffer cannot be map read & map
+    // write
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->new_buffer(memory_space, usages, size_bytes, buffer);
 }
@@ -28,10 +31,11 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_buffer_view(CRTLDevice device,
 
 extern "C" CRTL_EXPORT CRTL_ERROR crtl_map_buffer_view(CRTLDevice device,
                                                        CRTLBufferView view,
+                                                       CRTL_BUFFER_MAP_MODE map_mode,
                                                        void **mapping)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->map_buffer_view(view, mapping);
+    return d->map_buffer_view(view, map_mode, mapping);
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR crtl_unmap_buffer_view(CRTLDevice device,

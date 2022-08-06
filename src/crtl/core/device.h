@@ -36,7 +36,9 @@ public:
                                        size_t n_elements,
                                        CRTLBufferView *view) = 0;
 
-    virtual CRTL_ERROR map_buffer_view(CRTLBufferView view, void **mapping) = 0;
+    virtual CRTL_ERROR map_buffer_view(CRTLBufferView view,
+                                       CRTL_BUFFER_MAP_MODE map_mode,
+                                       void **mapping) = 0;
 
     virtual CRTL_ERROR unmap_buffer_view(CRTLBufferView view) = 0;
 

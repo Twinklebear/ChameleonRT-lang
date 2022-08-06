@@ -53,6 +53,7 @@ CRTL_EXPORT CRTL_ERROR crtl_new_buffer_view(CRTLDevice device,
  */
 CRTL_EXPORT CRTL_ERROR crtl_map_buffer_view(CRTLDevice device,
                                             CRTLBufferView view,
+                                            CRTL_BUFFER_MAP_MODE map_mode,
                                             void **mapping);
 
 CRTL_EXPORT CRTL_ERROR crtl_unmap_buffer_view(CRTLDevice device, CRTLBufferView view);

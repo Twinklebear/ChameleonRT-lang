@@ -52,7 +52,9 @@ public:
                                size_t n_elements,
                                CRTLBufferView *view) override;
 
-    CRTL_ERROR map_buffer_view(CRTLBufferView view, void **mapping) override;
+    CRTL_ERROR map_buffer_view(CRTLBufferView view,
+                               CRTL_BUFFER_MAP_MODE map_mode,
+                               void **mapping) override;
 
     CRTL_ERROR unmap_buffer_view(CRTLBufferView view) override;
 
