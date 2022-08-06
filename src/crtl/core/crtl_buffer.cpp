@@ -34,6 +34,8 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_map_buffer_view(CRTLDevice device,
                                                        CRTL_BUFFER_MAP_MODE map_mode,
                                                        void **mapping)
 {
+    // TODO: Buffer usage and map mode validation, cannot map a buffer that's not map
+    // write for writing, can't map a non-map read one for reading
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->map_buffer_view(view, map_mode, mapping);
 }

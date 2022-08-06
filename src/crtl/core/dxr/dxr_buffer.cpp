@@ -54,35 +54,6 @@ Buffer::Buffer(DXRDevice *device,
                                                                   IID_PPV_ARGS(&res)));
 }
 
-void *Buffer::map()
-{
-    assert(heap_type != D3D12_HEAP_TYPE_DEFAULT);
-    void *mapping = nullptr;
-    D3D12_RANGE range = {0};
-    // Explicitly note we want the whole range to silence debug layer warnings
-    range.End = size_bytes;
-    CHECK_ERR(res->Map(0, &range, &mapping));
-    return mapping;
-}
-
-void *Buffer::map(D3D12_RANGE read)
-{
-    assert(heap_type != D3D12_HEAP_TYPE_DEFAULT);
-    void *mapping = nullptr;
-    CHECK_ERR(res->Map(0, &read, &mapping));
-    return mapping;
-}
-
-void Buffer::unmap()
-{
-    res->Unmap(0, nullptr);
-}
-
-void Buffer::unmap(D3D12_RANGE written)
-{
-    res->Unmap(0, &written);
-}
-
 size_t Buffer::size() const
 {
     return size_bytes;

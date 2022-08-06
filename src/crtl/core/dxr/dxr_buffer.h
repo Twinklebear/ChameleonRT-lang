@@ -20,19 +20,6 @@ public:
            CRTL_BUFFER_USAGE usages,
            size_t size_bytes);
 
-    // TODO: Keep? Or go all through the views internally too?
-    // Map the whole range for potentially being read
-    void *map();
-
-    // Map to read a specific or empty range
-    void *map(D3D12_RANGE read);
-
-    // Unmap and mark the whole range as written
-    void unmap();
-
-    // Unmap and mark a specific range as written
-    void unmap(D3D12_RANGE written);
-
     size_t size() const;
 
 private:

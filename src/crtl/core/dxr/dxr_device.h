@@ -252,6 +252,16 @@ public:
         return o;
     }
 
+    template <typename T>
+    std::shared_ptr<T> lookup_api_object(crtl::APIObject *o)
+    {
+        auto fnd = api_objects.find(o);
+        if (fnd != api_objects.end()) {
+            return std::dynamic_pointer_cast<Buffer>(fnd->second);
+        }
+        return nullptr;
+    }
+
     Microsoft::WRL::ComPtr<IDXGIFactory2> get_dxgi_factory();
 
     Microsoft::WRL::ComPtr<ID3D12Device5> get_d3d12_device();

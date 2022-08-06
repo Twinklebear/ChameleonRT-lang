@@ -12,7 +12,7 @@
 
 namespace crtl {
 
-std::string pretty_print_count(const double count)
+CRTL_EXPORT std::string pretty_print_count(const double count)
 {
     const double giga = 1000000000;
     const double mega = 1000000;
@@ -32,7 +32,7 @@ CRTL_EXPORT uint64_t align_to(uint64_t val, uint64_t align)
     return ((val + align - 1) / align) * align;
 }
 
-void ortho_basis(glm::vec3 &v_x, glm::vec3 &v_y, const glm::vec3 &n)
+CRTL_EXPORT void ortho_basis(glm::vec3 &v_x, glm::vec3 &v_y, const glm::vec3 &n)
 {
     v_y = glm::vec3(0);
 
@@ -49,12 +49,12 @@ void ortho_basis(glm::vec3 &v_x, glm::vec3 &v_y, const glm::vec3 &n)
     v_y = glm::normalize(glm::cross(n, v_x));
 }
 
-void canonicalize_path(std::string &path)
+CRTL_EXPORT void canonicalize_path(std::string &path)
 {
     std::replace(path.begin(), path.end(), '\\', '/');
 }
 
-std::string get_file_extension(const std::string &fname)
+CRTL_EXPORT std::string get_file_extension(const std::string &fname)
 {
     const size_t fnd = fname.find_last_of('.');
     if (fnd == std::string::npos) {
@@ -63,7 +63,7 @@ std::string get_file_extension(const std::string &fname)
     return fname.substr(fnd + 1);
 }
 
-std::string get_cpu_brand()
+CRTL_EXPORT std::string get_cpu_brand()
 {
 #if defined(__APPLE__) and defined(__aarch64__)
     return "Apple M1";
@@ -91,7 +91,7 @@ std::string get_cpu_brand()
 #endif
 }
 
-float srgb_to_linear(float x)
+CRTL_EXPORT float srgb_to_linear(float x)
 {
     if (x <= 0.04045f) {
         return x / 12.92f;
@@ -99,7 +99,7 @@ float srgb_to_linear(float x)
     return std::pow((x + 0.055f) / 1.055f, 2.4);
 }
 
-float linear_to_srgb(float x)
+CRTL_EXPORT float linear_to_srgb(float x)
 {
     if (x <= 0.0031308f) {
         return 12.92f * x;
@@ -107,21 +107,201 @@ float linear_to_srgb(float x)
     return 1.055f * pow(x, 1.f / 2.4f) - 0.055f;
 }
 
-float luminance(const glm::vec3 &c)
+CRTL_EXPORT float luminance(const glm::vec3 &c)
 {
     return 0.2126f * c.x + 0.7152f * c.y + 0.0722f * c.z;
 }
 
-std::wstring utf8_to_utf16(const std::string &utf8)
+CRTL_EXPORT std::wstring utf8_to_utf16(const std::string &utf8)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.from_bytes(utf8);
 }
 
-std::string utf16_to_utf8(const std::wstring &utf16)
+CRTL_EXPORT std::string utf16_to_utf8(const std::wstring &utf16)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.to_bytes(utf16);
 }
 
+CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
+{
+    // Note: Bool is same size as int for GPU
+    switch (type) {
+    case CRTL_DATA_TYPE_BOOL:
+    case CRTL_DATA_TYPE_BOOL1:
+    case CRTL_DATA_TYPE_BOOL1X1:
+
+    case CRTL_DATA_TYPE_INT:
+    case CRTL_DATA_TYPE_INT1:
+    case CRTL_DATA_TYPE_INT1X1:
+
+    case CRTL_DATA_TYPE_UINT:
+    case CRTL_DATA_TYPE_UINT1:
+    case CRTL_DATA_TYPE_UINT1X1:
+
+    case CRTL_DATA_TYPE_FLOAT:
+    case CRTL_DATA_TYPE_FLOAT1:
+    case CRTL_DATA_TYPE_FLOAT1X1:
+        return 4;
+
+    case CRTL_DATA_TYPE_BOOL2:
+    case CRTL_DATA_TYPE_BOOL2X1:
+    case CRTL_DATA_TYPE_BOOL1X2:
+
+    case CRTL_DATA_TYPE_INT2:
+    case CRTL_DATA_TYPE_INT2X1:
+    case CRTL_DATA_TYPE_INT1X2:
+
+    case CRTL_DATA_TYPE_UINT2:
+    case CRTL_DATA_TYPE_UINT2X1:
+    case CRTL_DATA_TYPE_UINT1X2:
+
+    case CRTL_DATA_TYPE_FLOAT2:
+    case CRTL_DATA_TYPE_FLOAT2X1:
+    case CRTL_DATA_TYPE_FLOAT1X2:
+        return 8;
+
+    case CRTL_DATA_TYPE_BOOL3:
+    case CRTL_DATA_TYPE_BOOL3X1:
+    case CRTL_DATA_TYPE_BOOL1X3:
+
+    case CRTL_DATA_TYPE_INT3:
+    case CRTL_DATA_TYPE_INT3X1:
+    case CRTL_DATA_TYPE_INT1X3:
+
+    case CRTL_DATA_TYPE_UINT3:
+    case CRTL_DATA_TYPE_UINT3X1:
+    case CRTL_DATA_TYPE_UINT1X3:
+
+    case CRTL_DATA_TYPE_FLOAT3:
+    case CRTL_DATA_TYPE_FLOAT3X1:
+    case CRTL_DATA_TYPE_FLOAT1X3:
+        return 12;
+
+    case CRTL_DATA_TYPE_BOOL4:
+    case CRTL_DATA_TYPE_BOOL4X1:
+    case CRTL_DATA_TYPE_BOOL1X4:
+
+    case CRTL_DATA_TYPE_INT4:
+    case CRTL_DATA_TYPE_INT4X1:
+    case CRTL_DATA_TYPE_INT1X4:
+
+    case CRTL_DATA_TYPE_UINT4:
+    case CRTL_DATA_TYPE_UINT4X1:
+    case CRTL_DATA_TYPE_UINT1X4:
+
+    case CRTL_DATA_TYPE_FLOAT4:
+    case CRTL_DATA_TYPE_FLOAT4X1:
+    case CRTL_DATA_TYPE_FLOAT1X4:
+        return 16;
+
+    case CRTL_DATA_TYPE_BOOL2X2:
+    case CRTL_DATA_TYPE_INT2X2:
+    case CRTL_DATA_TYPE_UINT2X2:
+    case CRTL_DATA_TYPE_FLOAT2X2:
+        return 16;
+
+    case CRTL_DATA_TYPE_BOOL2X3:
+    case CRTL_DATA_TYPE_BOOL3X2:
+
+    case CRTL_DATA_TYPE_INT2X3:
+    case CRTL_DATA_TYPE_INT3X2:
+
+    case CRTL_DATA_TYPE_UINT2X3:
+    case CRTL_DATA_TYPE_UINT3X2:
+
+    case CRTL_DATA_TYPE_FLOAT2X3:
+    case CRTL_DATA_TYPE_FLOAT3X2:
+        return 24;
+
+    case CRTL_DATA_TYPE_BOOL4X2:
+    case CRTL_DATA_TYPE_BOOL2X4:
+
+    case CRTL_DATA_TYPE_INT4X2:
+    case CRTL_DATA_TYPE_INT2X4:
+
+    case CRTL_DATA_TYPE_UINT4X2:
+    case CRTL_DATA_TYPE_UINT2X4:
+
+    case CRTL_DATA_TYPE_FLOAT4X2:
+    case CRTL_DATA_TYPE_FLOAT2X4:
+        return 32;
+
+    case CRTL_DATA_TYPE_BOOL3X3:
+    case CRTL_DATA_TYPE_INT3X3:
+    case CRTL_DATA_TYPE_UINT3X3:
+    case CRTL_DATA_TYPE_FLOAT3X3:
+        return 36;
+
+    case CRTL_DATA_TYPE_BOOL4X3:
+    case CRTL_DATA_TYPE_BOOL3X4:
+
+    case CRTL_DATA_TYPE_INT4X3:
+    case CRTL_DATA_TYPE_INT3X4:
+
+    case CRTL_DATA_TYPE_UINT4X3:
+    case CRTL_DATA_TYPE_UINT3X4:
+
+    case CRTL_DATA_TYPE_FLOAT4X3:
+    case CRTL_DATA_TYPE_FLOAT3X4:
+        return 48;
+
+    case CRTL_DATA_TYPE_BOOL4X4:
+    case CRTL_DATA_TYPE_INT4X4:
+    case CRTL_DATA_TYPE_UINT4X4:
+    case CRTL_DATA_TYPE_FLOAT4X4:
+        return 64;
+
+    case CRTL_DATA_TYPE_DOUBLE:
+    case CRTL_DATA_TYPE_DOUBLE1:
+    case CRTL_DATA_TYPE_DOUBLE1X1:
+        return 8;
+
+    case CRTL_DATA_TYPE_DOUBLE2:
+    case CRTL_DATA_TYPE_DOUBLE2X1:
+    case CRTL_DATA_TYPE_DOUBLE1X2:
+        return 16;
+
+    case CRTL_DATA_TYPE_DOUBLE3:
+    case CRTL_DATA_TYPE_DOUBLE3X1:
+    case CRTL_DATA_TYPE_DOUBLE1X3:
+        return 24;
+
+    case CRTL_DATA_TYPE_DOUBLE4:
+    case CRTL_DATA_TYPE_DOUBLE4X1:
+    case CRTL_DATA_TYPE_DOUBLE1X4:
+        return 32;
+
+    case CRTL_DATA_TYPE_DOUBLE2X2:
+        return 32;
+
+    case CRTL_DATA_TYPE_DOUBLE3X2:
+    case CRTL_DATA_TYPE_DOUBLE2X3:
+        return 48;
+
+    case CRTL_DATA_TYPE_DOUBLE4X2:
+    case CRTL_DATA_TYPE_DOUBLE2X4:
+        return 64;
+
+    case CRTL_DATA_TYPE_DOUBLE3X3:
+        return 72;
+
+    case CRTL_DATA_TYPE_DOUBLE4X3:
+    case CRTL_DATA_TYPE_DOUBLE3X4:
+        return 96;
+
+    case CRTL_DATA_TYPE_DOUBLE4X4:
+        return 128;
+
+    case CRTL_DATA_TYPE_BUFFER:
+    case CRTL_DATA_TYPE_RWBUFFER:
+    case CRTL_DATA_TYPE_TEXTURE:
+    case CRTL_DATA_TYPE_RWTEXTURE:
+    case CRTL_DATA_TYPE_ACCELERATION_STRUCTURE:
+        return 8;
+    default:
+        return 0;
+    }
+}
 }

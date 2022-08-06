@@ -1,6 +1,8 @@
 #include "dxr_device.h"
-#include "dxr_buffer.h"
 #include "error.h"
+
+#include "dxr_buffer.h"
+#include "dxr_buffer_view.h"
 
 namespace crtl {
 namespace dxr {
@@ -96,6 +98,14 @@ CRTL_ERROR DXRDevice::new_buffer_view(CRTLBuffer buffer,
                                       size_t n_elements,
                                       CRTLBufferView *view)
 {
+    auto buf = lookup_api_object<Buffer>(reinterpret_cast<crtl::APIObject *>(buffer));
+    if (!buf) {
+        report_error(CRTL_ERROR_INVALID_OBJECT,
+                     "crtl_new_buffer_view: The CRTLBuffer passed is invalid");
+        return CRTL_ERROR_INVALID_OBJECT;
+    }
+    auto v = make_api_object<BufferView>(buf, type, offset_bytes, n_elements);
+    *view = reinterpret_cast<CRTLBufferView>(v.get());
     return CRTL_ERROR_NONE;
 }
 
