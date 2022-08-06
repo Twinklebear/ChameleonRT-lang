@@ -29,7 +29,7 @@ void *BufferView::map(CRTL_BUFFER_MAP_MODE map_mode)
         read_range.Begin = 0;
         read_range.End = 0;
     }
-    buffer->get()->Map(0, &read_range, reinterpret_cast<void **>(&mapping));
+    CHECK_ERR(buffer->get()->Map(0, &read_range, reinterpret_cast<void **>(&mapping)));
 
     // DX12 doesn't offset the mapping, so apply the offset now to return the
     // region the app expects
