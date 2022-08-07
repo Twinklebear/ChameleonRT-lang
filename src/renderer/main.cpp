@@ -72,6 +72,30 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     CHECK_CRTL_ERR(crtl_get_device_api(device, &api));
     std::cout << "Device API: " << api_to_string(api) << "\n";
 
+    CRTLBuffer buffer;
+    CHECK_CRTL_ERR(crtl_new_buffer(
+        device,
+        CRTL_MEMORY_SPACE_UPLOAD,
+        (CRTL_BUFFER_USAGE)(CRTL_BUFFER_USAGE_COPY_SRC | CRTL_BUFFER_USAGE_MAP_WRITE),
+        sizeof(glm::vec4),
+        &buffer));
+
+    CRTLBufferView view;
+    CHECK_CRTL_ERR(
+        crtl_new_buffer_view(device, buffer, CRTL_DATA_TYPE_FLOAT4, 0, 1, &view));
+
+    {
+        glm::vec4 *mapping = nullptr;
+        CHECK_CRTL_ERR(crtl_map_buffer_view(device,
+                                            view,
+                                            CRTL_BUFFER_MAP_MODE_WRITE,
+                                            reinterpret_cast<void **>(&mapping)));
+
+        *mapping = glm::vec4(0.2f, 0.2f, 1.f, 1.f);
+
+        CHECK_CRTL_ERR(crtl_unmap_buffer_view(device, view));
+    }
+
 #if 0
     crtr::dxr::ShaderLibrary shader_library(
         small_dxil, sizeof(small_dxil), {raygen_name});
@@ -249,6 +273,7 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     ID3D12CommandList *render_cmds = cmd_list.Get();
 #endif
 
+    std::cout << "Running!\n";
     bool done = false;
     while (!done) {
         SDL_Event event;
@@ -276,6 +301,8 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
         }
     }
 
+    crtl_release(device, view);
+    crtl_release(device, buffer);
     crtl_release(device, device);
 }
 

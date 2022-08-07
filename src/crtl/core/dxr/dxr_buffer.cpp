@@ -16,6 +16,8 @@ Buffer::Buffer(DXRDevice *device,
         throw Error("Buffer size must be > 0", CRTL_ERROR_INVALID_BUFFER_SIZE);
     }
 
+    // Note: MAP_WRITE will require MEMORY_SPACE_UPLOAD at the higher API validation level
+    // similarly, MAP_READ will require MEMORY_SPACE_READBACK
     const auto heap_props = memory_space_to_heap_properties(memory_space);
     heap_type = heap_props.Type;
 

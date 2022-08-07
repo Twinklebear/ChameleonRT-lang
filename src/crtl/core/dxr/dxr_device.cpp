@@ -113,11 +113,25 @@ CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view,
                                       CRTL_BUFFER_MAP_MODE map_mode,
                                       void **mapping)
 {
+    auto v = lookup_api_object<BufferView>(reinterpret_cast<crtl::APIObject *>(view));
+    if (!v) {
+        report_error(CRTL_ERROR_INVALID_OBJECT,
+                     "crtl_map_buffer_view: The CRTLBufferView passed is invalid");
+        return CRTL_ERROR_INVALID_OBJECT;
+    }
+    *mapping = v->map(map_mode);
     return CRTL_ERROR_NONE;
 }
 
 CRTL_ERROR DXRDevice::unmap_buffer_view(CRTLBufferView view)
 {
+    auto v = lookup_api_object<BufferView>(reinterpret_cast<crtl::APIObject *>(view));
+    if (!v) {
+        report_error(CRTL_ERROR_INVALID_OBJECT,
+                     "crtl_unmap_buffer_view: The CRTLBufferView passed is invalid");
+        return CRTL_ERROR_INVALID_OBJECT;
+    }
+    v->unmap();
     return CRTL_ERROR_NONE;
 }
 
