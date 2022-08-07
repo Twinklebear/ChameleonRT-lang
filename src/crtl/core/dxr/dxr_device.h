@@ -257,7 +257,7 @@ public:
     {
         auto fnd = api_objects.find(o);
         if (fnd != api_objects.end()) {
-            return std::dynamic_pointer_cast<Buffer>(fnd->second);
+            return std::dynamic_pointer_cast<T>(fnd->second);
         }
         return nullptr;
     }
