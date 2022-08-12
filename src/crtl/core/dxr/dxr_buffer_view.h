@@ -7,7 +7,7 @@
 namespace crtl {
 namespace dxr {
 
-class CRTL_DXR_EXPORT BufferView : public crtl::APIObject, public Resource {
+class CRTL_DXR_EXPORT BufferView : public crtl::APIObject {
     std::shared_ptr<Buffer> buffer;
     CRTL_DATA_TYPE data_type;
 

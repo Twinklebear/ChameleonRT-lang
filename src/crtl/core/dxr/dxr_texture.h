@@ -9,26 +9,18 @@
 namespace crtl {
 namespace dxr {
 
-// TODO: Generalize to support 3D textures
 class CRTL_DXR_EXPORT Texture : public crtl::APIObject, public Resource {
-    glm::uvec2 tdims = glm::uvec2(0);
-    DXGI_FORMAT format;
+    glm::uvec3 tdims = glm::uvec3(0);
+    DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+    // The supported usages for this image
+    CRTL_IMAGE_USAGE image_usages;
 
 public:
-    static Texture device(ID3D12Device *device,
-                          // TODO: generalize to support 3D textures
-                          glm::uvec2 dims,
-                          D3D12_RESOURCE_STATES state,
-                          DXGI_FORMAT img_format,
-                          D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE);
-
-    // Read the texture data back into the provided buffer
-    // buffer size must be aligned to a row pitch of D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
-    void readback(ID3D12GraphicsCommandList4 *cmd_list, Buffer &buf);
-
-    // Upload the buffer into the texture
-    // buffer size must be aligned to a row pitch of D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
-    void upload(ID3D12GraphicsCommandList4 *cmd_list, Buffer &buf);
+    Texture(DXRDevice *device,
+            CRTL_TEXTURE_TYPE texture_type,
+            CRTL_IMAGE_FORMAT format,
+            CRTL_IMAGE_USAGE usages,
+            glm::uvec3 dimensions);
 
     size_t linear_row_pitch() const;
 
@@ -37,7 +29,7 @@ public:
 
     DXGI_FORMAT pixel_format() const;
 
-    glm::uvec2 dims() const;
+    glm::uvec3 dims() const;
 };
 }
 }

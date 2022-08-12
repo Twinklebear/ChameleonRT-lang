@@ -13,6 +13,8 @@ namespace dxr {
 class CRTL_DXR_EXPORT Buffer : public crtl::APIObject, public Resource {
     size_t size_bytes = 0;
     D3D12_RESOURCE_FLAGS res_flags = D3D12_RESOURCE_FLAG_NONE;
+    // The supported usages for this buffer
+    CRTL_BUFFER_USAGE buffer_usages = CRTL_BUFFER_USAGE_SHADER_READ;
 
 public:
     Buffer(DXRDevice *device,

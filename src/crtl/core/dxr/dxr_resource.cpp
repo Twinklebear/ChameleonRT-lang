@@ -27,7 +27,7 @@ D3D12_HEAP_TYPE Resource::heap() const
 }
 D3D12_RESOURCE_STATES Resource::state() const
 {
-    return res_states;
+    return res_state;
 }
 }
 }

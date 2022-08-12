@@ -10,7 +10,7 @@ Buffer::Buffer(DXRDevice *device,
                CRTL_MEMORY_SPACE memory_space,
                CRTL_BUFFER_USAGE usages,
                size_t sz_bytes)
-    : size_bytes(sz_bytes)
+    : size_bytes(sz_bytes), buffer_usages(usages)
 {
     if (size_bytes == 0) {
         throw Error("Buffer size must be > 0", CRTL_ERROR_INVALID_BUFFER_SIZE);
@@ -27,22 +27,22 @@ Buffer::Buffer(DXRDevice *device,
     // done here to pick which one we're going to make the resource in. Upload/readback
     // heaps also enforce requirements on the state the resource has to be created in
     if (heap_type == D3D12_HEAP_TYPE_UPLOAD) {
-        res_states = D3D12_RESOURCE_STATE_GENERIC_READ;
+        res_state = D3D12_RESOURCE_STATE_GENERIC_READ;
     } else if (heap_type == D3D12_HEAP_TYPE_READBACK) {
-        res_states = D3D12_RESOURCE_STATE_COPY_DEST;
+        res_state = D3D12_RESOURCE_STATE_COPY_DEST;
     } else {
         if (usages & CRTL_BUFFER_USAGE_SHADER_READ_WRITE) {
             res_flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-            res_states = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+            res_state = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
         } else if (usages & CRTL_BUFFER_USAGE_ACCELERATION_STRUCTURE) {
             res_flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-            res_states = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
+            res_state = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
         } else if (usages & CRTL_BUFFER_USAGE_SHADER_READ) {
-            res_states = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+            res_state = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
         } else if (usages & CRTL_BUFFER_USAGE_COPY_DST) {
-            res_states = D3D12_RESOURCE_STATE_COPY_DEST;
+            res_state = D3D12_RESOURCE_STATE_COPY_DEST;
         } else if (usages & CRTL_BUFFER_USAGE_COPY_DST) {
-            res_states = D3D12_RESOURCE_STATE_COPY_SOURCE;
+            res_state = D3D12_RESOURCE_STATE_COPY_SOURCE;
         } else {
             throw Error("Unhandled/supported buffer usage!?", CRTL_ERROR_UNKNOWN);
         }
@@ -51,7 +51,7 @@ Buffer::Buffer(DXRDevice *device,
     CHECK_ERR(device->get_d3d12_device()->CreateCommittedResource(&heap_props,
                                                                   D3D12_HEAP_FLAG_NONE,
                                                                   &desc,
-                                                                  res_states,
+                                                                  res_state,
                                                                   nullptr,
                                                                   IID_PPV_ARGS(&res)));
 }

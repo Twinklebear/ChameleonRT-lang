@@ -44,5 +44,18 @@ memory_space_to_heap_properties(CRTL_MEMORY_SPACE memory_space)
     }
 }
 
+CRTL_DXR_EXPORT DXGI_FORMAT image_format_to_dxgi_format(CRTL_IMAGE_FORMAT image_format)
+{
+    switch (image_format) {
+    case CRTL_IMAGE_FORMAT_R8G8B8A8_UNORM:
+        return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case CRTL_IMAGE_FORMAT_R8G8B8A8_UNORM_SRGB:
+        return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    case CRTL_IMAGE_FORMAT_R32G32B32A32_FLOAT:
+        return DXGI_FORMAT_R32G32B32A32_FLOAT;
+    default:
+        return DXGI_FORMAT_UNKNOWN;
+    }
+}
 }
 }

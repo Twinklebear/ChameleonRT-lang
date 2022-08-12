@@ -11,5 +11,7 @@ namespace dxr {
 
 CRTL_DXR_EXPORT D3D12_HEAP_PROPERTIES
 memory_space_to_heap_properties(CRTL_MEMORY_SPACE memory_space);
+
+CRTL_DXR_EXPORT DXGI_FORMAT image_format_to_dxgi_format(CRTL_IMAGE_FORMAT image_format);
 }
 }

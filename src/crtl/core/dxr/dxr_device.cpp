@@ -3,6 +3,7 @@
 
 #include "dxr_buffer.h"
 #include "dxr_buffer_view.h"
+#include "dxr_texture.h"
 
 namespace crtl {
 namespace dxr {
@@ -457,7 +458,12 @@ CRTL_ERROR DXRDevice::new_texture(CRTL_TEXTURE_TYPE texture_type,
                                   uint32_t dimensions[3],
                                   CRTLTexture *texture)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        const glm::uvec3 d(dimensions[0], dimensions[1], dimensions[2]);
+        auto tex = make_api_object<Texture>(this, texture_type, format, usages, d);
+        *texture = reinterpret_cast<CRTLTexture>(tex.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 ComPtr<IDXGIFactory2> DXRDevice::get_dxgi_factory()
 {

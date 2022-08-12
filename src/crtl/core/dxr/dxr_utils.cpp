@@ -64,7 +64,7 @@ CRTL_DXR_EXPORT D3D12_RESOURCE_BARRIER barrier_transition(Resource &res,
                                                           D3D12_RESOURCE_STATES after)
 {
     D3D12_RESOURCE_BARRIER b = barrier_transition(res.get(), res.state(), after);
-    res.res_states = after;
+    res.res_state = after;
     return b;
 }
 

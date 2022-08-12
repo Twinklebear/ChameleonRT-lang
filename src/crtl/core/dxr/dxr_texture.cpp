@@ -4,36 +4,52 @@
 
 namespace crtl {
 namespace dxr {
-Texture Texture::device(ID3D12Device *device,
-                        glm::uvec2 dims,
-                        D3D12_RESOURCE_STATES state,
-                        DXGI_FORMAT img_format,
-                        D3D12_RESOURCE_FLAGS flags)
+Texture::Texture(DXRDevice *device,
+                 CRTL_TEXTURE_TYPE texture_type,
+                 CRTL_IMAGE_FORMAT crtl_fmt,
+                 CRTL_IMAGE_USAGE usages,
+                 glm::uvec3 dimensions)
+    : tdims(dimensions),
+      format(image_format_to_dxgi_format(crtl_fmt)),
+      image_usages(usages)
 {
     D3D12_RESOURCE_DESC desc = {};
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    desc.Width = dims.x;
-    desc.Height = dims.y;
-    desc.DepthOrArraySize = 1;
+    desc.Width = tdims.x;
+    desc.Height = tdims.y;
+    desc.DepthOrArraySize = tdims.z;
     desc.MipLevels = 1;
-    desc.Format = img_format;
+    desc.Format = format;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = flags;
-
-    Texture t;
-    t.tdims = dims;
-    t.res_states = state;
-    t.heap_type = D3D12_HEAP_TYPE_DEFAULT;
-    t.format = img_format;
+    if (usages & CRTL_IMAGE_USAGE_SHADER_READ_WRITE) {
+        desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        res_state = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    } else {
+        desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        // If we're starting in a write state, then we want to be in that state initially,
+        // otherwise we can be in generic read
+        if (usages & CRTL_IMAGE_USAGE_COPY_DST) {
+            res_state = D3D12_RESOURCE_STATE_COPY_DEST;
+        } else {
+            res_state = D3D12_RESOURCE_STATE_GENERIC_READ;
+        }
+    }
 
     const auto heap_props = memory_space_to_heap_properties(CRTL_MEMORY_SPACE_DEVICE);
 
-    CHECK_ERR(device->CreateCommittedResource(
-        &heap_props, D3D12_HEAP_FLAG_NONE, &desc, state, nullptr, IID_PPV_ARGS(&t.res)));
-    return t;
+    CHECK_ERR(device->get_d3d12_device()->CreateCommittedResource(&heap_props,
+                                                                  D3D12_HEAP_FLAG_NONE,
+                                                                  &desc,
+                                                                  res_state,
+                                                                  nullptr,
+                                                                  IID_PPV_ARGS(&res)));
 }
+
+/*
+Note: kept for reference but this will be implemented in the buffer/texture copy
+commands
 
 void Texture::readback(ID3D12GraphicsCommandList4 *cmd_list, Buffer &buf)
 {
@@ -88,6 +104,7 @@ void Texture::upload(ID3D12GraphicsCommandList4 *cmd_list, Buffer &buf)
     region.back = 1;
     cmd_list->CopyTextureRegion(&dst_desc, 0, 0, 0, &src_desc, &region);
 }
+*/
 
 size_t Texture::linear_row_pitch() const
 {
@@ -96,7 +113,7 @@ size_t Texture::linear_row_pitch() const
 
 size_t Texture::pixel_size() const
 {
-    // Just the common formats I plan to use
+    // TODO: need to keep in sync with the CRTL formats
     switch (format) {
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
@@ -116,7 +133,7 @@ DXGI_FORMAT Texture::pixel_format() const
     return format;
 }
 
-glm::uvec2 Texture::dims() const
+glm::uvec3 Texture::dims() const
 {
     return tdims;
 }

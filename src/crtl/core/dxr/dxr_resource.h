@@ -11,8 +11,9 @@ protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> res = nullptr;
     D3D12_HEAP_TYPE heap_type;
     // TODO: Won't need to track these resource states with enhanced barriers,
-    // but will need to track some usage info.
-    D3D12_RESOURCE_STATES res_states;
+    // but will need to track some usage info, or at least the supported usage info
+    // that a resource was created with
+    D3D12_RESOURCE_STATES res_state;
 
     friend D3D12_RESOURCE_BARRIER barrier_transition(Resource &res,
                                                      D3D12_RESOURCE_STATES after);

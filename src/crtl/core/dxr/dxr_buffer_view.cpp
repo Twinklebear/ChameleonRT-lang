@@ -1,4 +1,5 @@
 #include "dxr_buffer_view.h"
+#include "error.h"
 #include "util.h"
 
 namespace crtl {
@@ -19,6 +20,11 @@ BufferView::BufferView(std::shared_ptr<Buffer> buffer,
 
 void *BufferView::map(CRTL_BUFFER_MAP_MODE map_mode)
 {
+    if (mapping) {
+        throw Error("Attempt to map a BufferView that is already mapped",
+                    CRTL_ERROR_BUFFER_VIEW_ALREADY_MAPPED);
+    }
+
     // Note: map mode/buffer usage validation will be handled higher up in the API
     mapped_mode = map_mode;
     D3D12_RANGE read_range;
@@ -39,6 +45,11 @@ void *BufferView::map(CRTL_BUFFER_MAP_MODE map_mode)
 
 void BufferView::unmap()
 {
+    if (!mapping) {
+        throw Error("Attempt to unmap a BufferView that is not mapped",
+                    CRTL_ERROR_BUFFER_VIEW_NOT_MAPPED);
+    }
+
     D3D12_RANGE written_range;
     if (mapped_mode == CRTL_BUFFER_MAP_MODE_WRITE) {
         written_range.Begin = offset_bytes;
@@ -48,6 +59,7 @@ void BufferView::unmap()
         written_range.End = 0;
     }
     buffer->get()->Unmap(0, &written_range);
+    mapping = nullptr;
 }
 
 size_t BufferView::size_bytes()
