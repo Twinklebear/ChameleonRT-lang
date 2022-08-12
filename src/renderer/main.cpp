@@ -5,8 +5,8 @@
 #include <crtl/crtl.h>
 #include <glm/glm.hpp>
 
-int win_width = 1280;
-int win_height = 720;
+uint32_t win_width = 1280;
+uint32_t win_height = 720;
 
 const char *error_to_string(CRTL_ERROR err);
 const char *api_to_string(CRTL_DEVICE_API api);
@@ -97,6 +97,15 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
 
         CHECK_CRTL_ERR(crtl_unmap_buffer_view(device, view));
     }
+
+    const uint32_t render_target_dims[3] = {win_width, win_height, 1};
+    CRTLTexture render_target;
+    CHECK_CRTL_ERR(crtl_new_texture(device,
+                                    CRTL_TEXTURE_TYPE_2D,
+                                    CRTL_IMAGE_FORMAT_R8G8B8A8_UNORM,
+                                    CRTL_IMAGE_USAGE_SHADER_READ_WRITE,
+                                    render_target_dims,
+                                    &render_target));
 
 #if 0
     crtr::dxr::ShaderLibrary shader_library(
@@ -303,6 +312,7 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
         }
     }
 
+    crtl_release(device, render_target);
     crtl_release(device, view);
     crtl_release(device, buffer);
     crtl_release(device, device);

@@ -455,7 +455,7 @@ CRTL_ERROR DXRDevice::set_shader_parameter_block(CRTLShaderRecord shader_record,
 CRTL_ERROR DXRDevice::new_texture(CRTL_TEXTURE_TYPE texture_type,
                                   CRTL_IMAGE_FORMAT format,
                                   CRTL_IMAGE_USAGE usages,
-                                  uint32_t dimensions[3],
+                                  const uint32_t dimensions[3],
                                   CRTLTexture *texture)
 {
     return wrap_try_catch([&]() {
