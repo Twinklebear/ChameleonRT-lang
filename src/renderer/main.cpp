@@ -24,7 +24,7 @@ const char *api_to_string(CRTL_DEVICE_API api);
 
 void error_callback(CRTL_ERROR err, const char *message)
 {
-    std::cout << "CRTL Error " << error_to_string(err) << ": " << message << "\n"
+    std::cout << "CRTL Error - " << error_to_string(err) << ": " << message << "\n"
               << std::flush;
 }
 
@@ -67,6 +67,8 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
 {
     CRTLDevice device;
     CHECK_CRTL_ERR(crtl_new_device(CRTL_DEVICE_API_DX12, &device));
+
+    CHECK_CRTL_ERR(crtl_register_device_error_callback(device, error_callback));
 
     CRTL_DEVICE_API api;
     CHECK_CRTL_ERR(crtl_get_device_api(device, &api));
@@ -321,6 +323,14 @@ const char *error_to_string(CRTL_ERROR err)
         return "CRTL_ERROR_INVALID_BUFFER_SIZE";
     case CRTL_ERROR_UNSUPPORTED_SYSTEM:
         return "CRTL_ERROR_UNSUPPORTED_SYSTEM";
+    case CRTL_ERROR_INVALID_BUFFER_USAGE:
+        return "CRTL_ERROR_INVALID_BUFFER_USAGE";
+    case CRTL_ERROR_INVALID_BUFFER_USAGE_FOR_HEAP:
+        return "CRTL_ERROR_INVALID_BUFFER_USAGE_FOR_HEAP";
+    case CRTL_ERROR_BUFFER_VIEW_ALREADY_MAPPED:
+        return "CRTL_ERROR_BUFFER_VIEW_ALREADY_MAPPED";
+    case CRTL_ERROR_BUFFER_VIEW_NOT_MAPPED:
+        return "CRTL_ERROR_BUFFER_VIEW_NOT_MAPPED";
     case CRTL_ERROR_UNKNOWN:
     default:
         return "CRTL_ERROR_UNKNOWN";

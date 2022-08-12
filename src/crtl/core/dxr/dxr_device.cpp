@@ -87,9 +87,11 @@ CRTL_ERROR DXRDevice::new_buffer(CRTL_MEMORY_SPACE memory_space,
                                  size_t size_bytes,
                                  CRTLBuffer *buffer)
 {
-    auto buf = make_api_object<Buffer>(this, memory_space, usages, size_bytes);
-    *buffer = reinterpret_cast<CRTLBuffer>(buf.get());
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto buf = make_api_object<Buffer>(this, memory_space, usages, size_bytes);
+        *buffer = reinterpret_cast<CRTLBuffer>(buf.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::new_buffer_view(CRTLBuffer buffer,
@@ -104,9 +106,11 @@ CRTL_ERROR DXRDevice::new_buffer_view(CRTLBuffer buffer,
                      "crtl_new_buffer_view: The CRTLBuffer passed is invalid");
         return CRTL_ERROR_INVALID_OBJECT;
     }
-    auto v = make_api_object<BufferView>(buf, type, offset_bytes, n_elements);
-    *view = reinterpret_cast<CRTLBufferView>(v.get());
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto v = make_api_object<BufferView>(buf, type, offset_bytes, n_elements);
+        *view = reinterpret_cast<CRTLBufferView>(v.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view,
@@ -119,8 +123,10 @@ CRTL_ERROR DXRDevice::map_buffer_view(CRTLBufferView view,
                      "crtl_map_buffer_view: The CRTLBufferView passed is invalid");
         return CRTL_ERROR_INVALID_OBJECT;
     }
-    *mapping = v->map(map_mode);
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        *mapping = v->map(map_mode);
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::unmap_buffer_view(CRTLBufferView view)
@@ -131,8 +137,10 @@ CRTL_ERROR DXRDevice::unmap_buffer_view(CRTLBufferView view)
                      "crtl_unmap_buffer_view: The CRTLBufferView passed is invalid");
         return CRTL_ERROR_INVALID_OBJECT;
     }
-    v->unmap();
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        v->unmap();
+        return CRTL_ERROR_NONE;
+    });
 }
 
 // Event APIs ====

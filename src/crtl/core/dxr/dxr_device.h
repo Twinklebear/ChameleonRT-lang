@@ -262,6 +262,26 @@ public:
         return nullptr;
     }
 
+    template <typename Fn>
+    CRTL_ERROR wrap_try_catch(const Fn &fn)
+    {
+        try {
+            return fn();
+        } catch (const Error &e) {
+            report_error(e.get_error(), e.what());
+            return e.get_error();
+
+        }
+        // The wildcard catch shouldn't be enabled in debug builds to make it easier to
+        // catch exceptions thrown from errors in the backend
+#ifndef _DEBUG
+        catch (const std::runtime_error &e) {
+            report_error(CRTL_ERROR_UNKNOWN, e.what());
+            return CRTL_ERROR_UNKNOWN;
+        }
+#endif
+    }
+
     Microsoft::WRL::ComPtr<IDXGIFactory2> get_dxgi_factory();
 
     Microsoft::WRL::ComPtr<ID3D12Device5> get_d3d12_device();
