@@ -21,6 +21,8 @@ endif (IS_DIRECTORY "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}.0")
 # Find the d3d12 and dxgi include path, it will typically look something like this.
 # C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um\d3d12.h
 # C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared\dxgi1_4.h
+# The header for the DXCompiler library (dxcapi.h) is also under D3D12_INCLUDE_DIR
+# so we don't do a separate search
 find_path(D3D12_INCLUDE_DIR    # Set variable D3D12_INCLUDE_DIR
 	d3d12.h                # Find a path with d3d12.h
 	HINTS "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}/um"
@@ -38,6 +40,8 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64)
 	find_library(DXGI_LIBRARY NAMES dxgi.lib
 		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64)
+    find_library(DXCOMPILER_LIBRARY NAMES dxcompiler.lib
+		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64)
 	find_program(D3D12_SHADER_COMPILER NAMES dxc
 		PATHS ${WIN10_SDK_PATH}/bin/${WIN10_SDK_VERSION}/x64)
 else()
@@ -46,6 +50,8 @@ else()
 	find_library(D3D12_COMPILER_LIBRARY NAMES d3dcompiler.lib
 		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86)
 	find_library(DXGI_LIBRARY NAMES dxgi.lib
+		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86)
+    find_library(DXCOMPILER_LIBRARY NAMES dxcompiler.lib
 		HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86)
 	find_program(D3D12_SHADER_COMPILER NAMES dxc
 		PATHS ${WIN10_SDK_PATH}/bin/${WIN10_SDK_VERSION}/x86)
@@ -101,8 +107,15 @@ function(add_dxil_embed_library)
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 endfunction()
 
-set(D3D12_LIBRARIES ${D3D12_LIBRARY} ${D3D12_COMPILER_LIBRARY} ${DXGI_LIBRARY})
-set(D3D12_INCLUDE_DIRS ${D3D12_INCLUDE_DIR} ${DXGI_INCLUDE_DIR})
+set(D3D12_LIBRARIES
+    ${D3D12_LIBRARY}
+    ${D3D12_COMPILER_LIBRARY}
+    ${DXGI_LIBRARY}
+    ${DXCOMPILER_LIBRARY})
+
+set(D3D12_INCLUDE_DIRS
+    ${D3D12_INCLUDE_DIR}
+    ${DXGI_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set D3D12_FOUND to TRUE
