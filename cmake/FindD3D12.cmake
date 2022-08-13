@@ -1,4 +1,6 @@
-# modified from https://github.com/Microsoft/DirectXShaderCompiler/blob/master/cmake/modules/FindD3D12.cmake
+# modified from 
+# https://github.com/Microsoft/DirectXShaderCompiler/blob/main/cmake/modules/FindD3D12.cmake
+
 # Find the win10 SDK path.
 if ("$ENV{WIN10_SDK_PATH}$ENV{WIN10_SDK_VERSION}" STREQUAL "" )
 	get_filename_component(WIN10_SDK_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]" ABSOLUTE CACHE)
@@ -16,7 +18,6 @@ endif ("$ENV{WIN10_SDK_PATH}$ENV{WIN10_SDK_VERSION}" STREQUAL "" )
 if (IS_DIRECTORY "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}.0")
 	set(WIN10_SDK_VERSION "${WIN10_SDK_VERSION}.0")
 endif (IS_DIRECTORY "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}.0")
-
 
 # Find the d3d12 and dxgi include path, it will typically look something like this.
 # C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um\d3d12.h

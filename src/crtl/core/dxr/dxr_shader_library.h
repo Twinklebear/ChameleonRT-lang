@@ -2,45 +2,43 @@
 
 #include <string>
 #include <vector>
+#include "api_object.h"
 #include "crtl_dxr_export.h"
 #include "dxr_utils.h"
+#include "hlsl/crtl_to_hlsl.h"
+
+#include <dxcapi.h>
 
 namespace crtl {
 namespace dxr {
 
-class CRTL_DXR_EXPORT ShaderLibrary {
-    D3D12_SHADER_BYTECODE bytecode = {0};
-    D3D12_DXIL_LIBRARY_DESC slibrary = {0};
+class CRTL_DXR_EXPORT ShaderLibrary : public APIObject {
+    std::shared_ptr<hlsl::ShaderCompilationResult> crtl_compilation_result;
+
+    Microsoft::WRL::ComPtr<IDxcBlob> shader_dxil = nullptr;
+
+    D3D12_SHADER_BYTECODE bytecode = {};
+    D3D12_DXIL_LIBRARY_DESC dxil_library_desc = {};
 
     std::vector<std::wstring> export_functions;
     // A bit annoying but we keep this around too b/c we need a contiguous
     // array of pointers for now to build the exports association in the pipeline
-    // TODO: We don't need to keep this
     std::vector<LPCWSTR> export_fcn_ptrs;
     std::vector<D3D12_EXPORT_DESC> exports;
 
 public:
-    ShaderLibrary(const void *bytecode,
-                  const size_t bytecode_size,
-                  // TODO: This exports list will have to come from the CRTL compilation
-                  // step, it will have this information
-                  const std::vector<std::wstring> &exports);
+    ShaderLibrary(const std::string &crtl_src);
 
-    ShaderLibrary(const ShaderLibrary &other);
-
-    ShaderLibrary &operator=(const ShaderLibrary &other);
+    ShaderLibrary(const ShaderLibrary &) = delete;
+    ShaderLibrary &operator=(const ShaderLibrary &) = delete;
 
     const std::vector<std::wstring> &export_names() const;
 
-    size_t num_exports() const;
-
-    LPCWSTR *export_names_ptr();
-
-    LPCWSTR *find_export(const std::wstring &name);
-
-    const D3D12_DXIL_LIBRARY_DESC *library() const;
+    const D3D12_DXIL_LIBRARY_DESC *library_desc() const;
 
 private:
+    void compile_dxil();
+
     void build_library_desc();
 };
 

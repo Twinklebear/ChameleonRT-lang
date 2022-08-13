@@ -63,6 +63,7 @@ target_include_directories(crtl_dxr PRIVATE
 
 target_link_libraries(crtl_dxr PRIVATE
     crtl
+    crtl_compiler
     ${D3D12_LIBRARIES})
 
 generate_export_header(crtl_dxr)

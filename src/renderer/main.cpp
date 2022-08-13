@@ -8,6 +8,30 @@
 uint32_t win_width = 1280;
 uint32_t win_height = 720;
 
+const std::string small_crtl = R"(
+struct SceneParams {
+    RWTexture2D<float4> image;
+    float test_constant;
+};
+
+in SceneParams scene;
+
+struct RayGenParams {
+    float4 color;
+    Buffer<float4> data;
+};
+
+ray_gen RayGen(RayGenParams params, float scale_factor)
+{
+    // TODO: Do need to know the type the built in functions return in case
+    // a conversion is needed here for example.
+    uint2 pixel = ray_index();
+    float4 c;
+    c = params.color * scene.test_constant + params.data[0];
+    scene.image[pixel] = params.color * scale_factor * c;
+}
+)";
+
 const char *error_to_string(CRTL_ERROR err);
 const char *api_to_string(CRTL_DEVICE_API api);
 
@@ -106,6 +130,9 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
                                     CRTL_IMAGE_USAGE_SHADER_READ_WRITE,
                                     render_target_dims,
                                     &render_target));
+
+    CRTLShaderLibrary shader_library;
+    CHECK_CRTL_ERR(crtl_new_shader_library(device, small_crtl.c_str(), &shader_library));
 
 #if 0
     crtr::dxr::ShaderLibrary shader_library(

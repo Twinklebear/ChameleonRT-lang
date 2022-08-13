@@ -1,5 +1,8 @@
 #include "dxr_shader_library.h"
 #include <algorithm>
+#include <array>
+#include <dxcapi.h>
+#include "error.h"
 #include "util.h"
 
 namespace crtl {
@@ -7,28 +10,23 @@ namespace dxr {
 
 using Microsoft::WRL::ComPtr;
 
-ShaderLibrary::ShaderLibrary(const void *code,
-                             const size_t code_size,
-                             const std::vector<std::wstring> &export_fns)
-    : export_functions(export_fns)
+ShaderLibrary::ShaderLibrary(const std::string &crtl_src)
+    // TODO: CRTL Compiler library needs some way for us to get errors and report them
+    // back up to the application
+    : crtl_compilation_result(hlsl::compile_crtl(crtl_src))
 {
-    bytecode.pShaderBytecode = code;
-    bytecode.BytecodeLength = code_size;
-    build_library_desc();
-}
+    std::cout << "----\nInput CRTL shader:\n" << crtl_src << "\n";
+    std::cout << "Compiled HLSL src:\n"
+              << crtl_compilation_result->hlsl_src << "\n----\n";
 
-ShaderLibrary::ShaderLibrary(const ShaderLibrary &other)
-    : bytecode(other.bytecode), export_functions(other.export_functions)
-{
-    build_library_desc();
-}
+    // Now compile the HLSL to DXIL
+    compile_dxil();
 
-ShaderLibrary &ShaderLibrary::operator=(const ShaderLibrary &other)
-{
-    bytecode = other.bytecode;
-    export_functions = other.export_functions;
+    bytecode.pShaderBytecode = shader_dxil->GetBufferPointer();
+    bytecode.BytecodeLength = shader_dxil->GetBufferSize();
+
+    // We need to get the export info translated over from the JSON metadata
     build_library_desc();
-    return *this;
 }
 
 const std::vector<std::wstring> &ShaderLibrary::export_names() const
@@ -36,30 +34,54 @@ const std::vector<std::wstring> &ShaderLibrary::export_names() const
     return export_functions;
 }
 
-size_t ShaderLibrary::num_exports() const
+const D3D12_DXIL_LIBRARY_DESC *ShaderLibrary::library_desc() const
 {
-    return export_fcn_ptrs.size();
+    return &dxil_library_desc;
 }
 
-LPCWSTR *ShaderLibrary::export_names_ptr()
+void ShaderLibrary::compile_dxil()
 {
-    return export_fcn_ptrs.data();
-}
+    ComPtr<IDxcCompiler3> dxc;
+    DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxc));
 
-LPCWSTR *ShaderLibrary::find_export(const std::wstring &name)
-{
-    auto fnd = std::find(export_functions.begin(), export_functions.end(), name);
-    if (fnd != export_functions.end()) {
-        size_t idx = std::distance(export_functions.begin(), fnd);
-        return &export_fcn_ptrs[idx];
-    } else {
-        return nullptr;
+    std::array<LPCWSTR, 3> dxc_args = {L"-T", L"lib_6_3", L"-O3"};
+
+    DxcBuffer hlsl_src_buf = {};
+    hlsl_src_buf.Ptr = crtl_compilation_result->hlsl_src.c_str();
+    hlsl_src_buf.Size = crtl_compilation_result->hlsl_src.size();
+    hlsl_src_buf.Encoding = DXC_CP_UTF8;
+
+    ComPtr<IDxcResult> dxc_results;
+    dxc->Compile(&hlsl_src_buf,
+                 dxc_args.data(),
+                 dxc_args.size(),
+                 nullptr,
+                 IID_PPV_ARGS(&dxc_results));
+
+    // Check for compilation errors
+    ComPtr<IDxcBlobUtf8> error_log = nullptr;
+    dxc_results->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&error_log), nullptr);
+
+    std::string error_log_utf8;
+    if (error_log && error_log->GetStringLength() > 0) {
+        error_log_utf8 = error_log->GetStringPointer();
+        // TODO : do need a way to report warnings in the native shader but probably just
+        // for internal development/logging?
+        std::cout << "DXC Warnings/Errors: " << error_log_utf8 << "\n";
     }
-}
 
-const D3D12_DXIL_LIBRARY_DESC *ShaderLibrary::library() const
-{
-    return &slibrary;
+    HRESULT compilation_status;
+    dxc_results->GetStatus(&compilation_status);
+    if (FAILED(compilation_status)) {
+        throw Error(error_log_utf8, CRTL_ERROR_NATIVE_SHADER_COMPILATION_FAILED);
+    }
+
+    // Get the shader binary
+    dxc_results->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shader_dxil), nullptr);
+    if (!shader_dxil) {
+        std::cout << "Somehow didn't get shader dxil!?";
+        throw Error("Didn't get DXIL?", CRTL_ERROR_NATIVE_SHADER_COMPILATION_FAILED);
+    }
 }
 
 void ShaderLibrary::build_library_desc()
@@ -72,9 +94,9 @@ void ShaderLibrary::build_library_desc()
         exports.push_back(shader_export);
         export_fcn_ptrs.push_back(fn.c_str());
     }
-    slibrary.DXILLibrary = bytecode;
-    slibrary.NumExports = exports.size();
-    slibrary.pExports = exports.data();
+    dxil_library_desc.DXILLibrary = bytecode;
+    dxil_library_desc.NumExports = exports.size();
+    dxil_library_desc.pExports = exports.data();
 }
 
 }

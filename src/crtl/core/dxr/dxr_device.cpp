@@ -3,6 +3,7 @@
 
 #include "dxr_buffer.h"
 #include "dxr_buffer_view.h"
+#include "dxr_shader_library.h"
 #include "dxr_texture.h"
 
 namespace crtl {
@@ -422,7 +423,11 @@ CRTL_ERROR DXRDevice::new_global_parameter_block(
 CRTL_ERROR DXRDevice::new_shader_library(const char *library_src,
                                          CRTLShaderLibrary *shader_library)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto lib = make_api_object<ShaderLibrary>(library_src);
+        *shader_library = reinterpret_cast<CRTLShaderLibrary>(lib.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::get_shader_entry_point(CRTLShaderLibrary shader_library,
