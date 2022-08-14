@@ -43,9 +43,6 @@ private:
     void build_library_desc();
 };
 
-// TODO: Shader entry point class can be in here, likely just a string + ref to the
-// library
-
 class CRTL_DXR_EXPORT ShaderEntryPoint : public APIObject {
     std::shared_ptr<ShaderLibrary> shader_library;
 
