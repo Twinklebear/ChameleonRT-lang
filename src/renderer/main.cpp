@@ -135,6 +135,10 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     CRTLShaderLibrary shader_library;
     CHECK_CRTL_ERR(crtl_new_shader_library(device, small_crtl.c_str(), &shader_library));
 
+    CRTLShaderEntryPoint raygen_entry_point;
+    CHECK_CRTL_ERR(crtl_get_shader_entry_point(
+        device, shader_library, "RayGen", &raygen_entry_point));
+
 #if 0
     crtr::dxr::ShaderLibrary shader_library(
         small_dxil, sizeof(small_dxil), {raygen_name});
@@ -369,6 +373,12 @@ const char *error_to_string(CRTL_ERROR err)
         return "CRTL_ERROR_BUFFER_VIEW_ALREADY_MAPPED";
     case CRTL_ERROR_BUFFER_VIEW_NOT_MAPPED:
         return "CRTL_ERROR_BUFFER_VIEW_NOT_MAPPED";
+    case CRTL_ERROR_SHADER_COMPILATION_FAILED:
+        return "CRTL_ERROR_SHADER_COMPILATION_FAILED";
+    case CRTL_ERROR_NATIVE_SHADER_COMPILATION_FAILED:
+        return "CRTL_ERROR_NATIVE_SHADER_COMPILATION_FAILED";
+    case CRTL_ERROR_ENTRY_POINT_NOT_FOUND:
+        return "CRTL_ERROR_ENTRY_POINT_NOT_FOUND";
     case CRTL_ERROR_UNKNOWN:
     default:
         return "CRTL_ERROR_UNKNOWN";

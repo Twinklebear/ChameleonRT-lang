@@ -434,7 +434,13 @@ CRTL_ERROR DXRDevice::get_shader_entry_point(CRTLShaderLibrary shader_library,
                                              const char *entry_point_name,
                                              CRTLShaderEntryPoint *entry_point)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto slib = lookup_api_object<ShaderLibrary>(
+            reinterpret_cast<crtl::APIObject *>(shader_library));
+        auto entry_pt = make_api_object<ShaderEntryPoint>(entry_point_name, slib);
+        *entry_point = reinterpret_cast<CRTLShaderEntryPoint>(entry_pt.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::new_shader_parameter_block(

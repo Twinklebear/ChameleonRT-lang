@@ -20,7 +20,7 @@ class CRTL_DXR_EXPORT ShaderLibrary : public APIObject {
     D3D12_SHADER_BYTECODE bytecode = {};
     D3D12_DXIL_LIBRARY_DESC dxil_library_desc = {};
 
-    std::vector<std::wstring> export_functions;
+    std::vector<std::wstring> exported_functions;
     // A bit annoying but we keep this around too b/c we need a contiguous
     // array of pointers for now to build the exports association in the pipeline
     std::vector<LPCWSTR> export_fcn_ptrs;
@@ -32,7 +32,8 @@ public:
     ShaderLibrary(const ShaderLibrary &) = delete;
     ShaderLibrary &operator=(const ShaderLibrary &) = delete;
 
-    const std::vector<std::wstring> &export_names() const;
+    // TODO: make this not work on JSON
+    nlohmann::json get_entry_point_info(const std::string &entry_point) const;
 
     const D3D12_DXIL_LIBRARY_DESC *library_desc() const;
 
@@ -44,5 +45,19 @@ private:
 
 // TODO: Shader entry point class can be in here, likely just a string + ref to the
 // library
+
+class CRTL_DXR_EXPORT ShaderEntryPoint : public APIObject {
+    std::shared_ptr<ShaderLibrary> shader_library;
+
+    // TODO: Make this not JSON so it's not so expensive to access in hot code paths,
+    // reduce string alloc & other ops
+    // This also doesn't need to copy it from the shader library, it can just reference it
+    // by ptr
+    nlohmann::json entry_point_info;
+
+public:
+    ShaderEntryPoint(const std::string &entry_point_name,
+                     const std::shared_ptr<ShaderLibrary> &shader_library);
+};
 }
 }

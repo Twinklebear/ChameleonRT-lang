@@ -25,13 +25,18 @@ ShaderLibrary::ShaderLibrary(const std::string &crtl_src)
     bytecode.pShaderBytecode = shader_dxil->GetBufferPointer();
     bytecode.BytecodeLength = shader_dxil->GetBufferSize();
 
+    // TODO: Should also build some intermediate struct here instead of working directly
+    // on the JSON data in the rest of the code to reduce amount of string
+    // manipulation/allocation on the hot code path
+
+    // Build the list of shader entry points
+    for (const auto &entry_pt : crtl_compilation_result->shader_info["entry_points"]) {
+        std::cout << "entry pt name: " << entry_pt["name"].get<std::string>() << "\n";
+        exported_functions.push_back(utf8_to_utf16(entry_pt["name"].get<std::string>()));
+    }
+
     // We need to get the export info translated over from the JSON metadata
     build_library_desc();
-}
-
-const std::vector<std::wstring> &ShaderLibrary::export_names() const
-{
-    return export_functions;
 }
 
 const D3D12_DXIL_LIBRARY_DESC *ShaderLibrary::library_desc() const
@@ -84,10 +89,21 @@ void ShaderLibrary::compile_dxil()
     }
 }
 
+nlohmann::json ShaderLibrary::get_entry_point_info(const std::string &entry_point) const
+{
+    const auto &entry_points = crtl_compilation_result->shader_info["entry_points"];
+    const auto fnd = entry_points.find(entry_point);
+    if (fnd == entry_points.end()) {
+        throw Error("ShaderLibrary does not contain entry point " + entry_point,
+                    CRTL_ERROR_ENTRY_POINT_NOT_FOUND);
+    }
+    return *fnd;
+}
+
 void ShaderLibrary::build_library_desc()
 {
-    for (const auto &fn : export_functions) {
-        D3D12_EXPORT_DESC shader_export = {0};
+    for (const auto &fn : exported_functions) {
+        D3D12_EXPORT_DESC shader_export = {};
         shader_export.ExportToRename = nullptr;
         shader_export.Flags = D3D12_EXPORT_FLAG_NONE;
         shader_export.Name = fn.c_str();
@@ -99,5 +115,11 @@ void ShaderLibrary::build_library_desc()
     dxil_library_desc.pExports = exports.data();
 }
 
+ShaderEntryPoint::ShaderEntryPoint(const std::string &entry_point_name,
+                                   const std::shared_ptr<ShaderLibrary> &shader_library)
+    : shader_library(shader_library),
+      entry_point_info(shader_library->get_entry_point_info(entry_point_name))
+{
+}
 }
 }
