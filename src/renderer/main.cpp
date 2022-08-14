@@ -19,16 +19,17 @@ in SceneParams scene;
 struct RayGenParams {
     float4 color;
     Buffer<float4> data;
+    float scale_factor;
 };
 
-ray_gen RayGen(RayGenParams params, float scale_factor)
+ray_gen RayGen(RayGenParams params)
 {
     // TODO: Do need to know the type the built in functions return in case
     // a conversion is needed here for example.
     uint2 pixel = ray_index();
     float4 c;
     c = params.color * scene.test_constant + params.data[0];
-    scene.image[pixel] = params.color * scale_factor * c;
+    scene.image[pixel] = params.color * params.scale_factor * c;
 }
 )";
 

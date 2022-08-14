@@ -58,14 +58,6 @@ CRTL_EXPORT CRTL_ERROR crtl_set_scene(CRTLDevice device,
 CRTL_EXPORT CRTL_ERROR crtl_build_shader_table(CRTLDevice device,
                                                CRTLRTPipeline pipeline);
 
-// TODO: For globals, could make some bind group style API rather than forcing all params
-// into a single block. This would make it easier to share subsets of global params across
-// pipelines
-CRTL_EXPORT CRTL_ERROR
-crtl_new_global_parameter_block(CRTLDevice device,
-                                CRTLRTPipeline pipeline,
-                                CRTLGlobalParameterBlock *parameter_block);
-
 #ifdef __cplusplus
 }
 #endif

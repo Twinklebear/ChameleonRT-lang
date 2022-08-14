@@ -27,6 +27,11 @@ CRTL_EXPORT CRTL_ERROR crtl_new_shader_library(CRTLDevice device,
                                                const char *library_src,
                                                CRTLShaderLibrary *shader_library);
 
+CRTL_EXPORT CRTL_ERROR
+crtl_new_global_parameter_block(CRTLDevice device,
+                                CRTLShaderLibrary shader_library,
+                                CRTLGlobalParameterBlock *parameter_block);
+
 CRTL_EXPORT CRTL_ERROR crtl_get_shader_entry_point(CRTLDevice device,
                                                    CRTLShaderLibrary shader_library,
                                                    const char *entry_point_name,
@@ -42,9 +47,9 @@ CRTL_EXPORT CRTL_ERROR crtl_new_shader_record(CRTLDevice device,
                                               CRTLShaderRecord *shader_record);
 
 CRTL_EXPORT CRTL_ERROR
-crtl_set_shader_parameter_block(CRTLDevice device,
-                                CRTLShaderRecord shader_record,
-                                CRTLShaderParameterBlock parameter_block);
+crtl_set_shader_record_parameter_block(CRTLDevice device,
+                                       CRTLShaderRecord shader_record,
+                                       CRTLShaderParameterBlock parameter_block);
 
 #ifdef __cplusplus
 }

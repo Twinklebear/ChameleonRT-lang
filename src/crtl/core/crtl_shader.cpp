@@ -9,6 +9,15 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_shader_library(
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR
+crtl_new_global_parameter_block(CRTLDevice device,
+                                CRTLShaderLibrary shader_library,
+                                CRTLGlobalParameterBlock *parameter_block)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->new_global_parameter_block(shader_library, parameter_block);
+}
+
+extern "C" CRTL_EXPORT CRTL_ERROR
 crtl_get_shader_entry_point(CRTLDevice device,
                             CRTLShaderLibrary shader_library,
                             const char *entry_point_name,
@@ -36,10 +45,10 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_shader_record(CRTLDevice device,
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR
-crtl_set_shader_parameter_block(CRTLDevice device,
-                                CRTLShaderRecord shader_record,
-                                CRTLShaderParameterBlock parameter_block)
+crtl_set_shader_record_parameter_block(CRTLDevice device,
+                                       CRTLShaderRecord shader_record,
+                                       CRTLShaderParameterBlock parameter_block)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->set_shader_parameter_block(shader_record, parameter_block);
+    return d->set_shader_record_parameter_block(shader_record, parameter_block);
 }

@@ -41,10 +41,3 @@ extern "C" CRTL_EXPORT CRTL_ERROR crtl_build_shader_table(CRTLDevice device,
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->build_shader_table(pipeline);
 }
-
-extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_global_parameter_block(
-    CRTLDevice device, CRTLRTPipeline pipeline, CRTLGlobalParameterBlock *parameter_block)
-{
-    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->new_global_parameter_block(pipeline, parameter_block);
-}

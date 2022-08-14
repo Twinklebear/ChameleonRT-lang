@@ -211,13 +211,14 @@ public:
 
     CRTL_ERROR build_shader_table(CRTLRTPipeline pipeline) override;
 
-    CRTL_ERROR new_global_parameter_block(
-        CRTLRTPipeline pipeline, CRTLGlobalParameterBlock *parameter_block) override;
-
     // Shader APIs ====
 
     CRTL_ERROR new_shader_library(const char *library_src,
                                   CRTLShaderLibrary *shader_library) override;
+
+    CRTL_ERROR new_global_parameter_block(
+        CRTLShaderLibrary shader_library,
+        CRTLGlobalParameterBlock *parameter_block) override;
 
     CRTL_ERROR get_shader_entry_point(CRTLShaderLibrary shader_library,
                                       const char *entry_point_name,
@@ -230,7 +231,7 @@ public:
     CRTL_ERROR new_shader_record(CRTLShaderEntryPoint entry_point,
                                  CRTLShaderRecord *shader_record) override;
 
-    CRTL_ERROR set_shader_parameter_block(
+    CRTL_ERROR set_shader_record_parameter_block(
         CRTLShaderRecord shader_record,
         CRTLShaderParameterBlock parameter_block) override;
 

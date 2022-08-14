@@ -412,12 +412,6 @@ CRTL_ERROR DXRDevice::build_shader_table(CRTLRTPipeline pipeline)
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::new_global_parameter_block(
-    CRTLRTPipeline pipeline, CRTLGlobalParameterBlock *parameter_block)
-{
-    return CRTL_ERROR_NONE;
-}
-
 // Shader APIs ====
 
 CRTL_ERROR DXRDevice::new_shader_library(const char *library_src,
@@ -428,6 +422,12 @@ CRTL_ERROR DXRDevice::new_shader_library(const char *library_src,
         *shader_library = reinterpret_cast<CRTLShaderLibrary>(lib.get());
         return CRTL_ERROR_NONE;
     });
+}
+
+CRTL_ERROR DXRDevice::new_global_parameter_block(
+    CRTLShaderLibrary shader_library, CRTLGlobalParameterBlock *parameter_block)
+{
+    return CRTL_ERROR_NONE;
 }
 
 CRTL_ERROR DXRDevice::get_shader_entry_point(CRTLShaderLibrary shader_library,
@@ -449,8 +449,8 @@ CRTL_ERROR DXRDevice::new_shader_record(CRTLShaderEntryPoint entry_point,
     return CRTL_ERROR_NONE;
 }
 
-CRTL_ERROR DXRDevice::set_shader_parameter_block(CRTLShaderRecord shader_record,
-                                                 CRTLShaderParameterBlock parameter_block)
+CRTL_ERROR DXRDevice::set_shader_record_parameter_block(
+    CRTLShaderRecord shader_record, CRTLShaderParameterBlock parameter_block)
 {
     return CRTL_ERROR_NONE;
 }
