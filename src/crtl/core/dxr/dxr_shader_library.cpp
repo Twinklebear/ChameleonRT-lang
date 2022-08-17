@@ -118,8 +118,34 @@ void ShaderLibrary::build_library_desc()
 ShaderEntryPoint::ShaderEntryPoint(const std::string &entry_point_name,
                                    const std::shared_ptr<ShaderLibrary> &shader_library)
     : shader_library(shader_library),
-      entry_point_info(shader_library->get_entry_point_info(entry_point_name))
+      entry_point_info(shader_library->get_entry_point_info(entry_point_name)),
+      entry_point_name(entry_point_info["name"])
 {
+    const std::string ty = entry_point_info["type"];
+    if (ty == "RAY_GEN") {
+        entry_point_type = EntryPointType::RAY_GEN;
+    } else if (ty == "CLOSEST_HIT") {
+        entry_point_type = EntryPointType::CLOSEST_HIT;
+    } else if (ty == "ANY_HIT") {
+        entry_point_type = EntryPointType::ANY_HIT;
+    } else if (ty == "INTERSECTION") {
+        entry_point_type = EntryPointType::INTERSECTION;
+    } else if (ty == "MISS") {
+        entry_point_type = EntryPointType::MISS;
+    } else {
+        std::cout << "TODO support for entry point type: " << ty << "\n";
+        throw Error("TODO support for entry point type " + ty, CRTL_ERROR_UNKNOWN);
+    }
+}
+
+EntryPointType ShaderEntryPoint::type() const
+{
+    return entry_point_type;
+}
+
+const std::string &ShaderEntryPoint::name() const
+{
+    return entry_point_name;
 }
 }
 }

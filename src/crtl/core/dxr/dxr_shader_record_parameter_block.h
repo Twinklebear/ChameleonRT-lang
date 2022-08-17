@@ -6,7 +6,7 @@
 namespace crtl {
 namespace dxr {
 
-class CRTL_DXR_EXPORT ShaderParameterBlock : public ParameterBlock {
+class CRTL_DXR_EXPORT ShaderRecordParameterBlock : public ParameterBlock {
 public:
     // TODO
 };

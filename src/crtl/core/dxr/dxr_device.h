@@ -224,16 +224,24 @@ public:
                                       const char *entry_point_name,
                                       CRTLShaderEntryPoint *entry_point) override;
 
-    CRTL_ERROR new_shader_parameter_block(
-        CRTLShaderEntryPoint entry_point,
-        CRTLShaderParameterBlock *parameter_block) override;
+    CRTL_ERROR new_hitgroup_record(CRTLShaderEntryPoint closest_hit,
+                                   CRTLShaderEntryPoint intersection_optional,
+                                   CRTLShaderEntryPoint any_hit_optional,
+                                   CRTLHitGroupRecord *shader_record) override;
 
-    CRTL_ERROR new_shader_record(CRTLShaderEntryPoint entry_point,
-                                 CRTLShaderRecord *shader_record) override;
+    CRTL_ERROR new_miss_record(CRTLShaderEntryPoint miss,
+                               CRTLMissRecord *shader_record) override;
+
+    CRTL_ERROR new_raygen_record(CRTLShaderEntryPoint raygen,
+                                 CRTLRaygenRecord *shader_record) override;
+
+    CRTL_ERROR new_shader_record_parameter_block(
+        CRTLShaderRecord shader_record,
+        CRTLShaderRecordParameterBlock *parameter_block) override;
 
     CRTL_ERROR set_shader_record_parameter_block(
         CRTLShaderRecord shader_record,
-        CRTLShaderParameterBlock parameter_block) override;
+        CRTLShaderRecordParameterBlock parameter_block) override;
 
     // Texture APIs ====
 
@@ -256,6 +264,9 @@ public:
     template <typename T>
     std::shared_ptr<T> lookup_api_object(crtl::APIObject *o)
     {
+        if (!o) {
+            return nullptr;
+        }
         auto fnd = api_objects.find(o);
         if (fnd != api_objects.end()) {
             return std::dynamic_pointer_cast<T>(fnd->second);

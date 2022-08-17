@@ -4,6 +4,7 @@
 #include "dxr_buffer.h"
 #include "dxr_buffer_view.h"
 #include "dxr_shader_library.h"
+#include "dxr_shader_record.h"
 #include "dxr_texture.h"
 
 namespace crtl {
@@ -443,20 +444,59 @@ CRTL_ERROR DXRDevice::get_shader_entry_point(CRTLShaderLibrary shader_library,
     });
 }
 
-CRTL_ERROR DXRDevice::new_shader_parameter_block(
-    CRTLShaderEntryPoint entry_point, CRTLShaderParameterBlock *parameter_block)
+CRTL_ERROR DXRDevice::new_hitgroup_record(CRTLShaderEntryPoint closest_hit,
+                                          CRTLShaderEntryPoint intersection_optional,
+                                          CRTLShaderEntryPoint any_hit_optional,
+                                          CRTLHitGroupRecord *shader_record)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto chit = lookup_api_object<ShaderEntryPoint>(
+            reinterpret_cast<crtl::APIObject *>(closest_hit));
+        auto intersection = lookup_api_object<ShaderEntryPoint>(
+            reinterpret_cast<crtl::APIObject *>(intersection_optional));
+        auto any_hit = lookup_api_object<ShaderEntryPoint>(
+            reinterpret_cast<crtl::APIObject *>(any_hit_optional));
+
+        auto sr = make_api_object<HitGroupRecord>(chit, intersection, any_hit);
+        *shader_record = reinterpret_cast<CRTLHitGroupRecord>(sr.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
-CRTL_ERROR DXRDevice::new_shader_record(CRTLShaderEntryPoint entry_point,
-                                        CRTLShaderRecord *shader_record)
+CRTL_ERROR DXRDevice::new_miss_record(CRTLShaderEntryPoint miss,
+                                      CRTLMissRecord *shader_record)
+{
+    return wrap_try_catch([&]() {
+        auto m = lookup_api_object<ShaderEntryPoint>(
+            reinterpret_cast<crtl::APIObject *>(miss));
+
+        auto sr = make_api_object<MissRecord>(m);
+        *shader_record = reinterpret_cast<CRTLMissRecord>(sr.get());
+        return CRTL_ERROR_NONE;
+    });
+}
+
+CRTL_ERROR DXRDevice::new_raygen_record(CRTLShaderEntryPoint raygen,
+                                        CRTLRaygenRecord *shader_record)
+{
+    return wrap_try_catch([&]() {
+        auto rg = lookup_api_object<ShaderEntryPoint>(
+            reinterpret_cast<crtl::APIObject *>(raygen));
+
+        auto sr = make_api_object<RaygenRecord>(rg);
+        *shader_record = reinterpret_cast<CRTLRaygenRecord>(sr.get());
+        return CRTL_ERROR_NONE;
+    });
+}
+
+CRTL_ERROR DXRDevice::new_shader_record_parameter_block(
+    CRTLShaderRecord shader_record, CRTLShaderRecordParameterBlock *parameter_block)
 {
     return CRTL_ERROR_NONE;
 }
 
 CRTL_ERROR DXRDevice::set_shader_record_parameter_block(
-    CRTLShaderRecord shader_record, CRTLShaderParameterBlock parameter_block)
+    CRTLShaderRecord shader_record, CRTLShaderRecordParameterBlock parameter_block)
 {
     return CRTL_ERROR_NONE;
 }

@@ -28,26 +28,46 @@ crtl_get_shader_entry_point(CRTLDevice device,
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR
-crtl_new_shader_parameter_block(CRTLDevice device,
-                                CRTLShaderEntryPoint entry_point,
-                                CRTLShaderParameterBlock *parameter_block)
+crtl_new_hitgroup_record(CRTLDevice device,
+                         CRTLShaderEntryPoint closest_hit,
+                         CRTLShaderEntryPoint intersection_optional,
+                         CRTLShaderEntryPoint any_hit_optional,
+                         CRTLHitGroupRecord *shader_record)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->new_shader_parameter_block(entry_point, parameter_block);
+    return d->new_hitgroup_record(
+        closest_hit, intersection_optional, any_hit_optional, shader_record);
 }
 
-extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_shader_record(CRTLDevice device,
-                                                         CRTLShaderEntryPoint entry_point,
-                                                         CRTLShaderRecord *shader_record)
+extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_miss_record(CRTLDevice device,
+                                                       CRTLShaderEntryPoint miss,
+                                                       CRTLMissRecord *shader_record)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
-    return d->new_shader_record(entry_point, shader_record);
+    return d->new_miss_record(miss, shader_record);
+}
+
+extern "C" CRTL_EXPORT CRTL_ERROR crtl_new_raygen_record(CRTLDevice device,
+                                                         CRTLShaderEntryPoint raygen,
+                                                         CRTLRaygenRecord *shader_record)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->new_raygen_record(raygen, shader_record);
+}
+
+extern "C" CRTL_EXPORT CRTL_ERROR
+crtl_new_shader_record_parameter_block(CRTLDevice device,
+                                       CRTLShaderRecord shader_record,
+                                       CRTLShaderRecordParameterBlock *parameter_block)
+{
+    crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
+    return d->new_shader_record_parameter_block(shader_record, parameter_block);
 }
 
 extern "C" CRTL_EXPORT CRTL_ERROR
 crtl_set_shader_record_parameter_block(CRTLDevice device,
                                        CRTLShaderRecord shader_record,
-                                       CRTLShaderParameterBlock parameter_block)
+                                       CRTLShaderRecordParameterBlock parameter_block)
 {
     crtl::Device *d = reinterpret_cast<crtl::Device *>(device);
     return d->set_shader_record_parameter_block(shader_record, parameter_block);

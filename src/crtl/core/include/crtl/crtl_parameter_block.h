@@ -7,15 +7,15 @@
 #ifdef __cplusplus
 namespace crtl_rhi {
 struct ParameterBlock : APIObject {};
-struct ShaderParameterBlock : ParameterBlock {};
+struct ShaderRecordParameterBlock : ParameterBlock {};
 struct GlobalParameterBlock : ParameterBlock {};
 }
 typedef crtl_rhi::ParameterBlock *CRTLParameterBlock;
-typedef crtl_rhi::ShaderParameterBlock *CRTLShaderParameterBlock;
+typedef crtl_rhi::ShaderRecordParameterBlock *CRTLShaderRecordParameterBlock;
 typedef crtl_rhi::GlobalParameterBlock *CRTLGlobalParameterBlock;
 #else
 typedef CRTLAPIObject CRTLParameterBlock;
-typedef CRTLAPIObject CRTLShaderParameterBlock;
+typedef CRTLAPIObject CRTLShaderRecordParameterBlock;
 typedef CRTLAPIObject CRTLGlobalParameterBlock;
 #endif
 

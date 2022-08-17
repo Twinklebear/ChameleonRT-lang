@@ -65,7 +65,7 @@ CRTL_EXPORT std::string get_file_extension(const std::string &fname)
 
 CRTL_EXPORT std::string get_cpu_brand()
 {
-#if defined(__APPLE__) and defined(__aarch64__)
+#if defined(__APPLE__) && defined(__aarch64__)
     return "Apple M1";
 #else
     std::string brand = "Unspecified";

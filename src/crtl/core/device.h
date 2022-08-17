@@ -207,14 +207,24 @@ public:
                                               const char *entry_point_name,
                                               CRTLShaderEntryPoint *entry_point) = 0;
 
-    virtual CRTL_ERROR new_shader_parameter_block(
-        CRTLShaderEntryPoint entry_point, CRTLShaderParameterBlock *parameter_block) = 0;
+    virtual CRTL_ERROR new_hitgroup_record(CRTLShaderEntryPoint closest_hit,
+                                           CRTLShaderEntryPoint intersection_optional,
+                                           CRTLShaderEntryPoint any_hit_optional,
+                                           CRTLHitGroupRecord *shader_record) = 0;
 
-    virtual CRTL_ERROR new_shader_record(CRTLShaderEntryPoint entry_point,
-                                         CRTLShaderRecord *shader_record) = 0;
+    virtual CRTL_ERROR new_miss_record(CRTLShaderEntryPoint miss,
+                                       CRTLMissRecord *shader_record) = 0;
+
+    virtual CRTL_ERROR new_raygen_record(CRTLShaderEntryPoint raygen,
+                                         CRTLRaygenRecord *shader_record) = 0;
+
+    virtual CRTL_ERROR new_shader_record_parameter_block(
+        CRTLShaderRecord shader_record,
+        CRTLShaderRecordParameterBlock *parameter_block) = 0;
 
     virtual CRTL_ERROR set_shader_record_parameter_block(
-        CRTLShaderRecord shader_record, CRTLShaderParameterBlock parameter_block) = 0;
+        CRTLShaderRecord shader_record,
+        CRTLShaderRecordParameterBlock parameter_block) = 0;
 
     // Texture APIs ====
 
