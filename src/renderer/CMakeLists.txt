@@ -38,3 +38,8 @@ target_link_libraries(crtl_test_renderer PUBLIC
     SDL2::SDL2main
     crtl)
 
+# Set the debugger command for visual studio so it's easier
+# to launch the debugger
+set_target_properties(crtl_test_renderer PROPERTIES
+    VS_DEBUGGER_COMMAND ${PROJECT_BINARY_DIR}/$<CONFIG>/crtl_test_renderer.exe)
+
