@@ -5,7 +5,7 @@
 #include "api_object.h"
 #include "crtl_dxr_export.h"
 #include "dxr_root_signature.h"
-#include "dxr_shader_library.h"
+#include "dxr_shader_entry_point.h"
 #include "dxr_utils.h"
 
 namespace crtl {
@@ -29,6 +29,8 @@ public:
     // or really, a vector of the param info + a map of name -> index
 };
 
+// TODO WILL: Hit Group records will be changed in the language/compiler/API to
+// better express the SBT -> shaders mapping
 class CRTL_DXR_EXPORT HitGroupRecord : public ShaderRecord {
     // TODO: Maybe make it atomic? for some thread safe support of creating records/etc?
     // IDs are tracked per record type rather than globally

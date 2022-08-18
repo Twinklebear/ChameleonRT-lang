@@ -14,6 +14,7 @@ RootSignatureBuilder RootSignatureBuilder::global()
     sig.flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     return sig;
 }
+
 RootSignatureBuilder RootSignatureBuilder::local()
 {
     RootSignatureBuilder sig;
@@ -21,12 +22,52 @@ RootSignatureBuilder RootSignatureBuilder::local()
     return sig;
 }
 
+std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
+    nlohmann::json &param_desc, ID3D12Device *device)
+{
+    auto builder = local();
+
+    // Put inline constants into the root signature
+    // TODO: will be renamed to inline_constants
+    auto inline_constants = param_desc.find("constant_buffer");
+    if (inline_constants != param_desc.end()) {
+        // TODO: will no longer pack the constants like I was thinking to do originally,
+        // it'll be easier to do the param mapping/writing with them separated
+        // Right now assume one constant value
+        auto constants_arr = (*inline_constants)["contents"];
+        for (auto &c : constants_arr) {
+            std::cout << "constant: " << c << "\n";
+
+            // TODO: this should be some type handling code to get # of floats for a given
+            // 32-bit based primitive int/uint/float vectors/matrices
+            if (c["type"] == "FLOAT4") {
+                builder.add_constants(c["name"],
+                                      (*inline_constants)["slot"].get<int>(),
+                                      4,
+                                      (*inline_constants)["space"].get<int>());
+            }
+        }
+    }
+
+    auto members = param_desc.find("members");
+    if (members != param_desc.end()) {
+        for (auto &m : members->items()) {
+            std::cout << "member: " << m << "\n";
+            if (m.value()["type"] == "BUFFER<FLOAT4>") {
+                builder.add_srv(
+                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
+            }
+        }
+    }
+    return builder.build(device);
+}
+
 void RootSignatureBuilder::add_descriptor(D3D12_ROOT_PARAMETER_TYPE desc_type,
                                           const std::string &name,
                                           uint32_t shader_register,
                                           uint32_t space)
 {
-    D3D12_ROOT_PARAMETER p = {0};
+    D3D12_ROOT_PARAMETER p = {};
     p.ParameterType = desc_type;
     p.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     p.Descriptor.ShaderRegister = shader_register;
@@ -39,7 +80,7 @@ RootSignatureBuilder &RootSignatureBuilder::add_constants(const std::string &nam
                                                           uint32_t num_vals,
                                                           uint32_t space)
 {
-    D3D12_ROOT_PARAMETER p = {0};
+    D3D12_ROOT_PARAMETER p = {};
     p.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
     p.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     p.Constants.ShaderRegister = shader_register;
@@ -70,14 +111,16 @@ RootSignatureBuilder &RootSignatureBuilder::add_cbv(const std::string &name,
     add_descriptor(D3D12_ROOT_PARAMETER_TYPE_CBV, name, shader_register, space);
     return *this;
 }
+/*
 RootSignatureBuilder &RootSignatureBuilder::add_desc_heap(const std::string &name,
                                                           const DescriptorHeap &heap)
 {
     params.push_back(RootParam(heap.root_param(), name));
     return *this;
 }
+*/
 
-RootSignature RootSignatureBuilder::create(ID3D12Device *device)
+std::shared_ptr<RootSignature> RootSignatureBuilder::build(ID3D12Device *device)
 {
     // Build the set of root parameters from the inputs
     // Pack constant values to the front, since we want to compact the shader record
@@ -120,7 +163,7 @@ RootSignature RootSignatureBuilder::create(ID3D12Device *device)
                                           signature_blob->GetBufferSize(),
                                           IID_PPV_ARGS(&signature)));
 
-    return RootSignature(flags, signature, params);
+    return std::make_shared<RootSignature>(flags, signature, params);
 }
 
 RootSignature::RootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags,

@@ -42,6 +42,7 @@ add_library(crtl_dxr SHARED
     dxr_global_parameter_block.cpp
     dxr_shader_record_parameter_block.cpp
     dxr_shader_library.cpp
+    dxr_shader_entry_point.cpp
     dxr_shader_record.cpp
     #dxr_rtpipeline.cpp
 

@@ -61,7 +61,7 @@ RaygenRecord::RaygenRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point)
 {
     if (entry_point->type() != EntryPointType::RAY_GEN) {
         throw Error(
-            "MissRecord: Provided ray_gen entry point is not a ray_gen entry point",
+            "RaygenRecord: Provided ray_gen entry point is not a ray_gen entry point",
             CRTL_ERROR_INVALID_SHADER_ENTRY_POINT);
     }
     shader_record_name =

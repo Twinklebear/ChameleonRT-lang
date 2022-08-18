@@ -19,7 +19,6 @@ in SceneParams scene;
 struct RayGenParams {
     float4 color;
     Buffer<float4> data;
-    float scale_factor;
 };
 
 ray_gen RayGen(RayGenParams params)
@@ -29,7 +28,7 @@ ray_gen RayGen(RayGenParams params)
     uint2 pixel = ray_index();
     float4 c;
     c = params.color * scene.test_constant + params.data[0];
-    scene.image[pixel] = params.color * params.scale_factor * c;
+    scene.image[pixel] = params.color * c;
 }
 )";
 
@@ -138,6 +137,9 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     CRTLShaderEntryPoint raygen_entry_point;
     CHECK_CRTL_ERR(crtl_get_shader_entry_point(
         device, shader_library, "RayGen", &raygen_entry_point));
+
+    CRTLRaygenRecord raygen_record;
+    CHECK_CRTL_ERR(crtl_new_raygen_record(device, raygen_entry_point, &raygen_record));
 
 #if 0
     crtr::dxr::ShaderLibrary shader_library(

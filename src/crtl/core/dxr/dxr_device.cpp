@@ -3,6 +3,7 @@
 
 #include "dxr_buffer.h"
 #include "dxr_buffer_view.h"
+#include "dxr_shader_entry_point.h"
 #include "dxr_shader_library.h"
 #include "dxr_shader_record.h"
 #include "dxr_texture.h"
@@ -438,7 +439,7 @@ CRTL_ERROR DXRDevice::get_shader_entry_point(CRTLShaderLibrary shader_library,
     return wrap_try_catch([&]() {
         auto slib = lookup_api_object<ShaderLibrary>(
             reinterpret_cast<crtl::APIObject *>(shader_library));
-        auto entry_pt = make_api_object<ShaderEntryPoint>(entry_point_name, slib);
+        auto entry_pt = make_api_object<ShaderEntryPoint>(this, entry_point_name, slib);
         *entry_point = reinterpret_cast<CRTLShaderEntryPoint>(entry_pt.get());
         return CRTL_ERROR_NONE;
     });
@@ -449,6 +450,8 @@ CRTL_ERROR DXRDevice::new_hitgroup_record(CRTLShaderEntryPoint closest_hit,
                                           CRTLShaderEntryPoint any_hit_optional,
                                           CRTLHitGroupRecord *shader_record)
 {
+    // TODO: will be changed
+    /*
     return wrap_try_catch([&]() {
         auto chit = lookup_api_object<ShaderEntryPoint>(
             reinterpret_cast<crtl::APIObject *>(closest_hit));
@@ -461,6 +464,8 @@ CRTL_ERROR DXRDevice::new_hitgroup_record(CRTLShaderEntryPoint closest_hit,
         *shader_record = reinterpret_cast<CRTLHitGroupRecord>(sr.get());
         return CRTL_ERROR_NONE;
     });
+    */
+    return CRTL_ERROR_NONE;
 }
 
 CRTL_ERROR DXRDevice::new_miss_record(CRTLShaderEntryPoint miss,

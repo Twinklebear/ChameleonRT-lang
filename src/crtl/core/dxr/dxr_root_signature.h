@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <json.hpp>
 #include "crtl_dxr_export.h"
 #include "dxr_descriptor_heap.h"
 #include "dxr_root_parameter.h"
@@ -15,13 +16,6 @@ class RootSignature;
 class RTPipelineBuilder;
 class RTPipeline;
 
-// The table doesn't need a name since
-// I think there should only ever be one, since you can specify a bunch of ranges
-// to reference the single pointer you get, right?
-// Actually since it refers into the global descriptor heap we don't need to write
-// anything into the actual shader table. I wonder why the RT gems book and other
-// resources seem to imply this? Because it seems like you can't read from a different
-// heap than the one which is bound.
 class CRTL_DXR_EXPORT RootSignatureBuilder {
     D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     std::vector<RootParam> params;
@@ -34,6 +28,11 @@ class CRTL_DXR_EXPORT RootSignatureBuilder {
 public:
     static RootSignatureBuilder global();
     static RootSignatureBuilder local();
+
+    // Build a local root signature from the passed parameter descriptor set
+    // TODO: will not work on json in the future
+    static std::shared_ptr<RootSignature> build_local_from_desc(
+        nlohmann::json &param_desc, ID3D12Device *device);
 
     RootSignatureBuilder &add_constants(const std::string &name,
                                         uint32_t shader_register,
@@ -49,10 +48,13 @@ public:
     RootSignatureBuilder &add_cbv(const std::string &name,
                                   uint32_t shader_register,
                                   uint32_t space);
-    RootSignatureBuilder &add_desc_heap(const std::string &name,
-                                        const DescriptorHeap &heap);
+    // TODO: this is actually writing a descriptor table into the root signature that
+    // views the entire heap need to add other APIs for writing just the descriptor table
+    // views
+    // RootSignatureBuilder &add_desc_heap(const std::string &name,
+    //                                  const DescriptorHeap &heap);
 
-    RootSignature create(ID3D12Device *device);
+    std::shared_ptr<RootSignature> build(ID3D12Device *device);
 };
 
 class CRTL_DXR_EXPORT RootSignature {
@@ -67,11 +69,11 @@ class CRTL_DXR_EXPORT RootSignature {
     friend class RTPipelineBuilder;
     friend class RTPipeline;
 
+public:
     RootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags,
                   Microsoft::WRL::ComPtr<ID3D12RootSignature> sig,
                   const std::vector<RootParam> &params);
 
-public:
     RootSignature() = default;
 
     // Returns size_t max if no such param
