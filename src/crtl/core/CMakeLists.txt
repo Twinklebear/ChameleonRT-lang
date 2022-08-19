@@ -15,6 +15,7 @@ add_library(crtl SHARED
     device.cpp
     util.cpp
     error.cpp
+    type.cpp
 )
 
 set_target_properties(crtl PROPERTIES

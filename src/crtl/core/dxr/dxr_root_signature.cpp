@@ -1,6 +1,7 @@
 #include "dxr_root_signature.h"
 #include <algorithm>
 #include <numeric>
+#include "type.h"
 #include "util.h"
 
 namespace crtl {
@@ -27,38 +28,36 @@ std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
 {
     auto builder = local();
 
-    // Put inline constants into the root signature
-    // TODO: will be renamed to inline_constants
-    auto inline_constants = param_desc.find("constant_buffer");
-    if (inline_constants != param_desc.end()) {
-        // TODO: will no longer pack the constants like I was thinking to do originally,
-        // it'll be easier to do the param mapping/writing with them separated
-        // Right now assume one constant value
-        auto constants_arr = (*inline_constants)["contents"];
+    auto &inline_constants = param_desc["constant_buffer"];
+    if (!inline_constants.is_null()) {
+        auto &constants_arr = inline_constants["contents"];
+
+        // TODO: must compute number of values in the constants buffer
+
+        // TODO: just testing here but this type info should be computed in the shader
+        // entry point to build its param desc
         for (auto &c : constants_arr) {
-            std::cout << "constant: " << c << "\n";
+            auto ty = ty::parse_type(c["type"]);
+        }
 
-            // TODO: this should be some type handling code to get # of floats for a given
-            // 32-bit based primitive int/uint/float vectors/matrices
-            if (c["type"] == "FLOAT4") {
-                builder.add_constants(c["name"],
-                                      (*inline_constants)["slot"].get<int>(),
-                                      4,
-                                      (*inline_constants)["space"].get<int>());
-            }
+        uint32_t numConstants = 0;
+
+        builder.add_constants("sbt_constants",
+                              inline_constants["slot"].get<int>(),
+                              numConstants,
+                              inline_constants["space"].get<int>());
+    }
+
+    auto &members = param_desc["members"];
+    for (auto &m : members.items()) {
+        std::cout << "member: " << m << "\n";
+        auto ty = ty::parse_type(m.value()["type"]);
+        if (m.value()["type"] == "BUFFER<FLOAT4>") {
+            builder.add_srv(
+                m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
         }
     }
 
-    auto members = param_desc.find("members");
-    if (members != param_desc.end()) {
-        for (auto &m : members->items()) {
-            std::cout << "member: " << m << "\n";
-            if (m.value()["type"] == "BUFFER<FLOAT4>") {
-                builder.add_srv(
-                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-            }
-        }
-    }
     return builder.build(device);
 }
 
@@ -176,7 +175,8 @@ RootSignature::RootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags,
         RootParam p = ip;
         p.offset = offset;
         if (p.param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS) {
-            // Constants must pad to a size multiple of 8 to align w/ the pointer entries
+            // Constants must pad to a size multiple of 8 to align w/ the pointer
+            // entries
             p.size = align_to(p.param.Constants.Num32BitValues * 4,
                               sizeof(D3D12_GPU_DESCRIPTOR_HANDLE));
         } else {
@@ -227,6 +227,5 @@ ID3D12RootSignature *RootSignature::get()
 {
     return sig.Get();
 }
-
 }
 }
