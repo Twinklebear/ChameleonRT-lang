@@ -128,26 +128,10 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
 {
     // Note: Bool is same size as int for GPU
     switch (type) {
-    case CRTL_DATA_TYPE_BOOL:
-    case CRTL_DATA_TYPE_BOOL1:
-    case CRTL_DATA_TYPE_BOOL1X1:
-
     case CRTL_DATA_TYPE_INT:
-    case CRTL_DATA_TYPE_INT1:
-    case CRTL_DATA_TYPE_INT1X1:
-
     case CRTL_DATA_TYPE_UINT:
-    case CRTL_DATA_TYPE_UINT1:
-    case CRTL_DATA_TYPE_UINT1X1:
-
     case CRTL_DATA_TYPE_FLOAT:
-    case CRTL_DATA_TYPE_FLOAT1:
-    case CRTL_DATA_TYPE_FLOAT1X1:
         return 4;
-
-    case CRTL_DATA_TYPE_BOOL2:
-    case CRTL_DATA_TYPE_BOOL2X1:
-    case CRTL_DATA_TYPE_BOOL1X2:
 
     case CRTL_DATA_TYPE_INT2:
     case CRTL_DATA_TYPE_INT2X1:
@@ -162,10 +146,6 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT1X2:
         return 8;
 
-    case CRTL_DATA_TYPE_BOOL3:
-    case CRTL_DATA_TYPE_BOOL3X1:
-    case CRTL_DATA_TYPE_BOOL1X3:
-
     case CRTL_DATA_TYPE_INT3:
     case CRTL_DATA_TYPE_INT3X1:
     case CRTL_DATA_TYPE_INT1X3:
@@ -178,10 +158,6 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT3X1:
     case CRTL_DATA_TYPE_FLOAT1X3:
         return 12;
-
-    case CRTL_DATA_TYPE_BOOL4:
-    case CRTL_DATA_TYPE_BOOL4X1:
-    case CRTL_DATA_TYPE_BOOL1X4:
 
     case CRTL_DATA_TYPE_INT4:
     case CRTL_DATA_TYPE_INT4X1:
@@ -196,14 +172,10 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT1X4:
         return 16;
 
-    case CRTL_DATA_TYPE_BOOL2X2:
     case CRTL_DATA_TYPE_INT2X2:
     case CRTL_DATA_TYPE_UINT2X2:
     case CRTL_DATA_TYPE_FLOAT2X2:
         return 16;
-
-    case CRTL_DATA_TYPE_BOOL2X3:
-    case CRTL_DATA_TYPE_BOOL3X2:
 
     case CRTL_DATA_TYPE_INT2X3:
     case CRTL_DATA_TYPE_INT3X2:
@@ -215,9 +187,6 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT3X2:
         return 24;
 
-    case CRTL_DATA_TYPE_BOOL4X2:
-    case CRTL_DATA_TYPE_BOOL2X4:
-
     case CRTL_DATA_TYPE_INT4X2:
     case CRTL_DATA_TYPE_INT2X4:
 
@@ -228,14 +197,10 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT2X4:
         return 32;
 
-    case CRTL_DATA_TYPE_BOOL3X3:
     case CRTL_DATA_TYPE_INT3X3:
     case CRTL_DATA_TYPE_UINT3X3:
     case CRTL_DATA_TYPE_FLOAT3X3:
         return 36;
-
-    case CRTL_DATA_TYPE_BOOL4X3:
-    case CRTL_DATA_TYPE_BOOL3X4:
 
     case CRTL_DATA_TYPE_INT4X3:
     case CRTL_DATA_TYPE_INT3X4:
@@ -247,15 +212,12 @@ CRTL_EXPORT size_t data_type_size(CRTL_DATA_TYPE type)
     case CRTL_DATA_TYPE_FLOAT3X4:
         return 48;
 
-    case CRTL_DATA_TYPE_BOOL4X4:
     case CRTL_DATA_TYPE_INT4X4:
     case CRTL_DATA_TYPE_UINT4X4:
     case CRTL_DATA_TYPE_FLOAT4X4:
         return 64;
 
     case CRTL_DATA_TYPE_DOUBLE:
-    case CRTL_DATA_TYPE_DOUBLE1:
-    case CRTL_DATA_TYPE_DOUBLE1X1:
         return 8;
 
     case CRTL_DATA_TYPE_DOUBLE2:

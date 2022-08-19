@@ -17,12 +17,10 @@ DEFAULT: 'default';
 
 BOOL: 'bool';
 
-BOOL1: 'bool1';
 BOOL2: 'bool2';
 BOOL3: 'bool3';
 BOOL4: 'bool4';
 
-BOOL1X1: 'bool1x1';
 BOOL2X1: 'bool2x1';
 BOOL3X1: 'bool3x1';
 BOOL4X1: 'bool4x1';
@@ -44,12 +42,10 @@ BOOL4X4: 'bool4x4';
 
 INT: 'int';
 
-INT1: 'int1';
 INT2: 'int2';
 INT3: 'int3';
 INT4: 'int4';
 
-INT1X1: 'int1x1';
 INT2X1: 'int2x1';
 INT3X1: 'int3x1';
 INT4X1: 'int4x1';
@@ -71,12 +67,10 @@ INT4X4: 'int4x4';
 
 UINT: 'uint';
 
-UINT1: 'uint1';
 UINT2: 'uint2';
 UINT3: 'uint3';
 UINT4: 'uint4';
 
-UINT1X1: 'uint1x1';
 UINT2X1: 'uint2x1';
 UINT3X1: 'uint3x1';
 UINT4X1: 'uint4x1';
@@ -98,12 +92,10 @@ UINT4X4: 'uint4x4';
 
 FLOAT: 'float';
 
-FLOAT1: 'float1';
 FLOAT2: 'float2';
 FLOAT3: 'float3';
 FLOAT4: 'float4';
 
-FLOAT1X1: 'float1x1';
 FLOAT2X1: 'float2x1';
 FLOAT3X1: 'float3x1';
 FLOAT4X1: 'float4x1';
@@ -125,12 +117,10 @@ FLOAT4X4: 'float4x4';
 
 DOUBLE: 'double';
 
-DOUBLE1: 'double1';
 DOUBLE2: 'double2';
 DOUBLE3: 'double3';
 DOUBLE4: 'double4';
 
-DOUBLE1X1: 'double1x1';
 DOUBLE2X1: 'double2x1';
 DOUBLE3X1: 'double3x1';
 DOUBLE4X1: 'double4x1';

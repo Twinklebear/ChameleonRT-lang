@@ -66,6 +66,7 @@ std::any ParameterMetadataOutputVisitor::visit_decl_entry_point(
         param_json["type"] = p->get_type()->to_string();
         param_json["is_builtin_type"] = p->get_type()->is_builtin();
 
+        // TODO: Later there will only be one parameter struct that can be passed here
         auto binding = parameter_bindings[p];
         // Built in type parameters map to a single register
         // Structs map to multiple registers + a constant buffer

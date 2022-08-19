@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <set>
 #include "node.h"
 
@@ -100,12 +101,12 @@ public:
 class Vector : public Type {
 public:
     std::shared_ptr<Primitive> element_type;
-    size_t dimensionality;
+    uint32_t dimensionality = 0;
 
-    Vector(const std::shared_ptr<Primitive> &element_type, const size_t dimensionality);
+    Vector(const std::shared_ptr<Primitive> &element_type, const uint32_t dimensionality);
 
     Vector(const std::shared_ptr<Primitive> &element_type,
-           const size_t n_elements,
+           const uint32_t n_elements,
            const std::set<Modifier> &modifiers);
 
     const std::string to_string() const override;
@@ -114,16 +115,16 @@ public:
 class Matrix : public Type {
 public:
     std::shared_ptr<Primitive> element_type;
-    size_t dim_0;
-    size_t dim_1;
+    uint32_t dim_0 = 0;
+    uint32_t dim_1 = 0;
 
     Matrix(const std::shared_ptr<Primitive> &element_type,
-           const size_t dim_0,
-           const size_t dim_1);
+           const uint32_t dim_0,
+           const uint32_t dim_1);
 
     Matrix(const std::shared_ptr<Primitive> &element_type,
-           const size_t dim_0,
-           const size_t dim_1,
+           const uint32_t dim_0,
+           const uint32_t dim_1,
            const std::set<Modifier> &modifiers);
 
     const std::string to_string() const override;
@@ -191,15 +192,15 @@ public:
 class Texture : public Template {
 public:
     Access access;
-    size_t dimensionality;
+    uint32_t dimensionality = 0;
 
     Texture(const std::shared_ptr<Type> &texture_type,
             const Access &access,
-            const size_t dimensionality);
+            const uint32_t dimensionality);
 
     Texture(const std::shared_ptr<Type> &texture_type,
             const Access &access,
-            const size_t dimensionality,
+            const uint32_t dimensionality,
             const std::set<Modifier> &modifiers);
 
     const std::string to_string() const override;

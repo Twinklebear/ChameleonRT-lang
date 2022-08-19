@@ -118,7 +118,8 @@ bool Type::is_builtin() const
            base_type != BaseType::ENTRY_POINT;
 }
 
-Primitive::Primitive(const PrimitiveType type_id) : Type(BaseType::PRIMITIVE), type_id(type_id)
+Primitive::Primitive(const PrimitiveType type_id)
+    : Type(BaseType::PRIMITIVE), type_id(type_id)
 {
 }
 
@@ -132,13 +133,14 @@ const std::string Primitive::to_string() const
     return ty::to_string(type_id);
 }
 
-Vector::Vector(const std::shared_ptr<Primitive> &element_type, const size_t dimensionality)
+Vector::Vector(const std::shared_ptr<Primitive> &element_type,
+               const uint32_t dimensionality)
     : Type(BaseType::VECTOR), element_type(element_type), dimensionality(dimensionality)
 {
 }
 
 Vector::Vector(const std::shared_ptr<Primitive> &element_type,
-               const size_t dimensionality,
+               const uint32_t dimensionality,
                const std::set<Modifier> &modifiers)
     : Type(BaseType::VECTOR, modifiers),
       element_type(element_type),
@@ -152,23 +154,27 @@ const std::string Vector::to_string() const
 }
 
 Matrix::Matrix(const std::shared_ptr<Primitive> &element_type,
-               const size_t dim_0,
-               const size_t dim_1)
+               const uint32_t dim_0,
+               const uint32_t dim_1)
     : Type(BaseType::MATRIX), element_type(element_type), dim_0(dim_0), dim_1(dim_1)
 {
 }
 
 Matrix::Matrix(const std::shared_ptr<Primitive> &element_type,
-               const size_t dim_0,
-               const size_t dim_1,
+               const uint32_t dim_0,
+               const uint32_t dim_1,
                const std::set<Modifier> &modifiers)
-    : Type(BaseType::MATRIX, modifiers), element_type(element_type), dim_0(dim_0), dim_1(dim_1)
+    : Type(BaseType::MATRIX, modifiers),
+      element_type(element_type),
+      dim_0(dim_0),
+      dim_1(dim_1)
 {
 }
 
 const std::string Matrix::to_string() const
 {
-    return element_type->to_string() + std::to_string(dim_0) + "X" + std::to_string(dim_1);
+    return element_type->to_string() + std::to_string(dim_0) + "X" +
+           std::to_string(dim_1);
 }
 
 Struct::Struct(const std::string &name) : Type(BaseType::STRUCT), name(name) {}
@@ -271,7 +277,7 @@ const std::string Buffer::to_string() const
 
 Texture::Texture(const std::shared_ptr<Type> &element_type,
                  const Access &access,
-                 const size_t dimensionality)
+                 const uint32_t dimensionality)
     : access(access), dimensionality(dimensionality)
 
 {
@@ -281,7 +287,7 @@ Texture::Texture(const std::shared_ptr<Type> &element_type,
 
 Texture::Texture(const std::shared_ptr<Type> &element_type,
                  const Access &access,
-                 const size_t dimensionality,
+                 const uint32_t dimensionality,
                  const std::set<Modifier> &mods)
     : access(access), dimensionality(dimensionality)
 

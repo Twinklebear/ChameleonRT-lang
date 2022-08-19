@@ -15,8 +15,8 @@ std::any ASTBuilderVisitor::visitTopLevelDeclaration(
     std::shared_ptr<Node> n;
     auto child = visitChildren(ctx);
     if (child.has_value()) {
-        // A bit of a pain, but there's a limited number of types of top-level declarations
-        // we can have so do this cast up to the generic Node type here
+        // A bit of a pain, but there's a limited number of types of top-level
+        // declarations we can have so do this cast up to the generic Node type here
         if (child.type() == typeid(std::shared_ptr<decl::EntryPoint>)) {
             n = std::any_cast<std::shared_ptr<decl::EntryPoint>>(child);
         } else if (child.type() == typeid(std::shared_ptr<decl::Function>)) {
@@ -34,8 +34,9 @@ std::any ASTBuilderVisitor::visitTopLevelDeclaration(
         ast->top_level_decls.push_back(n);
     } else {
         // report_error(ctx->getStart(), "Unhandled/unrecognized top level declaration!");
-        report_warning(ctx->getStart(),
-                       "Unhandled/unrecognized top level declaration! TODO make error later");
+        report_warning(
+            ctx->getStart(),
+            "Unhandled/unrecognized top level declaration! TODO make error later");
     }
     return std::any();
 }
@@ -48,10 +49,11 @@ std::any ASTBuilderVisitor::visitFunctionDecl(
 
     std::vector<std::shared_ptr<decl::Variable>> params;
     if (ctx->parameterList()) {
-        // TODO: Now that ANTLR4 is using std::any this could change to not return the shared
-        // ptr wrapper anymore
-        params = *std::any_cast<std::shared_ptr<std::vector<std::shared_ptr<decl::Variable>>>>(
-            visitParameterList(ctx->parameterList()));
+        // TODO: Now that ANTLR4 is using std::any this could change to not return the
+        // shared ptr wrapper anymore
+        params =
+            *std::any_cast<std::shared_ptr<std::vector<std::shared_ptr<decl::Variable>>>>(
+                visitParameterList(ctx->parameterList()));
     }
 
     auto block = std::any_cast<std::shared_ptr<stmt::Block>>(visit(ctx->block()));
@@ -77,7 +79,8 @@ std::any ASTBuilderVisitor::visitFunctionDecl(
                          "Invalid entry point type " + entry_pt_type_ctx->getText());
             return std::any();
         }
-        return std::make_shared<decl::EntryPoint>(name, token, params, entry_pt_type, block);
+        return std::make_shared<decl::EntryPoint>(
+            name, token, params, entry_pt_type, block);
     }
 
     // Regular functions have a return type
@@ -86,7 +89,8 @@ std::any ASTBuilderVisitor::visitFunctionDecl(
     return std::make_shared<decl::Function>(name, token, params, block, return_type);
 }
 
-std::any ASTBuilderVisitor::visitStructDecl(crtg::ChameleonRTParser::StructDeclContext *ctx)
+std::any ASTBuilderVisitor::visitStructDecl(
+    crtg::ChameleonRTParser::StructDeclContext *ctx)
 {
     const std::string name = ctx->IDENTIFIER()->getText();
 
@@ -106,7 +110,8 @@ std::any ASTBuilderVisitor::visitStructMember(
     const std::string name = ctx->IDENTIFIER()->getText();
     auto type = std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(ctx->typeName()));
 
-    return std::make_shared<decl::StructMember>(name, ctx->IDENTIFIER()->getSymbol(), type);
+    return std::make_shared<decl::StructMember>(
+        name, ctx->IDENTIFIER()->getSymbol(), type);
 }
 
 std::any ASTBuilderVisitor::visitParameterList(
@@ -139,7 +144,8 @@ std::any ASTBuilderVisitor::visitBlock(crtg::ChameleonRTParser::BlockContext *ct
     for (auto &s : ctx_stmts) {
         auto res = visit(s);
         if (!res.has_value()) {
-            report_warning(s->getStart(), "TODO WILL: Unimplemented statement -> AST mapping");
+            report_warning(s->getStart(),
+                           "TODO WILL: Unimplemented statement -> AST mapping");
         } else {
             if (res.type() == typeid(std::shared_ptr<stmt::VariableDeclaration>)) {
                 // varDeclStmt can be in top level and blocks, so it returns itself as its
@@ -149,17 +155,19 @@ std::any ASTBuilderVisitor::visitBlock(crtg::ChameleonRTParser::BlockContext *ct
                 statements.push_back(
                     std::dynamic_pointer_cast<stmt::Statement>(var_decl_stmt));
             } else if (res.type() == typeid(std::shared_ptr<stmt::Block>)) {
-                // Similar case for block, where it returns as a block instead of a statement
-                // to make some other code a bit easier
+                // Similar case for block, where it returns as a block instead of a
+                // statement to make some other code a bit easier
                 auto block_stmt = std::any_cast<std::shared_ptr<stmt::Block>>(res);
-                statements.push_back(std::dynamic_pointer_cast<stmt::Statement>(block_stmt));
+                statements.push_back(
+                    std::dynamic_pointer_cast<stmt::Statement>(block_stmt));
             } else {
                 if (res.type() != typeid(std::shared_ptr<stmt::Statement>)) {
-                    report_error(
-                        s->getStart(),
-                        "Expecting statement for block statements but got non-statement!");
+                    report_error(s->getStart(),
+                                 "Expecting statement for block statements but got "
+                                 "non-statement!");
                 }
-                statements.push_back(std::any_cast<std::shared_ptr<stmt::Statement>>(res));
+                statements.push_back(
+                    std::any_cast<std::shared_ptr<stmt::Statement>>(res));
             }
         }
     }
@@ -179,7 +187,8 @@ std::any ASTBuilderVisitor::visitVarDecl(crtg::ChameleonRTParser::VarDeclContext
         // Temporarily filter out unimplemented parts of the AST visitor
         auto init_res_tmp = visit(ctx->expr());
         if (!init_res_tmp.has_value()) {
-            report_warning(ctx->expr()->getStart(), "TODO WILL: Parse initializer expression");
+            report_warning(ctx->expr()->getStart(),
+                           "TODO WILL: Parse initializer expression");
         } else {
             initializer = std::any_cast<std::shared_ptr<expr::Expression>>(init_res_tmp);
         }
@@ -187,9 +196,11 @@ std::any ASTBuilderVisitor::visitVarDecl(crtg::ChameleonRTParser::VarDeclContext
     return std::make_shared<decl::Variable>(name, token, type, initializer);
 }
 
-std::any ASTBuilderVisitor::visitVarDeclStmt(crtg::ChameleonRTParser::VarDeclStmtContext *ctx)
+std::any ASTBuilderVisitor::visitVarDeclStmt(
+    crtg::ChameleonRTParser::VarDeclStmtContext *ctx)
 {
-    auto decl = std::any_cast<std::shared_ptr<decl::Variable>>(visitVarDecl(ctx->varDecl()));
+    auto decl =
+        std::any_cast<std::shared_ptr<decl::Variable>>(visitVarDecl(ctx->varDecl()));
     return std::make_shared<stmt::VariableDeclaration>(ctx->getStart(), decl);
 }
 
@@ -215,8 +226,8 @@ std::any ASTBuilderVisitor::visitIfStmt(crtg::ChameleonRTParser::IfStmtContext *
     if (branches.size() == 2) {
         else_branch = std::any_cast<std::shared_ptr<stmt::Statement>>(visit(branches[1]));
     }
-    return std::dynamic_pointer_cast<stmt::Statement>(
-        std::make_shared<stmt::IfElse>(ctx->getStart(), condition, if_branch, else_branch));
+    return std::dynamic_pointer_cast<stmt::Statement>(std::make_shared<stmt::IfElse>(
+        ctx->getStart(), condition, if_branch, else_branch));
 }
 
 std::any ASTBuilderVisitor::visitWhileStmt(crtg::ChameleonRTParser::WhileStmtContext *ctx)
@@ -229,7 +240,8 @@ std::any ASTBuilderVisitor::visitForStmt(crtg::ChameleonRTParser::ForStmtContext
     return std::any();
 }
 
-std::any ASTBuilderVisitor::visitReturnStmt(crtg::ChameleonRTParser::ReturnStmtContext *ctx)
+std::any ASTBuilderVisitor::visitReturnStmt(
+    crtg::ChameleonRTParser::ReturnStmtContext *ctx)
 {
     return std::any();
 }
@@ -269,15 +281,15 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
             report_error(ctx->templateParameters()->getStart(),
                          "Error TODO: template structs");
         }
-        // TODO: Here it would be good to re-use type's we've already allocated so that it's
-        // easier to see two structs have the same type.
+        // TODO: Here it would be good to re-use type's we've already allocated so that
+        // it's easier to see two structs have the same type.
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Struct>(ctx->IDENTIFIER()->getText()));
     }
 
     if (ctx->TEXTURE()) {
         const std::string dimensionality_str = ctx->TEXTURE()->getText().substr(7, 1);
-        const size_t dimensionality = std::stoi(dimensionality_str);
+        const uint32_t dimensionality = std::stoi(dimensionality_str);
 
         if (template_parameters[0]->base_type != ty::BaseType::PRIMITIVE &&
             template_parameters[0]->base_type != ty::BaseType::VECTOR) {
@@ -293,7 +305,7 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
 
     if (ctx->RWTEXTURE()) {
         const std::string dimensionality_str = ctx->RWTEXTURE()->getText().substr(9, 1);
-        const size_t dimensionality = std::stoi(dimensionality_str);
+        const uint32_t dimensionality = std::stoi(dimensionality_str);
 
         if (template_parameters[0]->base_type != ty::BaseType::PRIMITIVE &&
             template_parameters[0]->base_type != ty::BaseType::VECTOR) {
@@ -338,14 +350,14 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
         if (ctx->BOOL()) {
             return std::dynamic_pointer_cast<ty::Type>(primitive_type);
         }
-
-        const size_t dimension_0 = std::stoi(type_str.substr(4, 1));
-        if (ctx->BOOL1() || ctx->BOOL2() || ctx->BOOL3() || ctx->BOOL4()) {
+        // TODO: Should just use ASCII math here..
+        const uint32_t dimension_0 = std::stoi(type_str.substr(4, 1));
+        if (ctx->BOOL2() || ctx->BOOL3() || ctx->BOOL4()) {
             return std::dynamic_pointer_cast<ty::Type>(
                 std::make_shared<ty::Vector>(primitive_type, dimension_0));
         }
 
-        const size_t dimension_1 = std::stoi(type_str.substr(6, 1));
+        const uint32_t dimension_1 = std::stoi(type_str.substr(6, 1));
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Matrix>(primitive_type, dimension_0, dimension_1));
     }
@@ -356,13 +368,13 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
             return std::dynamic_pointer_cast<ty::Type>(primitive_type);
         }
 
-        const size_t dimension_0 = std::stoi(type_str.substr(3, 1));
-        if (ctx->INT1() || ctx->INT2() || ctx->INT3() || ctx->INT4()) {
+        const uint32_t dimension_0 = std::stoi(type_str.substr(3, 1));
+        if (ctx->INT2() || ctx->INT3() || ctx->INT4()) {
             return std::dynamic_pointer_cast<ty::Type>(
                 std::make_shared<ty::Vector>(primitive_type, dimension_0));
         }
 
-        const size_t dimension_1 = std::stoi(type_str.substr(5, 1));
+        const uint32_t dimension_1 = std::stoi(type_str.substr(5, 1));
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Matrix>(primitive_type, dimension_0, dimension_1));
     }
@@ -373,13 +385,13 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
             return std::dynamic_pointer_cast<ty::Type>(primitive_type);
         }
 
-        const size_t dimension_0 = std::stoi(type_str.substr(4, 1));
-        if (ctx->UINT1() || ctx->UINT2() || ctx->UINT3() || ctx->UINT4()) {
+        const uint32_t dimension_0 = std::stoi(type_str.substr(4, 1));
+        if (ctx->UINT2() || ctx->UINT3() || ctx->UINT4()) {
             return std::dynamic_pointer_cast<ty::Type>(
                 std::make_shared<ty::Vector>(primitive_type, dimension_0));
         }
 
-        const size_t dimension_1 = std::stoi(type_str.substr(6, 1));
+        const uint32_t dimension_1 = std::stoi(type_str.substr(6, 1));
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Matrix>(primitive_type, dimension_0, dimension_1));
     }
@@ -390,13 +402,13 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
             return std::dynamic_pointer_cast<ty::Type>(primitive_type);
         }
 
-        const size_t dimension_0 = std::stoi(type_str.substr(5, 1));
-        if (ctx->FLOAT1() || ctx->FLOAT2() || ctx->FLOAT3() || ctx->FLOAT4()) {
+        const uint32_t dimension_0 = std::stoi(type_str.substr(5, 1));
+        if (ctx->FLOAT2() || ctx->FLOAT3() || ctx->FLOAT4()) {
             return std::dynamic_pointer_cast<ty::Type>(
                 std::make_shared<ty::Vector>(primitive_type, dimension_0));
         }
 
-        const size_t dimension_1 = std::stoi(type_str.substr(7, 1));
+        const uint32_t dimension_1 = std::stoi(type_str.substr(7, 1));
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Matrix>(primitive_type, dimension_0, dimension_1));
     }
@@ -407,13 +419,13 @@ std::any ASTBuilderVisitor::visitTypeName(crtg::ChameleonRTParser::TypeNameConte
             return std::dynamic_pointer_cast<ty::Type>(primitive_type);
         }
 
-        const size_t dimension_0 = std::stoi(type_str.substr(6, 1));
-        if (ctx->DOUBLE1() || ctx->DOUBLE2() || ctx->DOUBLE3() || ctx->DOUBLE4()) {
+        const uint32_t dimension_0 = std::stoi(type_str.substr(6, 1));
+        if (ctx->DOUBLE2() || ctx->DOUBLE3() || ctx->DOUBLE4()) {
             return std::dynamic_pointer_cast<ty::Type>(
                 std::make_shared<ty::Vector>(primitive_type, dimension_0));
         }
 
-        const size_t dimension_1 = std::stoi(type_str.substr(8, 1));
+        const uint32_t dimension_1 = std::stoi(type_str.substr(8, 1));
         return std::dynamic_pointer_cast<ty::Type>(
             std::make_shared<ty::Matrix>(primitive_type, dimension_0, dimension_1));
     }
@@ -428,7 +440,8 @@ std::any ASTBuilderVisitor::visitTemplateParameters(
     auto template_params = std::make_shared<std::vector<std::shared_ptr<ty::Type>>>();
     auto type_list = ctx->typeName();
     for (auto &t : type_list) {
-        template_params->push_back(std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(t)));
+        template_params->push_back(
+            std::any_cast<std::shared_ptr<ty::Type>>(visitTypeName(t)));
     }
     return template_params;
 }
@@ -453,12 +466,14 @@ std::set<ty::Modifier> ASTBuilderVisitor::parse_modifiers(
         report_error(token, "Redundant modifiers found in modifier list");
     }
     if (modifiers.contains(ty::Modifier::CONST) &&
-        (modifiers.contains(ty::Modifier::OUT) || modifiers.contains(ty::Modifier::IN_OUT))) {
+        (modifiers.contains(ty::Modifier::OUT) ||
+         modifiers.contains(ty::Modifier::IN_OUT))) {
         report_error(token, "Invalid modifier set: const found with out or inout");
     }
     if (modifiers.contains(ty::Modifier::IN_OUT) &&
         (modifiers.contains(ty::Modifier::IN) || modifiers.contains(ty::Modifier::OUT))) {
-        report_error(token, "Invalid modifier set: redundant use of in or out with inout");
+        report_error(token,
+                     "Invalid modifier set: redundant use of in or out with inout");
     }
 
     return modifiers;
@@ -472,7 +487,8 @@ std::any ASTBuilderVisitor::visitCall(crtg::ChameleonRTParser::CallContext *ctx)
 {
     return visit_expr(ctx);
 }
-std::any ASTBuilderVisitor::visitStructArray(crtg::ChameleonRTParser::StructArrayContext *ctx)
+std::any ASTBuilderVisitor::visitStructArray(
+    crtg::ChameleonRTParser::StructArrayContext *ctx)
 {
     return visit_expr(ctx);
 }
@@ -488,7 +504,8 @@ std::any ASTBuilderVisitor::visitAddSub(crtg::ChameleonRTParser::AddSubContext *
 {
     return visit_expr(ctx);
 }
-std::any ASTBuilderVisitor::visitComparison(crtg::ChameleonRTParser::ComparisonContext *ctx)
+std::any ASTBuilderVisitor::visitComparison(
+    crtg::ChameleonRTParser::ComparisonContext *ctx)
 {
     return visit_expr(ctx);
 }

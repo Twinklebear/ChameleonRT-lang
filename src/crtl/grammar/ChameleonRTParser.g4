@@ -107,11 +107,9 @@ typeName: IDENTIFIER templateParameters?
         | ACCELERATION_STRUCTURE
         | RAY
         | BOOL
-        | BOOL1
         | BOOL2
         | BOOL3
         | BOOL4
-        | BOOL1X1
         | BOOL2X1
         | BOOL3X1
         | BOOL4X1
@@ -128,11 +126,9 @@ typeName: IDENTIFIER templateParameters?
         | BOOL3X4
         | BOOL4X4
         | INT
-        | INT1
         | INT2
         | INT3
         | INT4
-        | INT1X1
         | INT2X1
         | INT3X1
         | INT4X1
@@ -149,11 +145,9 @@ typeName: IDENTIFIER templateParameters?
         | INT3X4
         | INT4X4
         | UINT
-        | UINT1
         | UINT2
         | UINT3
         | UINT4
-        | UINT1X1
         | UINT2X1
         | UINT3X1
         | UINT4X1
@@ -170,11 +164,9 @@ typeName: IDENTIFIER templateParameters?
         | UINT3X4
         | UINT4X4
         | FLOAT
-        | FLOAT1
         | FLOAT2
         | FLOAT3
         | FLOAT4
-        | FLOAT1X1
         | FLOAT2X1
         | FLOAT3X1
         | FLOAT4X1
@@ -191,11 +183,9 @@ typeName: IDENTIFIER templateParameters?
         | FLOAT3X4
         | FLOAT4X4
         | DOUBLE
-        | DOUBLE1
         | DOUBLE2
         | DOUBLE3
         | DOUBLE4
-        | DOUBLE1X1
         | DOUBLE2X1
         | DOUBLE3X1
         | DOUBLE4X1
