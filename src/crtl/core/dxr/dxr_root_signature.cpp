@@ -35,13 +35,18 @@ std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
         // TODO: must compute number of values in the constants buffer
 
         // TODO: just testing here but this type info should be computed in the shader
-        // entry point to build its param desc
+        // entry point to build its param desc in some non-JSON faster representation
+        // Note: it's enforced at the language level that only primitives, vectors and
+        // matrices can be in the constants list here
+        uint32_t numConstants = 0;
         for (auto &c : constants_arr) {
             auto ty = ty::parse_type(c["type"]);
+            numConstants += ty->size() / 4;
         }
-
-        uint32_t numConstants = 0;
-
+        std::cout << "sbt constants:\n  - slot: " << inline_constants["slot"].get<int>()
+                  << "\n"
+                  << "  - # of constants = " << numConstants << "\n"
+                  << "  - space: " << inline_constants["space"].get<int>() << "\n";
         builder.add_constants("sbt_constants",
                               inline_constants["slot"].get<int>(),
                               numConstants,
