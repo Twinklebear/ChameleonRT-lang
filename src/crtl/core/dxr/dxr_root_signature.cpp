@@ -32,8 +32,6 @@ std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
     if (!inline_constants.is_null()) {
         auto &constants_arr = inline_constants["contents"];
 
-        // TODO: must compute number of values in the constants buffer
-
         // TODO: just testing here but this type info should be computed in the shader
         // entry point to build its param desc in some non-JSON faster representation
         // Note: it's enforced at the language level that only primitives, vectors and
@@ -57,7 +55,28 @@ std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
     for (auto &m : members.items()) {
         std::cout << "member: " << m << "\n";
         auto ty = ty::parse_type(m.value()["type"]);
-        if (m.value()["type"] == "BUFFER<FLOAT4>") {
+        // TODO: Maybe better to split the UAV/SRV/etc up to different structs higher
+        // up when building the shader entry point parameter descriptor info?
+        // Or have the DX12 backend set this info up? Would clean this up a bit
+        if (ty->base_type == ty::BaseType::BUFFER_VIEW) {
+            auto buf_view = std::dynamic_pointer_cast<ty::BufferView>(ty);
+            if (buf_view->access == ty::Access::READ_ONLY) {
+                builder.add_srv(
+                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
+            } else {
+                builder.add_uav(
+                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
+            }
+        } else if (ty->base_type == ty::BaseType::TEXTURE) {
+            auto texture = std::dynamic_pointer_cast<ty::Texture>(ty);
+            if (texture->access == ty::Access::READ_ONLY) {
+                builder.add_srv(
+                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
+            } else if (texture->access == ty::Access::READ_WRITE) {
+                builder.add_uav(
+                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
+            }
+        } else if (ty->base_type == ty::BaseType::ACCELERATION_STRUCTURE) {
             builder.add_srv(
                 m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
         }
