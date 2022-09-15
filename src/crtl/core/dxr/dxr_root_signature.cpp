@@ -1,7 +1,6 @@
 #include "dxr_root_signature.h"
 #include <algorithm>
 #include <numeric>
-#include "type.h"
 #include "util.h"
 
 namespace crtl {
@@ -21,68 +20,6 @@ RootSignatureBuilder RootSignatureBuilder::local()
     RootSignatureBuilder sig;
     sig.flags = D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE;
     return sig;
-}
-
-std::shared_ptr<RootSignature> RootSignatureBuilder::build_local_from_desc(
-    nlohmann::json &param_desc, ID3D12Device *device)
-{
-    auto builder = local();
-
-    auto &inline_constants = param_desc["constant_buffer"];
-    if (!inline_constants.is_null()) {
-        auto &constants_arr = inline_constants["contents"];
-
-        // TODO: just testing here but this type info should be computed in the shader
-        // entry point to build its param desc in some non-JSON faster representation
-        // Note: it's enforced at the language level that only primitives, vectors and
-        // matrices can be in the constants list here
-        uint32_t numConstants = 0;
-        for (auto &c : constants_arr) {
-            auto ty = ty::parse_type(c["type"]);
-            numConstants += ty->size() / 4;
-        }
-        std::cout << "sbt constants:\n  - slot: " << inline_constants["slot"].get<int>()
-                  << "\n"
-                  << "  - # of constants = " << numConstants << "\n"
-                  << "  - space: " << inline_constants["space"].get<int>() << "\n";
-        builder.add_constants("sbt_constants",
-                              inline_constants["slot"].get<int>(),
-                              numConstants,
-                              inline_constants["space"].get<int>());
-    }
-
-    auto &members = param_desc["members"];
-    for (auto &m : members.items()) {
-        std::cout << "member: " << m << "\n";
-        auto ty = ty::parse_type(m.value()["type"]);
-        // TODO: Maybe better to split the UAV/SRV/etc up to different structs higher
-        // up when building the shader entry point parameter descriptor info?
-        // Or have the DX12 backend set this info up? Would clean this up a bit
-        if (ty->base_type == ty::BaseType::BUFFER_VIEW) {
-            auto buf_view = std::dynamic_pointer_cast<ty::BufferView>(ty);
-            if (buf_view->access == ty::Access::READ_ONLY) {
-                builder.add_srv(
-                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-            } else {
-                builder.add_uav(
-                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-            }
-        } else if (ty->base_type == ty::BaseType::TEXTURE) {
-            auto texture = std::dynamic_pointer_cast<ty::Texture>(ty);
-            if (texture->access == ty::Access::READ_ONLY) {
-                builder.add_srv(
-                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-            } else if (texture->access == ty::Access::READ_WRITE) {
-                builder.add_uav(
-                    m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-            }
-        } else if (ty->base_type == ty::BaseType::ACCELERATION_STRUCTURE) {
-            builder.add_srv(
-                m.key(), m.value()["slot"].get<int>(), m.value()["space"].get<int>());
-        }
-    }
-
-    return builder.build(device);
 }
 
 void RootSignatureBuilder::add_descriptor(D3D12_ROOT_PARAMETER_TYPE desc_type,

@@ -27,12 +27,8 @@ class CRTL_DXR_EXPORT RootSignatureBuilder {
 
 public:
     static RootSignatureBuilder global();
-    static RootSignatureBuilder local();
 
-    // Build a local root signature from the passed parameter descriptor set
-    // TODO: will not work on json in the future
-    static std::shared_ptr<RootSignature> build_local_from_desc(
-        nlohmann::json &param_desc, ID3D12Device *device);
+    static RootSignatureBuilder local();
 
     RootSignatureBuilder &add_constants(const std::string &name,
                                         uint32_t shader_register,
@@ -42,14 +38,17 @@ public:
     RootSignatureBuilder &add_srv(const std::string &name,
                                   uint32_t shader_register,
                                   uint32_t space);
+
     RootSignatureBuilder &add_uav(const std::string &name,
                                   uint32_t shader_register,
                                   uint32_t space);
+
     RootSignatureBuilder &add_cbv(const std::string &name,
                                   uint32_t shader_register,
                                   uint32_t space);
+
     // TODO: this is actually writing a descriptor table into the root signature that
-    // views the entire heap need to add other APIs for writing just the descriptor table
+    // views the entire heap. Need to add other APIs for writing just the descriptor table
     // views
     // RootSignatureBuilder &add_desc_heap(const std::string &name,
     //                                  const DescriptorHeap &heap);

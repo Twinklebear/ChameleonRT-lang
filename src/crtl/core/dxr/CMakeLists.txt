@@ -44,6 +44,7 @@ add_library(crtl_dxr SHARED
     dxr_shader_library.cpp
     dxr_shader_entry_point.cpp
     dxr_shader_record.cpp
+    dxr_shader_parameter_desc.cpp
     #dxr_rtpipeline.cpp
 
     # TODO: cross platform windowing interaction is a different 

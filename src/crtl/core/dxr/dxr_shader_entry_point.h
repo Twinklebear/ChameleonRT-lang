@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 
 #include <string>
 #include <vector>
@@ -7,8 +8,10 @@
 #include "dxr_device.h"
 #include "dxr_root_signature.h"
 #include "dxr_shader_library.h"
+#include "dxr_shader_parameter_desc.h"
 #include "dxr_utils.h"
 #include "hlsl/crtl_to_hlsl.h"
+#include "parallel_hashmap/phmap.h"
 
 #include <dxcapi.h>
 
@@ -36,6 +39,8 @@ class CRTL_DXR_EXPORT ShaderEntryPoint : public APIObject {
     nlohmann::json entry_point_info = nullptr;
     EntryPointType entry_point_type = EntryPointType::INVALID;
 
+    phmap::flat_hash_map<std::string, ShaderParameterDesc> parameter_info;
+
     // TODO: this would be lifted into the entry point metadata when I move off JSON for
     // storing it
     std::string entry_point_name;
@@ -51,8 +56,9 @@ public:
 
     const std::string &name() const;
 
-    // TODO: move away from JSON for this info
-    nlohmann::json sbt_parameter_info() const;
+private:
+    // Builds the root signature and the parameter info
+    void build_root_signature(DXRDevice *device);
 };
 }
 }

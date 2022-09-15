@@ -56,6 +56,8 @@ class CRTL_DXR_EXPORT DescriptorHeap : public RootParam {
 public:
     DescriptorHeap() = default;
 
+    // TODO: Root param should be separated from the descriptor heap, since here the root
+    // param returned is just a view of the whole table
     D3D12_ROOT_PARAMETER root_param() const;
     D3D12_GPU_DESCRIPTOR_HANDLE gpu_desc_handle();
     D3D12_CPU_DESCRIPTOR_HANDLE cpu_desc_handle();
