@@ -9,7 +9,6 @@ namespace dxr {
 
 class CRTL_DXR_EXPORT ParameterBlock : public crtl::APIObject {
 public:
-    // TODO
     virtual ~ParameterBlock() = default;
 };
 }
