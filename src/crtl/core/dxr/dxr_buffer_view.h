@@ -28,6 +28,8 @@ public:
     void unmap();
 
     size_t size_bytes();
+
+    D3D12_GPU_VIRTUAL_ADDRESS gpu_virtual_address();
 };
 }
 }

@@ -24,6 +24,8 @@ public:
 
     size_t size() const;
 
+    D3D12_GPU_VIRTUAL_ADDRESS gpu_virtual_address();
+
 private:
     D3D12_RESOURCE_DESC res_desc();
 };

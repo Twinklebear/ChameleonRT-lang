@@ -61,6 +61,11 @@ size_t Buffer::size() const
     return size_bytes;
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS Buffer::gpu_virtual_address()
+{
+    return get()->GetGPUVirtualAddress();
+}
+
 D3D12_RESOURCE_DESC Buffer::res_desc()
 {
     D3D12_RESOURCE_DESC desc = {};

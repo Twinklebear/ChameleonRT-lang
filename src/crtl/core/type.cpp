@@ -106,6 +106,7 @@ std::shared_ptr<Type> parse_type(const std::string &type_str)
             return std::make_shared<Primitive>(PrimitiveType::DOUBLE);
         }
     }
+    return nullptr;
 }
 
 Primitive::Primitive(const PrimitiveType primitive_type)
@@ -196,6 +197,7 @@ CRTL_DATA_TYPE Vector::data_type() const
             return CRTL_DATA_TYPE_UNKNOWN;
         }
     }
+    return CRTL_DATA_TYPE_UNKNOWN;
 }
 
 size_t Vector::size() const

@@ -66,5 +66,10 @@ size_t BufferView::size_bytes()
 {
     return size * crtl::data_type_size(data_type);
 }
+
+D3D12_GPU_VIRTUAL_ADDRESS BufferView::gpu_virtual_address()
+{
+    return buffer->gpu_virtual_address() + offset_bytes;
+}
 }
 }
