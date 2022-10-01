@@ -142,6 +142,10 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     CRTLRaygenRecord raygen_record;
     CHECK_CRTL_ERR(crtl_new_raygen_record(device, raygen_entry_point, &raygen_record));
 
+    CRTLShaderRecordParameterBlock raygen_params;
+    CHECK_CRTL_ERR(
+        crtl_new_shader_record_parameter_block(device, raygen_record, &raygen_params));
+
 #if 0
     crtr::dxr::ShaderLibrary shader_library(
         small_dxil, sizeof(small_dxil), {raygen_name});

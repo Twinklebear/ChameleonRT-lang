@@ -28,10 +28,8 @@ ShaderEntryPoint::ShaderEntryPoint(DXRDevice *device,
         std::cout << "TODO support for entry point type: " << ty << "\n";
         throw Error("TODO support for entry point type " + ty, CRTL_ERROR_UNKNOWN);
     }
-
-    // TODO: Decide on and build here (or in shader library step) some non-json faster
-    // representation of parameter info and other entry point info
-
+    // TODO: This would need to be done later for hit group records within the hit group
+    // shader record.
     build_root_signature(device);
 }
 
@@ -43,6 +41,17 @@ EntryPointType ShaderEntryPoint::type() const
 const std::string &ShaderEntryPoint::name() const
 {
     return entry_point_name;
+}
+
+const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+    &ShaderEntryPoint::get_parameter_info() const
+{
+    return parameter_info;
+}
+
+const RootSignature *ShaderEntryPoint::get_root_signature() const
+{
+    return root_signature.get();
 }
 
 void ShaderEntryPoint::build_root_signature(DXRDevice *device)
@@ -124,6 +133,7 @@ void ShaderEntryPoint::build_root_signature(DXRDevice *device)
     }
 
     root_signature = builder.build(device->get_d3d12_device().Get());
+    std::cout << "param block size: " << root_signature->total_size() << "\n";
 }
 
 }

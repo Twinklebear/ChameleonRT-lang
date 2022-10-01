@@ -172,6 +172,8 @@ size_t RootSignature::size(const std::string &name) const
 
 size_t RootSignature::total_size() const
 {
+    // TODO: Should cache if computing multiple times.
+    std::cout << "# of param offsets: " << param_offsets.size() << "\n";
     return std::accumulate(
         param_offsets.begin(),
         param_offsets.end(),

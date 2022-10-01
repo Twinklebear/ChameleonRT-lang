@@ -56,6 +56,11 @@ public:
 
     const std::string &name() const;
 
+    const phmap::flat_hash_map<std::string, ShaderParameterDesc> &get_parameter_info()
+        const;
+
+    const RootSignature *get_root_signature() const;
+
 private:
     // Builds the root signature and the parameter info
     void build_root_signature(DXRDevice *device);

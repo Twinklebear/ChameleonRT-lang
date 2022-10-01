@@ -4,6 +4,12 @@
 namespace crtl {
 namespace dxr {
 
+size_t ShaderRecord::get_parameter_block_size() const
+{
+    auto rs = get_root_signature();
+    return rs ? rs->total_size() : 0;
+}
+
 HitGroupRecord::HitGroupRecord(const std::shared_ptr<ShaderEntryPoint> &closest_hit,
                                const std::shared_ptr<ShaderEntryPoint> &intersection,
                                const std::shared_ptr<ShaderEntryPoint> &any_hit)
@@ -45,6 +51,18 @@ HitGroupRecord::HitGroupRecord(const std::shared_ptr<ShaderEntryPoint> &closest_
     }
 }
 
+const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+    &HitGroupRecord::get_parameter_info() const
+{
+    // TODO
+    return closest_hit->get_parameter_info();
+}
+
+const RootSignature *HitGroupRecord::get_root_signature() const
+{
+    return nullptr;
+}
+
 MissRecord::MissRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point)
     : entry_point(entry_point)
 {
@@ -54,6 +72,17 @@ MissRecord::MissRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point)
     }
     shader_record_name =
         "M" + std::to_string(next_record_id++) + "_" + entry_point->name();
+}
+
+const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+    &MissRecord::get_parameter_info() const
+{
+    return entry_point->get_parameter_info();
+}
+
+const RootSignature *MissRecord::get_root_signature() const
+{
+    return entry_point->get_root_signature();
 }
 
 RaygenRecord::RaygenRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point)
@@ -68,5 +97,15 @@ RaygenRecord::RaygenRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point)
         "RG" + std::to_string(next_record_id++) + "_" + entry_point->name();
 }
 
+const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+    &RaygenRecord::get_parameter_info() const
+{
+    return entry_point->get_parameter_info();
+}
+
+const RootSignature *RaygenRecord::get_root_signature() const
+{
+    return entry_point->get_root_signature();
+}
 }
 }

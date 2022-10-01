@@ -15,7 +15,11 @@ class CRTL_DXR_EXPORT ShaderRecord : public APIObject {
 protected:
     std::string shader_record_name;
 
+    // TODO: Some member here storing "current parameter block"
+
 public:
+    virtual ~ShaderRecord() = default;
+
     // TODO: Some method should be provided here to get the local root signature and root
     // signature association object for a shader record renderables/pipelines etc. this
     // will also provide info to the parameter block.
@@ -27,6 +31,13 @@ public:
     // What it needs is a parameter descriptor, the block takes a list of these in a map
     // by their name so that set param can map to the right location
     // or really, a vector of the param info + a map of name -> index
+
+    virtual const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+        &get_parameter_info() const = 0;
+
+    virtual const RootSignature *get_root_signature() const = 0;
+
+    size_t get_parameter_block_size() const;
 };
 
 // TODO WILL: Hit Group records will be changed in the language/compiler/API to
@@ -42,9 +53,16 @@ class CRTL_DXR_EXPORT HitGroupRecord : public ShaderRecord {
 
 public:
     // Intersection and any hit are optional, can pass nullptr to not have them
+    // TODO: After code syntax for HG changes this will not take a bunch of entry points
+    // but a "hit group definition" or somethign that has the root sig/params/etc.
     HitGroupRecord(const std::shared_ptr<ShaderEntryPoint> &closest_hit,
                    const std::shared_ptr<ShaderEntryPoint> &intersection,
                    const std::shared_ptr<ShaderEntryPoint> &any_hit);
+
+    virtual const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+        &get_parameter_info() const override;
+
+    virtual const RootSignature *get_root_signature() const override;
 };
 
 class CRTL_DXR_EXPORT MissRecord : public ShaderRecord {
@@ -54,6 +72,11 @@ class CRTL_DXR_EXPORT MissRecord : public ShaderRecord {
 
 public:
     MissRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point);
+
+    virtual const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+        &get_parameter_info() const override;
+
+    virtual const RootSignature *get_root_signature() const override;
 };
 
 class CRTL_DXR_EXPORT RaygenRecord : public ShaderRecord {
@@ -63,6 +86,11 @@ class CRTL_DXR_EXPORT RaygenRecord : public ShaderRecord {
 
 public:
     RaygenRecord(const std::shared_ptr<ShaderEntryPoint> &entry_point);
+
+    virtual const phmap::flat_hash_map<std::string, ShaderParameterDesc>
+        &get_parameter_info() const override;
+
+    virtual const RootSignature *get_root_signature() const override;
 };
 }
 }

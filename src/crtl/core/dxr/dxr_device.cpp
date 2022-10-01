@@ -6,6 +6,7 @@
 #include "dxr_shader_entry_point.h"
 #include "dxr_shader_library.h"
 #include "dxr_shader_record.h"
+#include "dxr_shader_record_parameter_block.h"
 #include "dxr_texture.h"
 
 namespace crtl {
@@ -497,7 +498,13 @@ CRTL_ERROR DXRDevice::new_raygen_record(CRTLShaderEntryPoint raygen,
 CRTL_ERROR DXRDevice::new_shader_record_parameter_block(
     CRTLShaderRecord shader_record, CRTLShaderRecordParameterBlock *parameter_block)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto sr = lookup_api_object<ShaderRecord>(
+            reinterpret_cast<crtl::APIObject *>(shader_record));
+        auto pb = make_api_object<ShaderRecordParameterBlock>(sr);
+        *parameter_block = reinterpret_cast<CRTLShaderRecordParameterBlock>(pb.get());
+        return CRTL_ERROR_NONE;
+    });
 }
 
 CRTL_ERROR DXRDevice::set_shader_record_parameter_block(
