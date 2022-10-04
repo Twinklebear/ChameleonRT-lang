@@ -235,7 +235,107 @@ CRTL_ERROR DXRDevice::set_parameter(CRTLParameterBlock parameter_block,
                                     CRTL_DATA_TYPE data_type,
                                     void *parameter)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto pb = lookup_api_object<ParameterBlock>(
+            reinterpret_cast<crtl::APIObject *>(parameter_block));
+        switch (data_type) {
+        case CRTL_DATA_TYPE_INT:
+        case CRTL_DATA_TYPE_INT2:
+        case CRTL_DATA_TYPE_INT3:
+        case CRTL_DATA_TYPE_INT4:
+        case CRTL_DATA_TYPE_INT2X1:
+        case CRTL_DATA_TYPE_INT3X1:
+        case CRTL_DATA_TYPE_INT4X1:
+        case CRTL_DATA_TYPE_INT1X2:
+        case CRTL_DATA_TYPE_INT2X2:
+        case CRTL_DATA_TYPE_INT3X2:
+        case CRTL_DATA_TYPE_INT4X2:
+        case CRTL_DATA_TYPE_INT1X3:
+        case CRTL_DATA_TYPE_INT2X3:
+        case CRTL_DATA_TYPE_INT3X3:
+        case CRTL_DATA_TYPE_INT4X3:
+        case CRTL_DATA_TYPE_INT1X4:
+        case CRTL_DATA_TYPE_INT2X4:
+        case CRTL_DATA_TYPE_INT3X4:
+        case CRTL_DATA_TYPE_INT4X4:
+        case CRTL_DATA_TYPE_UINT:
+        case CRTL_DATA_TYPE_UINT2:
+        case CRTL_DATA_TYPE_UINT3:
+        case CRTL_DATA_TYPE_UINT4:
+        case CRTL_DATA_TYPE_UINT2X1:
+        case CRTL_DATA_TYPE_UINT3X1:
+        case CRTL_DATA_TYPE_UINT4X1:
+        case CRTL_DATA_TYPE_UINT1X2:
+        case CRTL_DATA_TYPE_UINT2X2:
+        case CRTL_DATA_TYPE_UINT3X2:
+        case CRTL_DATA_TYPE_UINT4X2:
+        case CRTL_DATA_TYPE_UINT1X3:
+        case CRTL_DATA_TYPE_UINT2X3:
+        case CRTL_DATA_TYPE_UINT3X3:
+        case CRTL_DATA_TYPE_UINT4X3:
+        case CRTL_DATA_TYPE_UINT1X4:
+        case CRTL_DATA_TYPE_UINT2X4:
+        case CRTL_DATA_TYPE_UINT3X4:
+        case CRTL_DATA_TYPE_UINT4X4:
+        case CRTL_DATA_TYPE_FLOAT:
+        case CRTL_DATA_TYPE_FLOAT2:
+        case CRTL_DATA_TYPE_FLOAT3:
+        case CRTL_DATA_TYPE_FLOAT4:
+        case CRTL_DATA_TYPE_FLOAT2X1:
+        case CRTL_DATA_TYPE_FLOAT3X1:
+        case CRTL_DATA_TYPE_FLOAT4X1:
+        case CRTL_DATA_TYPE_FLOAT1X2:
+        case CRTL_DATA_TYPE_FLOAT2X2:
+        case CRTL_DATA_TYPE_FLOAT3X2:
+        case CRTL_DATA_TYPE_FLOAT4X2:
+        case CRTL_DATA_TYPE_FLOAT1X3:
+        case CRTL_DATA_TYPE_FLOAT2X3:
+        case CRTL_DATA_TYPE_FLOAT3X3:
+        case CRTL_DATA_TYPE_FLOAT4X3:
+        case CRTL_DATA_TYPE_FLOAT1X4:
+        case CRTL_DATA_TYPE_FLOAT2X4:
+        case CRTL_DATA_TYPE_FLOAT3X4:
+        case CRTL_DATA_TYPE_FLOAT4X4:
+        case CRTL_DATA_TYPE_DOUBLE:
+        case CRTL_DATA_TYPE_DOUBLE2:
+        case CRTL_DATA_TYPE_DOUBLE3:
+        case CRTL_DATA_TYPE_DOUBLE4:
+        case CRTL_DATA_TYPE_DOUBLE2X1:
+        case CRTL_DATA_TYPE_DOUBLE3X1:
+        case CRTL_DATA_TYPE_DOUBLE4X1:
+        case CRTL_DATA_TYPE_DOUBLE1X2:
+        case CRTL_DATA_TYPE_DOUBLE2X2:
+        case CRTL_DATA_TYPE_DOUBLE3X2:
+        case CRTL_DATA_TYPE_DOUBLE4X2:
+        case CRTL_DATA_TYPE_DOUBLE1X3:
+        case CRTL_DATA_TYPE_DOUBLE2X3:
+        case CRTL_DATA_TYPE_DOUBLE3X3:
+        case CRTL_DATA_TYPE_DOUBLE4X3:
+        case CRTL_DATA_TYPE_DOUBLE1X4:
+        case CRTL_DATA_TYPE_DOUBLE2X4:
+        case CRTL_DATA_TYPE_DOUBLE3X4:
+        case CRTL_DATA_TYPE_DOUBLE4X4:
+            pb->set_parameter(name, data_type, parameter);
+            break;
+            // TODO: whole untyped/byte buffers as parameters?
+        // case CRTL_DATA_TYPE_BUFFER:
+        // case CRTL_DATA_TYPE_RWBUFFER:
+        case CRTL_DATA_TYPE_BUFFER_VIEW:
+        case CRTL_DATA_TYPE_RWBUFFER_VIEW:
+            pb->set_parameter(name,
+                              data_type,
+                              lookup_api_object<BufferView>(
+                                  *reinterpret_cast<crtl::APIObject **>(parameter)));
+            break;
+        // TODO: texture/acceleration structures
+        // case CRTL_DATA_TYPE_TEXTURE:
+        // case CRTL_DATA_TYPE_RWTEXTURE:
+        // case CRTL_DATA_TYPE_ACCELERATION_STRUCTURE:
+        default:
+            return CRTL_ERROR_INVALID_PARAMETER_TYPE;
+        }
+        return CRTL_ERROR_NONE;
+    });
 }
 
 // Queue APIs ====
@@ -510,7 +610,14 @@ CRTL_ERROR DXRDevice::new_shader_record_parameter_block(
 CRTL_ERROR DXRDevice::set_shader_record_parameter_block(
     CRTLShaderRecord shader_record, CRTLShaderRecordParameterBlock parameter_block)
 {
-    return CRTL_ERROR_NONE;
+    return wrap_try_catch([&]() {
+        auto sr = lookup_api_object<ShaderRecord>(
+            reinterpret_cast<crtl::APIObject *>(shader_record));
+        auto pb = lookup_api_object<ShaderRecordParameterBlock>(
+            reinterpret_cast<crtl::APIObject *>(parameter_block));
+        sr->set_parameter_block(pb);
+        return CRTL_ERROR_NONE;
+    });
 }
 
 // Texture APIs ====

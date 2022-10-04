@@ -131,10 +131,10 @@ RootSignature::RootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags,
                              const std::vector<RootParam> &params)
     : flags(flags), sig(sig)
 {
-    size_t offset = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+    total_size = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
     for (const auto &ip : params) {
         RootParam p = ip;
-        p.offset = offset;
+        p.offset = total_size;
         if (p.param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS) {
             // Constants must pad to a size multiple of 8 to align w/ the pointer
             // entries
@@ -144,7 +144,7 @@ RootSignature::RootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags,
             p.size = sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         }
         param_offsets[p.name] = p;
-        offset += p.size;
+        total_size += p.size;
     }
 }
 
@@ -170,15 +170,9 @@ size_t RootSignature::size(const std::string &name) const
     }
 }
 
-size_t RootSignature::total_size() const
+size_t RootSignature::get_total_size() const
 {
-    // TODO: Should cache if computing multiple times.
-    std::cout << "# of param offsets: " << param_offsets.size() << "\n";
-    return std::accumulate(
-        param_offsets.begin(),
-        param_offsets.end(),
-        size_t(0),
-        [](const size_t &n, const auto &p) { return n + p.second.size; });
+    return total_size;
 }
 
 ID3D12RootSignature *RootSignature::operator->()

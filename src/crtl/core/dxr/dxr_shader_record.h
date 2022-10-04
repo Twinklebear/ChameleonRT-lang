@@ -11,11 +11,13 @@
 namespace crtl {
 namespace dxr {
 
+class ShaderRecordParameterBlock;
+
 class CRTL_DXR_EXPORT ShaderRecord : public APIObject {
 protected:
     std::string shader_record_name;
 
-    // TODO: Some member here storing "current parameter block"
+    std::shared_ptr<ShaderRecordParameterBlock> bound_parameter_block;
 
 public:
     virtual ~ShaderRecord() = default;
@@ -38,6 +40,9 @@ public:
     virtual const RootSignature *get_root_signature() const = 0;
 
     size_t get_parameter_block_size() const;
+
+    void set_parameter_block(
+        const std::shared_ptr<ShaderRecordParameterBlock> &parameter_block);
 };
 
 // TODO WILL: Hit Group records will be changed in the language/compiler/API to

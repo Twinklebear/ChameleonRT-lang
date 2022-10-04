@@ -133,7 +133,6 @@ void ShaderEntryPoint::build_root_signature(DXRDevice *device)
     }
 
     root_signature = builder.build(device->get_d3d12_device().Get());
-    std::cout << "param block size: " << root_signature->total_size() << "\n";
 }
 
 }

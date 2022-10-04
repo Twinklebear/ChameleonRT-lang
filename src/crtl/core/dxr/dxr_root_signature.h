@@ -60,6 +60,8 @@ class CRTL_DXR_EXPORT RootSignature {
     D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> sig;
 
+    size_t total_size = 0;
+
     // The offsets of the parameters into the shader arguments part
     // of the shader record. The offsets returned account for the shader identifier size
     phmap::flat_hash_map<std::string, RootParam> param_offsets;
@@ -75,12 +77,13 @@ public:
 
     RootSignature() = default;
 
-    // Returns size_t max if no such param
+    // Returns size_t max if no such param, offsets include the shader identifier
     size_t offset(const std::string &name) const;
+
     size_t size(const std::string &name) const;
 
-    // Return the total size of the root signature arguments
-    size_t total_size() const;
+    // Return the total size of the shader record, including the shader identifier
+    size_t get_total_size() const;
 
     ID3D12RootSignature *operator->();
     ID3D12RootSignature *get();

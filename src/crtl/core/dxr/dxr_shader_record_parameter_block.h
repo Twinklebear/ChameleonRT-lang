@@ -27,46 +27,21 @@ public:
     // parameter_info;
     ShaderRecordParameterBlock(const std::shared_ptr<ShaderRecord> &shader_record);
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_standard_layout<T>::value, bool> = true>
+    // The generic set_parameter dispatches to the typed ones
     void set_parameter(const std::string &name,
                        CRTL_DATA_TYPE data_type,
-                       const T *parameter);
+                       void *parameter) override;
 
     void set_parameter(const std::string &name,
                        CRTL_DATA_TYPE data_type,
-                       const std::shared_ptr<BufferView> &parameter);
+                       const std::shared_ptr<BufferView> &parameter) override;
     /*
      * TODO: acceleration structures as parameters as well
      */
 
     size_t size() const;
+
+    const ShaderRecord *get_shader_record() const;
 };
-
-template <typename T,
-          typename = std::enable_if_t<std::is_standard_layout<T>::value, bool> = true>
-void ShaderRecordParameterBlock::set_parameter(const std::string &name,
-                                               CRTL_DATA_TYPE data_type,
-                                               const T *parameter)
-{
-    try {
-        // offset will throw if there's no sbt_constants
-        const size_t sbt_constants_offset =
-            entry_point->get_root_signature()->offset("sbt_constants");
-    } catch (const std::runtime_error &e) {
-        throw Error("Parameter " + name + " does not exist in the parameter block.",
-                    CRTL_ERROR_INVALID_PARAMETER_NAME);
-    }
-    const auto &parameter_info = entry_point->get_parameter_info();
-    auto param_info = parameter_info.find(name);
-    if (param_info == parameter_info.end()) {
-        throw Error("Parameter " + name + " does not exist in parameter block.",
-                    CRTL_ERROR_INVALID_PARAMETER_NAME);
-    }
-
-    const size_t param_offset =
-        sbt_constants_offset + param_info->second.constant_offset_bytes;
-    std::memcpy(parameter_block.data() + param_offset, parameter, sizeof(T));
-}
 }
 }

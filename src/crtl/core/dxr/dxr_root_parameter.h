@@ -9,7 +9,7 @@ namespace dxr {
 
 class CRTL_DXR_EXPORT RootParam {
 public:
-    D3D12_ROOT_PARAMETER param = {0};
+    D3D12_ROOT_PARAMETER param = {};
     std::string name;
     size_t offset = 0;
     size_t size = 0;

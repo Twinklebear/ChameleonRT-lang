@@ -146,6 +146,25 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
     CHECK_CRTL_ERR(
         crtl_new_shader_record_parameter_block(device, raygen_record, &raygen_params));
 
+    {
+        glm::vec4 color_param(0.2f, 0.2f, 0.8f, 1.f);
+        CHECK_CRTL_ERR(crtl_set_parameter(
+            device, raygen_params, "color", CRTL_DATA_TYPE_FLOAT4, &color_param));
+
+        float scale_factor_param = 0.5f;
+        CHECK_CRTL_ERR(crtl_set_parameter(device,
+                                          raygen_params,
+                                          "scale_factor",
+                                          CRTL_DATA_TYPE_FLOAT,
+                                          &scale_factor_param));
+    }
+
+    CHECK_CRTL_ERR(crtl_set_parameter(
+        device, raygen_params, "data", CRTL_DATA_TYPE_BUFFER_VIEW, &view));
+
+    CHECK_CRTL_ERR(
+        crtl_set_shader_record_parameter_block(device, raygen_record, raygen_params));
+
 #if 0
     crtr::dxr::ShaderLibrary shader_library(
         small_dxil, sizeof(small_dxil), {raygen_name});
@@ -386,6 +405,14 @@ const char *error_to_string(CRTL_ERROR err)
         return "CRTL_ERROR_NATIVE_SHADER_COMPILATION_FAILED";
     case CRTL_ERROR_ENTRY_POINT_NOT_FOUND:
         return "CRTL_ERROR_ENTRY_POINT_NOT_FOUND";
+    case CRTL_ERROR_INVALID_SHADER_ENTRY_POINT:
+        return "CRTL_ERROR_INVALID_SHADER_ENTRY_POINT";
+    case CRTL_ERROR_INVALID_PARAMETER_NAME:
+        return "CRTL_ERROR_INVALID_PARAMETER_NAME";
+    case CRTL_ERROR_INCOMPATIBLE_SHADER_RECORD_PARAMETER_BLOCK:
+        return "CRTL_ERROR_INCOMPATIBLE_SHADER_RECORD_PARAMETER_BLOCK";
+    case CRTL_ERROR_INVALID_PARAMETER_TYPE:
+        return "CRTL_ERROR_INVALID_PARAMETER_TYPE";
     case CRTL_ERROR_UNKNOWN:
     default:
         return "CRTL_ERROR_UNKNOWN";

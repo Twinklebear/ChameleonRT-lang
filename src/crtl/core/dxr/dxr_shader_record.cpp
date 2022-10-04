@@ -1,4 +1,5 @@
 #include "dxr_shader_record.h"
+#include "dxr_shader_record_parameter_block.h"
 #include "error.h"
 
 namespace crtl {
@@ -7,7 +8,21 @@ namespace dxr {
 size_t ShaderRecord::get_parameter_block_size() const
 {
     auto rs = get_root_signature();
-    return rs ? rs->total_size() : 0;
+    return rs ? rs->get_total_size() - D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES : 0;
+}
+
+void ShaderRecord::set_parameter_block(
+    const std::shared_ptr<ShaderRecordParameterBlock> &parameter_block)
+{
+    // TODO: This restriction could be lifted somewhat to allow swapping param blocks for
+    // shaders with the same parameter layout, but can leave that for later
+    if (parameter_block->get_shader_record() != this) {
+        throw Error(
+            "ShaderRecored: Provided ShaderRecordParameterBlock was not created from "
+            "this shader record.",
+            CRTL_ERROR_INCOMPATIBLE_SHADER_RECORD_PARAMETER_BLOCK);
+    }
+    bound_parameter_block = parameter_block;
 }
 
 HitGroupRecord::HitGroupRecord(const std::shared_ptr<ShaderEntryPoint> &closest_hit,
