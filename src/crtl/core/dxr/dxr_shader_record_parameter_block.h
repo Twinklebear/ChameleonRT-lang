@@ -27,7 +27,6 @@ public:
     // parameter_info;
     ShaderRecordParameterBlock(const std::shared_ptr<ShaderRecord> &shader_record);
 
-    // The generic set_parameter dispatches to the typed ones
     void set_parameter(const std::string &name,
                        CRTL_DATA_TYPE data_type,
                        void *parameter) override;

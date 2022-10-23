@@ -43,6 +43,7 @@ CRTL_EXPORT CRTL_ERROR crtl_new_queue(CRTLDevice device, CRTLQueue *queue);
 
 /* Create a new command allocator that can be shared by command encoders to encode
  * rendering commands
+ * New command buffers are returned in the reset state, ready for recording
  * Will note: here the API is a bit in between WebGPU and DX12/Vulkan, WebGPU doesn't
  * split the command allocator out from the Command Encoder while DX12/Vulkan do expose
  * this detail, and I think it can be useful to have that lower level of control

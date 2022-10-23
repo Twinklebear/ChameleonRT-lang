@@ -11,7 +11,11 @@ uint32_t win_height = 720;
 const std::string small_crtl = R"(
 struct SceneParams {
     RWTexture2D<float4> image;
-    float test_constant;
+    // TODO: handling direct values here is a bit tricky, I need to generate a buffer
+    // or generate push constant setup for DX12/Vulkan. On other backends need to make
+    // a buffer for the app and treat it like a Buffer containing (I guess each individual?
+    // or all value types?)
+    // float test_constant;
 };
 
 in SceneParams scene;
@@ -28,7 +32,7 @@ ray_gen RayGen(RayGenParams params)
     // a conversion is needed here for example.
     uint2 pixel = ray_index();
     float4 c;
-    c = params.color * scene.test_constant + params.data[0];
+    c = params.color + params.data[0];
     scene.image[pixel] = params.color * params.scale_factor * c;
 }
 )";
@@ -164,6 +168,59 @@ void run_app(SDL_Window *window, const std::vector<std::string> &args)
 
     CHECK_CRTL_ERR(
         crtl_set_shader_record_parameter_block(device, raygen_record, raygen_params));
+
+    // Next step is to make the pipeline
+    CRTLRTPipeline rt_pipeline;
+    // TODO: Is it actually valid to not have any miss shaders? It only makes sense if
+    // you'll never call trace ray
+    CHECK_CRTL_ERR(crtl_new_rtpipeline(device, shader_library, 0, &rt_pipeline));
+
+    CHECK_CRTL_ERR(crtl_set_raygen_record(device, rt_pipeline, raygen_record));
+
+    // TODO: right now skipping the scene setup for testing but later will need to make
+    // scene and set it as a parameter
+    // CHECK_CRTL_ERR(crtl_set_scene(device, rt_pipeline, scene));
+
+    CHECK_CRTL_ERR(crtl_build_shader_table(device, rt_pipeline));
+
+    // Setup global parameters for the pipeline
+    CRTLGlobalParameterBlock global_params;
+    CHECK_CRTL_ERR(
+        crtl_new_global_parameter_block(device, shader_library, &global_params));
+
+    // TODO: populate the global param block
+
+    // Now we should be able to run the pipeline
+    CRTLQueue cmd_queue;
+    CHECK_CRTL_ERR(crtl_new_queue(device, &cmd_queue));
+
+    CRTLCommandAllocator cmd_allocator;
+    CHECK_CRTL_ERR(crtl_new_command_allocator(device, cmd_queue, &cmd_allocator));
+
+    CRTLCommandBuffer cmd_buffer;
+    CHECK_CRTL_ERR(crtl_new_command_buffer(device, cmd_allocator, &cmd_buffer));
+
+    CRTLEvent frame_event;
+    CHECK_CRTL_ERR(crtl_new_event(device, &frame_event));
+
+    CHECK_CRTL_ERR(crtl_upload_shader_table(device, cmd_buffer, rt_pipeline));
+    // Here should queue a barrier (buffer should be fine but how to get the shader table
+    // buffer ref? not exposed right now and forcing a global barrier when updating just
+    // SBT for animation would be bad)
+    CHECK_CRTL_ERR(crtl_barrier_global(device,
+                                       cmd_buffer,
+                                       CRTL_BARRIER_STAGE_ALL,
+                                       CRTL_BARRIER_STAGE_RAYTRACING,
+                                       CRTL_BARRIER_ACCESS_ALL,
+                                       CRTL_BARRIER_ACCESS_ALL));
+    CHECK_CRTL_ERR(crtl_set_rtpipeline(device, cmd_buffer, rt_pipeline));
+    CHECK_CRTL_ERR(crtl_set_global_parameter_block(device, cmd_buffer, global_params));
+    CHECK_CRTL_ERR(crtl_dispatch_rays(device, cmd_buffer, win_width, win_height));
+    CHECK_CRTL_ERR(crtl_close_command_buffer(device, cmd_buffer));
+
+    CHECK_CRTL_ERR(
+        crtl_submit_command_buffer(device, cmd_queue, cmd_buffer, frame_event));
+    CHECK_CRTL_ERR(crtl_await_event(device, frame_event));
 
 #if 0
     crtr::dxr::ShaderLibrary shader_library(

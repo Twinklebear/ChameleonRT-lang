@@ -317,9 +317,6 @@ CRTL_ERROR DXRDevice::set_parameter(CRTLParameterBlock parameter_block,
         case CRTL_DATA_TYPE_DOUBLE4X4:
             pb->set_parameter(name, data_type, parameter);
             break;
-            // TODO: whole untyped/byte buffers as parameters?
-        // case CRTL_DATA_TYPE_BUFFER:
-        // case CRTL_DATA_TYPE_RWBUFFER:
         case CRTL_DATA_TYPE_BUFFER_VIEW:
         case CRTL_DATA_TYPE_RWBUFFER_VIEW:
             pb->set_parameter(name,
@@ -331,6 +328,10 @@ CRTL_ERROR DXRDevice::set_parameter(CRTLParameterBlock parameter_block,
         // case CRTL_DATA_TYPE_TEXTURE:
         // case CRTL_DATA_TYPE_RWTEXTURE:
         // case CRTL_DATA_TYPE_ACCELERATION_STRUCTURE:
+
+        // Raw buffers/RWbuffer not supported, app can just make a byte view of it to set
+        // the whole buffer as a param case CRTL_DATA_TYPE_BUFFER: case
+        // CRTL_DATA_TYPE_RWBUFFER:
         default:
             return CRTL_ERROR_INVALID_PARAMETER_TYPE;
         }

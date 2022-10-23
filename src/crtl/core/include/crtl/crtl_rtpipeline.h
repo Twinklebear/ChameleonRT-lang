@@ -27,6 +27,8 @@ extern "C" {
 // "linked" in the global parameter passing sense. Right now this is a bit error prone,
 // it's easy to pass raygen record/miss record/scene using different shader libraries than
 // this one or each other to the pipeline
+// Error checking can be done using the shader library of the entry point though to
+// validate that all shaders in the pipeline are from the same shader library
 CRTL_EXPORT CRTL_ERROR crtl_new_rtpipeline(CRTLDevice device,
                                            CRTLShaderLibrary shader_library,
                                            uint32_t n_miss_records,
